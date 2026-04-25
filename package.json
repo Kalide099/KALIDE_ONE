@@ -4,7 +4,7 @@
   "description": "Root package.json to manage the Artisana ecosystem",
   "scripts": {
     "dev": "npm run dev --prefix ArtisanaWebsite/skillhub-africa/frontend",
-    "build": "npm run build --prefix ArtisanaWebsite/skillhub-africa/frontend",
+    "build": "([ -d ArtisanaWebsite/skillhub-africa/frontend/node_modules ] || npm install --prefix ArtisanaWebsite/skillhub-africa/frontend) && npm run build --prefix ArtisanaWebsite/skillhub-africa/frontend",
     "start": "npm run start --prefix ArtisanaWebsite/skillhub-africa/frontend",
     "lint": "npm run lint --prefix ArtisanaWebsite/skillhub-africa/frontend",
     "backend:seed": "cd ArtisanaWebsite/skillhub-africa/backend && python seed_users.py",
