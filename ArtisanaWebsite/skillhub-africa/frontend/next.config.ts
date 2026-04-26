@@ -5,7 +5,6 @@ import path from 'path';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  distDir: path.join(process.cwd(), '.next'),
   images: {
     remotePatterns: [
       {
