@@ -5,7 +5,7 @@ import path from 'path';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  // Remove standalone output for Vercel compatibility
   images: {
     remotePatterns: [
       {
