@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1/kalide-one';
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api/v1/kalide-one' : (process.env.NEXT_PUBLIC_API_URL || '/api/v1/kalide-one');
 
 export interface RegisterData {
   name: string;
