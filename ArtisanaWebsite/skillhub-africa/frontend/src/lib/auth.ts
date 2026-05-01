@@ -49,3 +49,11 @@ export function generateTokens(user: { id: bigint | number; email: string; name:
 
   return { access, refresh };
 }
+
+export function verifyToken(token: string) {
+  try {
+    return jwt.verify(token, JWT_SECRET) as { user_id: number; email: string; role: string };
+  } catch (error) {
+    return null;
+  }
+}
