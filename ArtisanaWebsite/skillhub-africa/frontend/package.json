@@ -6,11 +6,12 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "next dev -p 3001",
     "dev:backend": "cd ../backend && python manage.py runserver 8000 --noreload",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "jsonwebtoken": "^9.0.3",
     "next": "16.1.6",
     "next-intl": "^4.9.1",
@@ -26,7 +27,7 @@
     "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "prisma": "^7.8.0",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

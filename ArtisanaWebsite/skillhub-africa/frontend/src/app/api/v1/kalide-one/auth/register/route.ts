@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../../../generated/prisma';
-import { hashDjangoPassword, generateTokens } from '../../../../../../lib/auth';
+import { PrismaClient } from '@/generated/prisma/client';
+import { hashDjangoPassword, generateTokens } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
