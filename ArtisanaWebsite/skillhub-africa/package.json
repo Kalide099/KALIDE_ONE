@@ -1,0 +1,10 @@
+{
+  "name": "skillhub-africa-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix frontend --include=dev && npm run build --prefix frontend && pip install -r backend/requirements.txt || echo 'pip install failed, maybe not available'",
+    "build": "npm run postinstall",
+    "start": "npm start --prefix frontend"
+  }
+}
