@@ -1,8 +1,14 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../../context/LanguageContext';
 
 export default function Services() {
   const { t } = useLanguage();
+  const router = useRouter();
+
+  const handleInitiate = () => {
+    router.push('/register');
+  };
 
   const services = [
     { 
@@ -61,7 +67,10 @@ export default function Services() {
                 {service.desc}
               </p>
               
-              <button className="w-full py-4 glass text-white rounded-2xl font-black uppercase tracking-widest text-xs group-hover:bg-secondary transition-all shadow-xl hover:shadow-secondary/20">
+              <button 
+                onClick={handleInitiate}
+                className="w-full py-4 glass text-white rounded-2xl font-black uppercase tracking-widest text-xs group-hover:bg-secondary transition-all shadow-xl hover:shadow-secondary/20"
+              >
                 {t.ServiceBundles?.cta || 'Initiate Contract'}
               </button>
             </div>

@@ -1,8 +1,14 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../../context/LanguageContext';
 
 export default function Bundles() {
   const { t } = useLanguage();
+  const router = useRouter();
+
+  const handleInitiate = () => {
+    router.push('/register');
+  };
 
   const bundles = [
     { 
@@ -70,7 +76,10 @@ export default function Bundles() {
               </div>
 
               <div className="mt-auto pt-8 border-t border-white/5">
-                <button className="w-full py-4 bg-white text-black hover:bg-primary hover:text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl hover:shadow-primary/30">
+                <button 
+                  onClick={handleInitiate}
+                  className="w-full py-4 bg-white text-black hover:bg-primary hover:text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl hover:shadow-primary/30"
+                >
                   {t.ServiceBundles?.cta || 'Initiate Contract'}
                 </button>
               </div>
