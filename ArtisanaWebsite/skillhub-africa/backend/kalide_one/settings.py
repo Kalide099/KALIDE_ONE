@@ -224,6 +224,7 @@ TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -1,0 +1,781 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x", "rhel-openssl-1.0.x", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model artisans_badge {
+  id                               BigInt                             @id @default(autoincrement())
+  name                             String                             @db.LongText
+  icon_url                         String?                            @db.VarChar(200)
+  description                      String                             @db.LongText
+  marketplace_professionals_badges marketplace_professionals_badges[]
+}
+
+model artisans_skillcategory {
+  id                         BigInt                       @id @default(autoincrement())
+  name                       String                       @db.LongText
+  marketplace_services       marketplace_services[]
+  marketplace_team_templates marketplace_team_templates[]
+  marketplace_teams          marketplace_teams[]
+}
+
+model auth_group {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique(map: "name") @db.VarChar(150)
+  auth_group_permissions auth_group_permissions[]
+  users_user_groups      users_user_groups[]
+}
+
+model auth_group_permissions {
+  id              BigInt          @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onUpdate: Restrict, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onUpdate: Restrict, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([permission_id], map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+}
+
+model auth_permission {
+  id                          Int                           @id @default(autoincrement())
+  name                        String                        @db.VarChar(255)
+  content_type_id             Int
+  codename                    String                        @db.VarChar(100)
+  auth_group_permissions      auth_group_permissions[]
+  django_content_type         django_content_type           @relation(fields: [content_type_id], references: [id], onUpdate: Restrict, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  users_user_user_permissions users_user_user_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+}
+
+model bookings_availability {
+  id              BigInt     @id @default(autoincrement())
+  date            DateTime   @db.Date
+  start_time      DateTime   @db.Time(6)
+  end_time        DateTime   @db.Time(6)
+  is_booked       Boolean
+  professional_id BigInt
+  users_user      users_user @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "bookings_availability_professional_id_a678b540_fk_users_user_id")
+
+  @@index([professional_id], map: "bookings_availability_professional_id_a678b540_fk_users_user_id")
+}
+
+model bookings_bookings {
+  id                                                       BigInt                       @id @default(autoincrement())
+  status                                                   String                       @db.VarChar(20)
+  created_at                                               DateTime                     @db.DateTime(6)
+  client_id                                                BigInt
+  professional_id                                          BigInt
+  project_id                                               BigInt?                      @unique(map: "project_id")
+  team_id                                                  BigInt?
+  end_time                                                 DateTime?                    @db.Time(6)
+  scheduled_date                                           DateTime?                    @db.Date
+  start_time                                               DateTime?                    @db.Time(6)
+  users_user_bookings_bookings_client_idTousers_user       users_user                   @relation("bookings_bookings_client_idTousers_user", fields: [client_id], references: [id], onUpdate: Restrict, map: "bookings_bookings_client_id_12f8f110_fk_users_user_id")
+  users_user_bookings_bookings_professional_idTousers_user users_user                   @relation("bookings_bookings_professional_idTousers_user", fields: [professional_id], references: [id], onUpdate: Restrict, map: "bookings_bookings_professional_id_395279ea_fk_users_user_id")
+  projects_projects                                        projects_projects?           @relation(fields: [project_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "bookings_bookings_project_id_1014122f_fk_projects_projects_id")
+  marketplace_teams                                        marketplace_teams?           @relation(fields: [team_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "bookings_bookings_team_id_cf1f7b0b_fk_marketplace_teams_id")
+  fraud_detection_fraudalert                               fraud_detection_fraudalert[]
+
+  @@index([client_id], map: "bookings_bookings_client_id_12f8f110_fk_users_user_id")
+  @@index([professional_id], map: "bookings_bookings_professional_id_395279ea_fk_users_user_id")
+  @@index([team_id], map: "bookings_bookings_team_id_cf1f7b0b_fk_marketplace_teams_id")
+}
+
+model disputes_dispute {
+  id                                                     BigInt                            @id @default(autoincrement())
+  title                                                  String                            @db.VarChar(255)
+  description                                            String                            @db.LongText
+  evidence                                               String                            @db.LongText
+  status                                                 String                            @db.VarChar(20)
+  priority                                               String                            @db.VarChar(20)
+  resolution                                             String?                           @db.VarChar(20)
+  resolution_notes                                       String                            @db.LongText
+  resolved_at                                            DateTime?                         @db.DateTime(6)
+  created_at                                             DateTime                          @db.DateTime(6)
+  updated_at                                             DateTime                          @db.DateTime(6)
+  initiator_id                                           BigInt
+  project_id                                             BigInt
+  resolved_by_id                                         BigInt?
+  respondent_id                                          BigInt
+  users_user_disputes_dispute_initiator_idTousers_user   users_user                        @relation("disputes_dispute_initiator_idTousers_user", fields: [initiator_id], references: [id], onUpdate: Restrict, map: "disputes_dispute_initiator_id_9b9c58fc_fk_users_user_id")
+  projects_projects                                      projects_projects                 @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "disputes_dispute_project_id_7c9b768c_fk_projects_projects_id")
+  users_user_disputes_dispute_resolved_by_idTousers_user users_user?                       @relation("disputes_dispute_resolved_by_idTousers_user", fields: [resolved_by_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "disputes_dispute_resolved_by_id_100fd82f_fk_users_user_id")
+  users_user_disputes_dispute_respondent_idTousers_user  users_user                        @relation("disputes_dispute_respondent_idTousers_user", fields: [respondent_id], references: [id], onUpdate: Restrict, map: "disputes_dispute_respondent_id_08f53200_fk_users_user_id")
+  disputes_disputeevidence                               disputes_disputeevidence[]
+  disputes_disputemessage                                disputes_disputemessage[]
+  disputes_justicenodeaisettlement                       disputes_justicenodeaisettlement?
+
+  @@index([initiator_id], map: "disputes_dispute_initiator_id_9b9c58fc_fk_users_user_id")
+  @@index([project_id], map: "disputes_dispute_project_id_7c9b768c_fk_projects_projects_id")
+  @@index([resolved_by_id], map: "disputes_dispute_resolved_by_id_100fd82f_fk_users_user_id")
+  @@index([respondent_id], map: "disputes_dispute_respondent_id_08f53200_fk_users_user_id")
+}
+
+model disputes_disputeevidence {
+  id               BigInt           @id @default(autoincrement())
+  file_url         String           @db.VarChar(200)
+  file_name        String           @db.VarChar(255)
+  evidence_type    String           @db.VarChar(20)
+  description      String           @db.LongText
+  uploaded_at      DateTime         @db.DateTime(6)
+  dispute_id       BigInt
+  uploaded_by_id   BigInt
+  disputes_dispute disputes_dispute @relation(fields: [dispute_id], references: [id], onUpdate: Restrict, map: "disputes_disputeevid_dispute_id_92c2489a_fk_disputes_")
+  users_user       users_user       @relation(fields: [uploaded_by_id], references: [id], onUpdate: Restrict, map: "disputes_disputeevid_uploaded_by_id_15f6fa83_fk_users_use")
+
+  @@index([dispute_id], map: "disputes_disputeevid_dispute_id_92c2489a_fk_disputes_")
+  @@index([uploaded_by_id], map: "disputes_disputeevid_uploaded_by_id_15f6fa83_fk_users_use")
+}
+
+model disputes_disputemessage {
+  id               BigInt           @id @default(autoincrement())
+  message          String           @db.LongText
+  attachments      String           @db.LongText
+  is_admin_message Boolean
+  created_at       DateTime         @db.DateTime(6)
+  dispute_id       BigInt
+  sender_id        BigInt
+  disputes_dispute disputes_dispute @relation(fields: [dispute_id], references: [id], onUpdate: Restrict, map: "disputes_disputemess_dispute_id_301c88ae_fk_disputes_")
+  users_user       users_user       @relation(fields: [sender_id], references: [id], onUpdate: Restrict, map: "disputes_disputemessage_sender_id_1e53ff4f_fk_users_user_id")
+
+  @@index([dispute_id], map: "disputes_disputemess_dispute_id_301c88ae_fk_disputes_")
+  @@index([sender_id], map: "disputes_disputemessage_sender_id_1e53ff4f_fk_users_user_id")
+}
+
+model disputes_justicenodeaisettlement {
+  id                                  BigInt           @id @default(autoincrement())
+  ai_confidence_score                 Decimal          @db.Decimal(5, 2)
+  suggested_client_refund_percentage  Int
+  suggested_artisan_payout_percentage Int
+  reasoning                           String           @db.LongText
+  is_accepted_by_both                 Boolean
+  generated_at                        DateTime         @db.DateTime(6)
+  dispute_id                          BigInt           @unique(map: "dispute_id")
+  disputes_dispute                    disputes_dispute @relation(fields: [dispute_id], references: [id], onUpdate: Restrict, map: "disputes_justicenode_dispute_id_5bdc82f6_fk_disputes_")
+}
+
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.DateTime(6)
+  object_id           String?              @db.LongText
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.UnsignedSmallInt
+  change_message      String               @db.LongText
+  content_type_id     Int?
+  user_id             BigInt
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  users_user          users_user           @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "django_admin_log_user_id_c564eba6_fk_users_user_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6_fk_users_user_id")
+}
+
+model django_content_type {
+  id               Int                @id @default(autoincrement())
+  app_label        String             @db.VarChar(100)
+  model            String             @db.VarChar(100)
+  auth_permission  auth_permission[]
+  django_admin_log django_admin_log[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      BigInt   @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.DateTime(6)
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String   @db.LongText
+  expire_date  DateTime @db.DateTime(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+}
+
+model fraud_detection_fraudalert {
+  id                 BigInt             @id @default(autoincrement())
+  reason             String             @db.VarChar(255)
+  severity           String             @db.VarChar(20)
+  status             String             @db.VarChar(20)
+  details            String             @db.LongText
+  created_at         DateTime           @db.DateTime(6)
+  updated_at         DateTime           @db.DateTime(6)
+  related_booking_id BigInt?
+  user_id            BigInt?
+  bookings_bookings  bookings_bookings? @relation(fields: [related_booking_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fraud_detection_frau_related_booking_id_82d54baa_fk_bookings_")
+  users_user         users_user?        @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fraud_detection_fraudalert_user_id_cbab356b_fk_users_user_id")
+
+  @@index([related_booking_id], map: "fraud_detection_frau_related_booking_id_82d54baa_fk_bookings_")
+  @@index([user_id], map: "fraud_detection_fraudalert_user_id_cbab356b_fk_users_user_id")
+}
+
+model marketplace_portfolio_items {
+  id              BigInt     @id @default(autoincrement())
+  title           String     @db.LongText
+  description     String     @db.LongText
+  image_url       String     @db.VarChar(200)
+  created_at      DateTime   @db.DateTime(6)
+  professional_id BigInt
+  users_user      users_user @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "marketplace_portfoli_professional_id_76ff5de1_fk_users_use")
+
+  @@index([professional_id], map: "marketplace_portfoli_professional_id_76ff5de1_fk_users_use")
+}
+
+model marketplace_professionals {
+  id                               BigInt                             @id @default(autoincrement())
+  skills                           String                             @db.LongText
+  experience_years                 Int
+  bio                              String                             @db.LongText
+  hourly_rate                      Decimal                            @db.Decimal(10, 2)
+  rating                           Decimal                            @db.Decimal(3, 2)
+  is_verified                      Boolean
+  completed_projects               Int
+  portfolio_images                 String                             @db.LongText
+  user_id                          BigInt                             @unique(map: "user_id")
+  users_user                       users_user                         @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "marketplace_professionals_user_id_1cfb7bb3_fk_users_user_id")
+  marketplace_professionals_badges marketplace_professionals_badges[]
+}
+
+model marketplace_professionals_badges {
+  id                        BigInt                    @id @default(autoincrement())
+  professional_id           BigInt
+  badge_id                  BigInt
+  artisans_badge            artisans_badge            @relation(fields: [badge_id], references: [id], onUpdate: Restrict, map: "marketplace_professi_badge_id_62bf816b_fk_artisans_")
+  marketplace_professionals marketplace_professionals @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "marketplace_professi_professional_id_6af5fc9b_fk_marketpla")
+
+  @@unique([professional_id, badge_id], map: "marketplace_professional_professional_id_badge_id_56eca4e3_uniq")
+  @@index([badge_id], map: "marketplace_professi_badge_id_62bf816b_fk_artisans_")
+}
+
+model marketplace_services {
+  id                     BigInt                 @id @default(autoincrement())
+  title                  String                 @db.LongText
+  description            String                 @db.LongText
+  price                  Decimal                @db.Decimal(10, 2)
+  location               String                 @db.VarChar(255)
+  category_id            BigInt
+  professional_id        BigInt
+  artisans_skillcategory artisans_skillcategory @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "marketplace_services_category_id_f7af0736_fk_artisans_")
+  users_user             users_user             @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "marketplace_services_professional_id_4fcbbf13_fk_users_user_id")
+
+  @@index([category_id], map: "marketplace_services_category_id_f7af0736_fk_artisans_")
+  @@index([professional_id], map: "marketplace_services_professional_id_4fcbbf13_fk_users_user_id")
+}
+
+model marketplace_team_members {
+  id                BigInt            @id @default(autoincrement())
+  role              String            @db.LongText
+  professional_id   BigInt
+  team_id           BigInt
+  users_user        users_user        @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "marketplace_team_mem_professional_id_82b3608f_fk_users_use")
+  marketplace_teams marketplace_teams @relation(fields: [team_id], references: [id], onUpdate: Restrict, map: "marketplace_team_mem_team_id_51fc41a2_fk_marketpla")
+
+  @@index([professional_id], map: "marketplace_team_mem_professional_id_82b3608f_fk_users_use")
+  @@index([team_id], map: "marketplace_team_mem_team_id_51fc41a2_fk_marketpla")
+}
+
+model marketplace_team_roles {
+  id                         BigInt                     @id @default(autoincrement())
+  role_name                  String                     @db.LongText
+  required_skill             String                     @db.VarChar(100)
+  team_template_id           BigInt
+  marketplace_team_templates marketplace_team_templates @relation(fields: [team_template_id], references: [id], onUpdate: Restrict, map: "marketplace_team_rol_team_template_id_35bdf544_fk_marketpla")
+
+  @@index([team_template_id], map: "marketplace_team_rol_team_template_id_35bdf544_fk_marketpla")
+}
+
+model marketplace_team_templates {
+  id                     BigInt                   @id @default(autoincrement())
+  name                   String                   @db.LongText
+  description            String                   @db.LongText
+  category_id            BigInt
+  marketplace_team_roles marketplace_team_roles[]
+  artisans_skillcategory artisans_skillcategory   @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "marketplace_team_tem_category_id_52e25d7e_fk_artisans_")
+
+  @@index([category_id], map: "marketplace_team_tem_category_id_52e25d7e_fk_artisans_")
+}
+
+model marketplace_teams {
+  id                       BigInt                     @id @default(autoincrement())
+  name                     String                     @db.LongText
+  description              String                     @db.LongText
+  category_id              BigInt
+  created_by_id            BigInt
+  bookings_bookings        bookings_bookings[]
+  marketplace_team_members marketplace_team_members[]
+  artisans_skillcategory   artisans_skillcategory     @relation(fields: [category_id], references: [id], onUpdate: Restrict, map: "marketplace_teams_category_id_45c92cce_fk_artisans_")
+  users_user               users_user                 @relation(fields: [created_by_id], references: [id], onUpdate: Restrict, map: "marketplace_teams_created_by_id_c7ec4beb_fk_users_user_id")
+  projects_projects        projects_projects[]
+
+  @@index([category_id], map: "marketplace_teams_category_id_45c92cce_fk_artisans_")
+  @@index([created_by_id], map: "marketplace_teams_created_by_id_c7ec4beb_fk_users_user_id")
+}
+
+model messaging_conversation {
+  id                                  BigInt                                @id @default(autoincrement())
+  created_at                          DateTime                              @db.DateTime(6)
+  messaging_conversation_participants messaging_conversation_participants[]
+  messaging_message                   messaging_message[]
+}
+
+model messaging_conversation_participants {
+  id                     BigInt                 @id @default(autoincrement())
+  conversation_id        BigInt
+  user_id                BigInt
+  messaging_conversation messaging_conversation @relation(fields: [conversation_id], references: [id], onUpdate: Restrict, map: "messaging_conversati_conversation_id_890e9e37_fk_messaging")
+  users_user             users_user             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "messaging_conversati_user_id_d4f41769_fk_users_use")
+
+  @@unique([conversation_id, user_id], map: "messaging_conversation_p_conversation_id_user_id_74726b68_uniq")
+  @@index([user_id], map: "messaging_conversati_user_id_d4f41769_fk_users_use")
+}
+
+model messaging_message {
+  id                     BigInt                  @id @default(autoincrement())
+  content                String                  @db.LongText
+  timestamp              DateTime                @db.DateTime(6)
+  room_name              String?                 @db.VarChar(100)
+  conversation_id        BigInt?
+  sender_id              BigInt
+  source_language        String                  @db.VarChar(10)
+  translated_content     String                  @db.LongText
+  messaging_conversation messaging_conversation? @relation(fields: [conversation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "messaging_message_conversation_id_3db4d3d1_fk_messaging")
+  users_user             users_user              @relation(fields: [sender_id], references: [id], onUpdate: Restrict, map: "messaging_message_sender_id_7a7088e6_fk_users_user_id")
+
+  @@index([conversation_id], map: "messaging_message_conversation_id_3db4d3d1_fk_messaging")
+  @@index([sender_id], map: "messaging_message_sender_id_7a7088e6_fk_users_user_id")
+}
+
+model notifications_notification {
+  id          BigInt     @id @default(autoincrement())
+  title       String     @db.VarChar(255)
+  message     String     @db.LongText
+  read_status Boolean
+  created_at  DateTime   @db.DateTime(6)
+  user_id     BigInt
+  users_user  users_user @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "notifications_notification_user_id_b5e8c0ff_fk_users_user_id")
+
+  @@index([user_id], map: "notifications_notification_user_id_b5e8c0ff_fk_users_user_id")
+}
+
+model payments_escrowaccount {
+  id                BigInt            @id @default(autoincrement())
+  client_deposit    Decimal           @db.Decimal(10, 2)
+  released_amount   Decimal           @db.Decimal(10, 2)
+  remaining_balance Decimal           @db.Decimal(10, 2)
+  project_id        BigInt            @unique(map: "project_id")
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "payments_escrowaccou_project_id_abcfed5c_fk_projects_")
+}
+
+model payments_invoice {
+  id                                                 BigInt            @id @default(autoincrement())
+  amount_due                                         Decimal           @db.Decimal(10, 2)
+  tax_amount                                         Decimal           @db.Decimal(10, 2)
+  total_amount                                       Decimal           @db.Decimal(10, 2)
+  status                                             String            @db.VarChar(20)
+  created_at                                         DateTime          @db.DateTime(6)
+  due_date                                           DateTime          @db.Date
+  artisan_id                                         BigInt
+  client_id                                          BigInt
+  project_id                                         BigInt
+  quote_id                                           BigInt?           @unique(map: "quote_id")
+  users_user_payments_invoice_artisan_idTousers_user users_user        @relation("payments_invoice_artisan_idTousers_user", fields: [artisan_id], references: [id], onUpdate: Restrict, map: "payments_invoice_artisan_id_107d42b6_fk_users_user_id")
+  users_user_payments_invoice_client_idTousers_user  users_user        @relation("payments_invoice_client_idTousers_user", fields: [client_id], references: [id], onUpdate: Restrict, map: "payments_invoice_client_id_2f292f4e_fk_users_user_id")
+  projects_projects                                  projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "payments_invoice_project_id_6b83df2c_fk_projects_projects_id")
+  payments_quote                                     payments_quote?   @relation(fields: [quote_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "payments_invoice_quote_id_a84a3ac6_fk_payments_quote_id")
+
+  @@index([artisan_id], map: "payments_invoice_artisan_id_107d42b6_fk_users_user_id")
+  @@index([client_id], map: "payments_invoice_client_id_2f292f4e_fk_users_user_id")
+  @@index([project_id], map: "payments_invoice_project_id_6b83df2c_fk_projects_projects_id")
+}
+
+model payments_payment {
+  id                BigInt            @id @default(autoincrement())
+  amount            Decimal           @db.Decimal(10, 2)
+  commission        Decimal           @db.Decimal(10, 2)
+  artisan_payment   Decimal           @db.Decimal(10, 2)
+  status            String            @db.VarChar(20)
+  project_id        BigInt            @unique(map: "project_id")
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "payments_payment_project_id_8793e4b8_fk_projects_projects_id")
+}
+
+model payments_quote {
+  id                                               BigInt            @id @default(autoincrement())
+  total_amount                                     Decimal           @db.Decimal(10, 2)
+  terms                                            String?           @db.LongText
+  status                                           String            @db.VarChar(20)
+  created_at                                       DateTime          @db.DateTime(6)
+  valid_until                                      DateTime?         @db.Date
+  artisan_id                                       BigInt
+  client_id                                        BigInt
+  project_id                                       BigInt
+  payments_invoice                                 payments_invoice?
+  users_user_payments_quote_artisan_idTousers_user users_user        @relation("payments_quote_artisan_idTousers_user", fields: [artisan_id], references: [id], onUpdate: Restrict, map: "payments_quote_artisan_id_45c2f0bf_fk_users_user_id")
+  users_user_payments_quote_client_idTousers_user  users_user        @relation("payments_quote_client_idTousers_user", fields: [client_id], references: [id], onUpdate: Restrict, map: "payments_quote_client_id_19c332f1_fk_users_user_id")
+  projects_projects                                projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "payments_quote_project_id_f69bbfb0_fk_projects_projects_id")
+
+  @@index([artisan_id], map: "payments_quote_artisan_id_45c2f0bf_fk_users_user_id")
+  @@index([client_id], map: "payments_quote_client_id_19c332f1_fk_users_user_id")
+  @@index([project_id], map: "payments_quote_project_id_f69bbfb0_fk_projects_projects_id")
+}
+
+model payments_subscriptionplan {
+  id                        BigInt                      @id @default(autoincrement())
+  name                      String                      @unique(map: "name") @db.VarChar(50)
+  price_monthly             Decimal                     @db.Decimal(6, 2)
+  max_active_projects       Int
+  features                  String                      @db.LongText
+  payments_usersubscription payments_usersubscription[]
+}
+
+model payments_transaction {
+  id              BigInt          @id @default(autoincrement())
+  amount          Decimal         @db.Decimal(10, 2)
+  type            String          @db.VarChar(10)
+  reference       String          @db.VarChar(255)
+  status          String          @db.VarChar(20)
+  created_at      DateTime        @db.DateTime(6)
+  wallet_id       BigInt
+  payments_wallet payments_wallet @relation(fields: [wallet_id], references: [id], onUpdate: Restrict, map: "payments_transaction_wallet_id_114a0cfe_fk_payments_wallet_id")
+
+  @@index([wallet_id], map: "payments_transaction_wallet_id_114a0cfe_fk_payments_wallet_id")
+}
+
+model payments_usersubscription {
+  id                        BigInt                     @id @default(autoincrement())
+  is_active                 Boolean
+  started_at                DateTime                   @db.DateTime(6)
+  expires_at                DateTime?                  @db.DateTime(6)
+  plan_id                   BigInt?
+  user_id                   BigInt                     @unique(map: "user_id")
+  payments_subscriptionplan payments_subscriptionplan? @relation(fields: [plan_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "payments_usersubscri_plan_id_6a26474f_fk_payments_")
+  users_user                users_user                 @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "payments_usersubscription_user_id_d544b7e6_fk_users_user_id")
+
+  @@index([plan_id], map: "payments_usersubscri_plan_id_6a26474f_fk_payments_")
+}
+
+model payments_wallet {
+  id                   BigInt                 @id @default(autoincrement())
+  balance              Decimal                @db.Decimal(10, 2)
+  currency             String                 @db.VarChar(3)
+  user_id              BigInt                 @unique(map: "user_id")
+  payments_transaction payments_transaction[]
+  users_user           users_user             @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "payments_wallet_user_id_5ce859c2_fk_users_user_id")
+}
+
+model projects_iottrigger {
+  id                  BigInt              @id @default(autoincrement())
+  device_id           String              @unique(map: "device_id") @db.VarChar(255)
+  activation_status   Boolean
+  triggered_at        DateTime?           @db.DateTime(6)
+  milestone_id        BigInt              @unique(map: "milestone_id")
+  projects_milestones projects_milestones @relation(fields: [milestone_id], references: [id], onUpdate: Restrict, map: "projects_iottrigger_milestone_id_f3bec252_fk_projects_")
+}
+
+model projects_kalidesupplypartner {
+  id                        BigInt                      @id @default(autoincrement())
+  name                      String                      @db.VarChar(255)
+  vendor_type               String                      @db.VarChar(100)
+  api_endpoint              String?                     @db.VarChar(200)
+  is_active                 Boolean
+  wallet_address            String                      @db.VarChar(255)
+  projects_procurementorder projects_procurementorder[]
+}
+
+model projects_milestones {
+  id                  BigInt               @id @default(autoincrement())
+  title               String               @db.LongText
+  description         String               @db.LongText
+  amount              Decimal              @db.Decimal(10, 2)
+  due_date            DateTime             @db.Date
+  status              String               @db.VarChar(20)
+  project_id          BigInt
+  projects_iottrigger projects_iottrigger?
+  projects_projects   projects_projects    @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_milestones_project_id_83bb5f08_fk_projects_projects_id")
+
+  @@index([project_id], map: "projects_milestones_project_id_83bb5f08_fk_projects_projects_id")
+}
+
+model projects_procurementorder {
+  id                           BigInt                       @id @default(autoincrement())
+  material_list                String                       @db.LongText
+  cost                         Decimal                      @db.Decimal(10, 2)
+  status                       String                       @db.VarChar(20)
+  delivery_qr_code             String                       @db.VarChar(50)
+  project_id                   BigInt
+  vendor_id                    BigInt
+  projects_projects            projects_projects            @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_procurement_project_id_f41e4e66_fk_projects_")
+  projects_kalidesupplypartner projects_kalidesupplypartner @relation(fields: [vendor_id], references: [id], onUpdate: Restrict, map: "projects_procurement_vendor_id_921f3324_fk_projects_")
+
+  @@index([project_id], map: "projects_procurement_project_id_f41e4e66_fk_projects_")
+  @@index([vendor_id], map: "projects_procurement_vendor_id_921f3324_fk_projects_")
+}
+
+model projects_projects {
+  id                                                       BigInt                      @id @default(autoincrement())
+  title                                                    String                      @db.LongText
+  description                                              String                      @db.LongText
+  budget                                                   Decimal                     @db.Decimal(10, 2)
+  status                                                   String                      @db.VarChar(20)
+  start_date                                               DateTime                    @db.Date
+  deadline                                                 DateTime                    @db.Date
+  client_id                                                BigInt
+  professional_id                                          BigInt?
+  team_id                                                  BigInt?
+  escrow_released                                          Boolean
+  insurance_active                                         Boolean                     @default(false)
+  insurance_fee                                            Decimal?                    @db.Decimal(10, 2)
+  bookings_bookings                                        bookings_bookings?
+  disputes_dispute                                         disputes_dispute[]
+  payments_escrowaccount                                   payments_escrowaccount?
+  payments_invoice                                         payments_invoice[]
+  payments_payment                                         payments_payment?
+  payments_quote                                           payments_quote[]
+  projects_milestones                                      projects_milestones[]
+  projects_procurementorder                                projects_procurementorder[]
+  users_user_projects_projects_client_idTousers_user       users_user                  @relation("projects_projects_client_idTousers_user", fields: [client_id], references: [id], onUpdate: Restrict, map: "projects_projects_client_id_8b85de2e_fk_users_user_id")
+  users_user_projects_projects_professional_idTousers_user users_user?                 @relation("projects_projects_professional_idTousers_user", fields: [professional_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_projects_professional_id_f1d2208a_fk_users_user_id")
+  marketplace_teams                                        marketplace_teams?          @relation(fields: [team_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_projects_team_id_f1bc09de_fk_marketplace_teams_id")
+  projects_tasks                                           projects_tasks[]
+  projects_updates                                         projects_updates[]
+  projects_attendance                                      projects_attendance[]
+  projects_insurance_claims                                projects_insurance_claims[]
+  reviews_review                                           reviews_review[]
+
+  @@index([client_id], map: "projects_projects_client_id_8b85de2e_fk_users_user_id")
+  @@index([professional_id], map: "projects_projects_professional_id_f1d2208a_fk_users_user_id")
+  @@index([team_id], map: "projects_projects_team_id_f1bc09de_fk_marketplace_teams_id")
+}
+
+model projects_tasks {
+  id                BigInt            @id @default(autoincrement())
+  title             String            @db.LongText
+  description       String            @db.LongText
+  status            String            @db.VarChar(20)
+  professional_id   BigInt
+  project_id        BigInt
+  users_user        users_user        @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "projects_tasks_professional_id_360c7ec7_fk_users_user_id")
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_tasks_project_id_df5d9b80_fk_projects_projects_id")
+
+  @@index([professional_id], map: "projects_tasks_professional_id_360c7ec7_fk_users_user_id")
+  @@index([project_id], map: "projects_tasks_project_id_df5d9b80_fk_projects_projects_id")
+}
+
+model projects_updates {
+  id                BigInt            @id @default(autoincrement())
+  message           String            @db.LongText
+  media_file        String?           @db.VarChar(100)
+  created_at        DateTime          @db.DateTime(6)
+  professional_id   BigInt
+  project_id        BigInt
+  users_user        users_user        @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "projects_updates_professional_id_1a6d27e6_fk_users_user_id")
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_updates_project_id_e29f98d0_fk_projects_projects_id")
+
+  @@index([professional_id], map: "projects_updates_professional_id_1a6d27e6_fk_users_user_id")
+  @@index([project_id], map: "projects_updates_project_id_e29f98d0_fk_projects_projects_id")
+}
+
+model reviews_review {
+  id                                                BigInt            @id @default(autoincrement())
+  rating                                            Int
+  comment                                           String            @db.LongText
+  sentiment                                         String?           @db.VarChar(20)
+  created_at                                        DateTime          @db.DateTime(6)
+  project_id                                        BigInt
+  reviewee_id                                       BigInt
+  reviewer_id                                       BigInt
+  projects_projects                                 projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "reviews_review_project_id_8f8337a7_fk_projects_projects_id")
+  users_user_reviews_review_reviewee_idTousers_user users_user        @relation("reviews_review_reviewee_idTousers_user", fields: [reviewee_id], references: [id], onUpdate: Restrict, map: "reviews_review_reviewee_id_5d71172e_fk_users_user_id")
+  users_user_reviews_review_reviewer_idTousers_user users_user        @relation("reviews_review_reviewer_idTousers_user", fields: [reviewer_id], references: [id], onUpdate: Restrict, map: "reviews_review_reviewer_id_29fc8a19_fk_users_user_id")
+
+  @@index([project_id], map: "reviews_review_project_id_8f8337a7_fk_projects_projects_id")
+  @@index([reviewee_id], map: "reviews_review_reviewee_id_5d71172e_fk_users_user_id")
+  @@index([reviewer_id], map: "reviews_review_reviewer_id_29fc8a19_fk_users_user_id")
+}
+
+model services_knowledgeforumpost {
+  id         BigInt     @id @default(autoincrement())
+  title      String     @db.VarChar(255)
+  content    String     @db.LongText
+  category   String     @db.VarChar(100)
+  upvotes    Int
+  created_at DateTime   @db.DateTime(6)
+  author_id  BigInt
+  users_user users_user @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "services_knowledgeforumpost_author_id_95a464b6_fk_users_user_id")
+
+  @@index([author_id], map: "services_knowledgeforumpost_author_id_95a464b6_fk_users_user_id")
+}
+
+model services_masterclass {
+  id            BigInt     @id @default(autoincrement())
+  title         String     @db.VarChar(255)
+  description   String     @db.LongText
+  video_url     String     @db.VarChar(200)
+  price         Decimal    @db.Decimal(8, 2)
+  awarded_badge String?    @db.VarChar(100)
+  created_at    DateTime   @db.DateTime(6)
+  instructor_id BigInt
+  users_user    users_user @relation(fields: [instructor_id], references: [id], onUpdate: Restrict, map: "services_masterclass_instructor_id_5f3be99c_fk_users_user_id")
+
+  @@index([instructor_id], map: "services_masterclass_instructor_id_5f3be99c_fk_users_user_id")
+}
+
+model services_mentorshipsession {
+  id                                                           BigInt      @id @default(autoincrement())
+  title                                                        String      @db.VarChar(255)
+  description                                                  String      @db.LongText
+  hourly_rate                                                  Decimal     @db.Decimal(8, 2)
+  is_ar_enabled                                                Boolean
+  created_at                                                   DateTime    @db.DateTime(6)
+  expert_id                                                    BigInt
+  learner_id                                                   BigInt?
+  users_user_services_mentorshipsession_expert_idTousers_user  users_user  @relation("services_mentorshipsession_expert_idTousers_user", fields: [expert_id], references: [id], onUpdate: Restrict, map: "services_mentorshipsession_expert_id_69d15fdd_fk_users_user_id")
+  users_user_services_mentorshipsession_learner_idTousers_user users_user? @relation("services_mentorshipsession_learner_idTousers_user", fields: [learner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "services_mentorshipsession_learner_id_d84bbce0_fk_users_user_id")
+
+  @@index([expert_id], map: "services_mentorshipsession_expert_id_69d15fdd_fk_users_user_id")
+  @@index([learner_id], map: "services_mentorshipsession_learner_id_d84bbce0_fk_users_user_id")
+}
+
+model trust_safety_professional_verifications {
+  id                  BigInt     @id @default(autoincrement())
+  document_type       String     @db.VarChar(100)
+  document_file       String     @db.VarChar(100)
+  verification_status String     @db.VarChar(20)
+  admin_notes         String     @db.LongText
+  submitted_at        DateTime   @db.DateTime(6)
+  verified_at         DateTime?  @db.DateTime(6)
+  professional_id     BigInt
+  users_user          users_user @relation(fields: [professional_id], references: [id], onUpdate: Restrict, map: "trust_safety_profess_professional_id_57ef0b0a_fk_users_use")
+
+  @@index([professional_id], map: "trust_safety_profess_professional_id_57ef0b0a_fk_users_use")
+}
+
+model users_user {
+  id                                                                           BigInt                                    @id @default(autoincrement())
+  password                                                                     String                                    @db.VarChar(128)
+  last_login                                                                   DateTime?                                 @db.DateTime(6)
+  is_superuser                                                                 Boolean
+  first_name                                                                   String                                    @db.VarChar(150)
+  last_name                                                                    String                                    @db.VarChar(150)
+  is_staff                                                                     Boolean
+  is_active                                                                    Boolean
+  date_joined                                                                  DateTime                                  @db.DateTime(6)
+  name                                                                         String                                    @db.VarChar(255)
+  email                                                                        String                                    @unique(map: "email") @db.VarChar(254)
+  phone                                                                        String                                    @db.VarChar(20)
+  country                                                                      String                                    @db.VarChar(100)
+  city                                                                         String                                    @db.VarChar(100)
+  role                                                                         String                                    @db.VarChar(20)
+  mentorship_tokens                                                            Int                                       @default(0)
+  created_at                                                                   DateTime                                  @db.DateTime(6)
+  bookings_availability                                                        bookings_availability[]
+  bookings_bookings_bookings_bookings_client_idTousers_user                    bookings_bookings[]                       @relation("bookings_bookings_client_idTousers_user")
+  bookings_bookings_bookings_bookings_professional_idTousers_user              bookings_bookings[]                       @relation("bookings_bookings_professional_idTousers_user")
+  disputes_dispute_disputes_dispute_initiator_idTousers_user                   disputes_dispute[]                        @relation("disputes_dispute_initiator_idTousers_user")
+  disputes_dispute_disputes_dispute_resolved_by_idTousers_user                 disputes_dispute[]                        @relation("disputes_dispute_resolved_by_idTousers_user")
+  disputes_dispute_disputes_dispute_respondent_idTousers_user                  disputes_dispute[]                        @relation("disputes_dispute_respondent_idTousers_user")
+  disputes_disputeevidence                                                     disputes_disputeevidence[]
+  disputes_disputemessage                                                      disputes_disputemessage[]
+  django_admin_log                                                             django_admin_log[]
+  fraud_detection_fraudalert                                                   fraud_detection_fraudalert[]
+  marketplace_portfolio_items                                                  marketplace_portfolio_items[]
+  marketplace_professionals                                                    marketplace_professionals?
+  marketplace_services                                                         marketplace_services[]
+  marketplace_team_members                                                     marketplace_team_members[]
+  marketplace_teams                                                            marketplace_teams[]
+  messaging_conversation_participants                                          messaging_conversation_participants[]
+  messaging_message                                                            messaging_message[]
+  notifications_notification                                                   notifications_notification[]
+  payments_invoice_payments_invoice_artisan_idTousers_user                     payments_invoice[]                        @relation("payments_invoice_artisan_idTousers_user")
+  payments_invoice_payments_invoice_client_idTousers_user                      payments_invoice[]                        @relation("payments_invoice_client_idTousers_user")
+  payments_quote_payments_quote_artisan_idTousers_user                         payments_quote[]                          @relation("payments_quote_artisan_idTousers_user")
+  payments_quote_payments_quote_client_idTousers_user                          payments_quote[]                          @relation("payments_quote_client_idTousers_user")
+  payments_usersubscription                                                    payments_usersubscription?
+  payments_wallet                                                              payments_wallet?
+  projects_projects_projects_projects_client_idTousers_user                    projects_projects[]                       @relation("projects_projects_client_idTousers_user")
+  projects_projects_projects_projects_professional_idTousers_user              projects_projects[]                       @relation("projects_projects_professional_idTousers_user")
+  projects_tasks                                                               projects_tasks[]
+  projects_updates                                                             projects_updates[]
+  projects_attendance                                                          projects_attendance[]
+  reviews_review_reviews_review_reviewee_idTousers_user                        reviews_review[]                          @relation("reviews_review_reviewee_idTousers_user")
+  reviews_review_reviews_review_reviewer_idTousers_user                        reviews_review[]                          @relation("reviews_review_reviewer_idTousers_user")
+  services_knowledgeforumpost                                                  services_knowledgeforumpost[]
+  services_masterclass                                                         services_masterclass[]
+  services_mentorshipsession_services_mentorshipsession_expert_idTousers_user  services_mentorshipsession[]              @relation("services_mentorshipsession_expert_idTousers_user")
+  services_mentorshipsession_services_mentorshipsession_learner_idTousers_user services_mentorshipsession[]              @relation("services_mentorshipsession_learner_idTousers_user")
+  trust_safety_professional_verifications                                      trust_safety_professional_verifications[]
+  mentorship_rewards                                                           mentorship_rewards[]
+  users_user_groups                                                            users_user_groups[]
+  users_user_user_permissions                                                  users_user_user_permissions[]
+}
+
+model users_user_groups {
+  id         BigInt     @id @default(autoincrement())
+  user_id    BigInt
+  group_id   Int
+  auth_group auth_group @relation(fields: [group_id], references: [id], onUpdate: Restrict, map: "users_user_groups_group_id_9afc8d0e_fk_auth_group_id")
+  users_user users_user @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "users_user_groups_user_id_5f6f5a90_fk_users_user_id")
+
+  @@unique([user_id, group_id], map: "users_user_groups_user_id_group_id_b88eab82_uniq")
+  @@index([group_id], map: "users_user_groups_group_id_9afc8d0e_fk_auth_group_id")
+}
+
+model users_user_user_permissions {
+  id              BigInt          @id @default(autoincrement())
+  user_id         BigInt
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onUpdate: Restrict, map: "users_user_user_perm_permission_id_0b93982e_fk_auth_perm")
+  users_user      users_user      @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "users_user_user_permissions_user_id_20aca447_fk_users_user_id")
+
+  @@unique([user_id, permission_id], map: "users_user_user_permissions_user_id_permission_id_43338c45_uniq")
+  @@index([permission_id], map: "users_user_user_perm_permission_id_0b93982e_fk_auth_perm")
+}
+
+model projects_attendance {
+  id                BigInt            @id @default(autoincrement())
+  project_id        BigInt
+  user_id           BigInt
+  timestamp         DateTime          @db.DateTime(6)
+  type              String            @db.VarChar(20) // 'check_in' or 'check_out'
+  location          String?           @db.VarChar(255)
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_attendance_project_id_fk")
+  users_user        users_user        @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "projects_attendance_user_id_fk")
+
+  @@index([project_id], map: "projects_attendance_project_id_fk")
+  @@index([user_id], map: "projects_attendance_user_id_fk")
+}
+
+model mentorship_rewards {
+  id         BigInt     @id @default(autoincrement())
+  user_id    BigInt
+  amount     Int
+  type       String     @db.VarChar(20) // 'earned' or 'spent'
+  reason     String     @db.LongText
+  created_at DateTime   @db.DateTime(6)
+  users_user users_user @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mentorship_rewards_user_id_fk")
+
+  @@index([user_id], map: "mentorship_rewards_user_id_fk")
+}
+
+model projects_insurance_claims {
+  id                BigInt            @id @default(autoincrement())
+  project_id        BigInt
+  reason            String            @db.LongText
+  details           String            @db.LongText
+  status            String            @db.VarChar(20) // 'pending', 'approved', 'rejected'
+  amount_claimed    Decimal           @db.Decimal(10, 2)
+  created_at        DateTime          @db.DateTime(6)
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_insurance_claims_project_id_fk")
+
+  @@index([project_id], map: "projects_insurance_claims_project_id_fk")
+}
