@@ -76,9 +76,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: false,
       message: 'An internal server error occurred',
-      debug: error.message
+      debug: error.stack || error.message
     }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
