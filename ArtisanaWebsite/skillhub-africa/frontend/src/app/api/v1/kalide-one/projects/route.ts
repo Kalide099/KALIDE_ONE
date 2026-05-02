@@ -1,24 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
+import prisma from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
-
-// Helper to serialize BigInt and Decimal for JSON
-function serialize(obj: any): any {
-  if (obj === null || obj === undefined) return obj;
-  if (typeof obj === 'bigint') return obj.toString();
-  if (Array.isArray(obj)) return obj.map(serialize);
-  if (typeof obj === 'object') {
-    if (obj.constructor?.name === 'Decimal') return obj.toString();
-    const newObj: any = {};
-    for (const key in obj) {
-      newObj[key] = serialize(obj[key]);
-    }
-    return newObj;
-  }
-  return obj;
-}
+import { serialize } from '@/lib/api-utils';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('Authorization');
@@ -63,9 +46,9 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(serialize(projects));
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching projects:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Internal Server Error', debug: error.message }, { status: 500 });
   }
 }
 

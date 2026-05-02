@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
+import prisma from '@/lib/prisma';
 import { verifyDjangoPassword, generateTokens } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
@@ -66,11 +64,12 @@ export async function POST(request: Request) {
         role: user.role,
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
     return NextResponse.json({
       success: false,
       message: 'An internal server error occurred',
+      debug: error.message
     }, { status: 500 });
   } finally {
     await prisma.$disconnect();
