@@ -1,16 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { serialize } from '@/lib/utils';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = BigInt(params.id);
+    const { id } = await params;
+    const bigIntId = BigInt(id);
 
     const professional = await prisma.marketplace_professionals.findUnique({
-      where: { id },
+      where: { id: bigIntId },
       include: {
         users_user: {
           select: {
