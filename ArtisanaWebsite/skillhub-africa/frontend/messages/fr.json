@@ -580,7 +580,9 @@
     "cancelled": "Annulé",
     "draft": "Brouillon",
     "accepted": "Accepté",
-    "funded": "Financé"
+    "funded": "Financé",
+    "confirmFund": "Êtes-vous sûr de vouloir financer cet engagement ?",
+    "fundSuccess": "Engagement financé avec succès !"
   },
   "return": "Retour au Centre de Commandement"
 }

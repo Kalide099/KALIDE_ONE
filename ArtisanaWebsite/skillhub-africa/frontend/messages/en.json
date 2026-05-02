@@ -636,7 +636,9 @@
     "cancelled": "Cancelled",
     "draft": "Draft",
     "accepted": "Accepted",
-    "funded": "Funded"
+    "funded": "Funded",
+    "confirmFund": "Are you sure you want to fund this escrow?",
+    "fundSuccess": "Escrow funded successfully!"
   },
   "return": "Return to Command Center"
 }
