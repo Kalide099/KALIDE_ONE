@@ -160,7 +160,10 @@
     "certified": "Certified",
     "yes": "Yes",
     "no": "No",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "initiateLink": "Initiate Link",
+    "viewLedger": "View Verified Ledger",
+    "secureProtocol": "Securely operated by Kalide Global Protocol"
   },
   "Admin": {
     "titlePrefix": "Supreme ",

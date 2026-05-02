@@ -113,15 +113,15 @@ export default function WorkerDetail() {
                     href={`/quotes/new?worker=${worker.id}`}
                     className="block w-full py-5 bg-primary hover:bg-primary/90 text-white text-center rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-primary/20"
                   >
-                    Initiate Link
+                    {t.WorkerProfile?.initiateLink || 'Initiate Link'}
                   </Link>
                   <button className="w-full py-5 glass hover:bg-white/5 text-slate-400 hover:text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all">
-                    View Verified Ledger
+                    {t.WorkerProfile?.viewLedger || 'View Verified Ledger'}
                   </button>
                 </div>
                 
                 <p className="mt-8 text-[9px] text-center text-slate-600 font-black uppercase tracking-widest">
-                  Securely operated by Kalide Global Protocol
+                  {t.WorkerProfile?.secureProtocol || 'Securely operated by Kalide Global Protocol'}
                 </p>
              </div>
           </div>
