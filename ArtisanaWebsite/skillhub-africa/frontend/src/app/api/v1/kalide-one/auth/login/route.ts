@@ -14,51 +14,41 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const userPromise = prisma.users_user.findUnique({
+    console.log('Login attempt for:', email);
+
+    const user = await prisma.users_user.findUnique({
       where: { email },
+    }).catch(err => {
+      throw new Error(`DB Query Failed: ${err.message}`);
     });
 
-    // 10 second timeout for DB connection
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Database query timed out. This often means the server cannot reach the MySQL database.')), 10000)
-    );
-
-    const user = await Promise.race([userPromise, timeoutPromise]) as any;
-
     if (!user) {
+      console.log('User not found:', email);
       return NextResponse.json({
         success: false,
         message: 'Invalid credentials',
       }, { status: 401 });
     }
 
-    if (!user.is_active) {
-      return NextResponse.json({
-        success: false,
-        message: 'Account is disabled',
-      }, { status: 401 });
-    }
-
-    const isPasswordValid = await verifyDjangoPassword(password, user.password);
+    console.log('User found, verifying password...');
+    const isPasswordValid = await verifyDjangoPassword(password, user.password).catch(err => {
+      throw new Error(`Password Verification Failed: ${err.message}`);
+    });
 
     if (!isPasswordValid) {
+      console.log('Password invalid for:', email);
       return NextResponse.json({
         success: false,
         message: 'Invalid credentials',
       }, { status: 401 });
     }
 
+    console.log('Password valid, generating tokens...');
     const tokens = generateTokens({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
-    });
-
-    // Update last_login
-    await prisma.users_user.update({
-      where: { id: user.id },
-      data: { last_login: new Date() },
     });
 
     return NextResponse.json({
@@ -72,11 +62,12 @@ export async function POST(request: Request) {
       }
     });
   } catch (error: any) {
-    console.error('Login error:', error);
+    console.error('CRITICAL LOGIN ERROR:', error);
     return NextResponse.json({
       success: false,
-      message: 'An internal server error occurred',
-      debug: error.stack || error.message
+      message: 'Server Error: ' + error.message,
+      stack: error.stack,
+      env_check: process.env.DATABASE_URL ? 'DB_URL_SET' : 'DB_URL_MISSING'
     }, { status: 500 });
   }
 }
