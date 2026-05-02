@@ -12,11 +12,11 @@ export default function MentorshipTokens() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/v1/kalide-one/users/me', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        const response = await fetch('/api/v1/kalide-one/auth/me', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
         });
         const result = await response.json();
-        setTokens(result.mentorship_tokens || 0);
+        setTokens(result.data?.mentorship_tokens || 0);
         
         // Fetch rewards history mock for now or real if endpoint exists
         setRewards([
