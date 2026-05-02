@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import { useState, useEffect } from 'react';
 import { apiService, Project } from '@/services/api';
+import ProfessionalMatch from '@/components/ProfessionalMatch';
 
 export default function ClientDashboard() {
   const { t, language } = useLanguage();
@@ -59,6 +60,11 @@ export default function ClientDashboard() {
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic mb-2">{t.ClientDashboard?.title}</h1>
           <p className="text-slate-500 font-medium">{t.ClientDashboard?.subtitle}</p>
+        </div>
+
+        {/* AI Recommendations Section */}
+        <div className="mb-20">
+          <ProfessionalMatch />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

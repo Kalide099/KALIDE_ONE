@@ -533,6 +533,8 @@ model projects_projects {
   professional_id                                          BigInt?
   team_id                                                  BigInt?
   escrow_released                                          Boolean
+  insurance_active                                         Boolean                     @default(false)
+  insurance_fee                                            Decimal?                    @db.Decimal(10, 2)
   bookings_bookings                                        bookings_bookings?
   disputes_dispute                                         disputes_dispute[]
   payments_escrowaccount                                   payments_escrowaccount?
@@ -546,6 +548,8 @@ model projects_projects {
   marketplace_teams                                        marketplace_teams?          @relation(fields: [team_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_projects_team_id_f1bc09de_fk_marketplace_teams_id")
   projects_tasks                                           projects_tasks[]
   projects_updates                                         projects_updates[]
+  projects_attendance                                      projects_attendance[]
+  projects_insurance_claims                                projects_insurance_claims[]
   reviews_review                                           reviews_review[]
 
   @@index([client_id], map: "projects_projects_client_id_8b85de2e_fk_users_user_id")
@@ -672,6 +676,7 @@ model users_user {
   country                                                                      String                                    @db.VarChar(100)
   city                                                                         String                                    @db.VarChar(100)
   role                                                                         String                                    @db.VarChar(20)
+  mentorship_tokens                                                            Int                                       @default(0)
   created_at                                                                   DateTime                                  @db.DateTime(6)
   bookings_availability                                                        bookings_availability[]
   bookings_bookings_bookings_bookings_client_idTousers_user                    bookings_bookings[]                       @relation("bookings_bookings_client_idTousers_user")
@@ -701,6 +706,7 @@ model users_user {
   projects_projects_projects_projects_professional_idTousers_user              projects_projects[]                       @relation("projects_projects_professional_idTousers_user")
   projects_tasks                                                               projects_tasks[]
   projects_updates                                                             projects_updates[]
+  projects_attendance                                                          projects_attendance[]
   reviews_review_reviews_review_reviewee_idTousers_user                        reviews_review[]                          @relation("reviews_review_reviewee_idTousers_user")
   reviews_review_reviews_review_reviewer_idTousers_user                        reviews_review[]                          @relation("reviews_review_reviewer_idTousers_user")
   services_knowledgeforumpost                                                  services_knowledgeforumpost[]
@@ -708,6 +714,7 @@ model users_user {
   services_mentorshipsession_services_mentorshipsession_expert_idTousers_user  services_mentorshipsession[]              @relation("services_mentorshipsession_expert_idTousers_user")
   services_mentorshipsession_services_mentorshipsession_learner_idTousers_user services_mentorshipsession[]              @relation("services_mentorshipsession_learner_idTousers_user")
   trust_safety_professional_verifications                                      trust_safety_professional_verifications[]
+  mentorship_rewards                                                           mentorship_rewards[]
   users_user_groups                                                            users_user_groups[]
   users_user_user_permissions                                                  users_user_user_permissions[]
 }
@@ -732,4 +739,43 @@ model users_user_user_permissions {
 
   @@unique([user_id, permission_id], map: "users_user_user_permissions_user_id_permission_id_43338c45_uniq")
   @@index([permission_id], map: "users_user_user_perm_permission_id_0b93982e_fk_auth_perm")
+}
+
+model projects_attendance {
+  id                BigInt            @id @default(autoincrement())
+  project_id        BigInt
+  user_id           BigInt
+  timestamp         DateTime          @db.DateTime(6)
+  type              String            @db.VarChar(20) // 'check_in' or 'check_out'
+  location          String?           @db.VarChar(255)
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_attendance_project_id_fk")
+  users_user        users_user        @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "projects_attendance_user_id_fk")
+
+  @@index([project_id], map: "projects_attendance_project_id_fk")
+  @@index([user_id], map: "projects_attendance_user_id_fk")
+}
+
+model mentorship_rewards {
+  id          BigInt     @id @default(autoincrement())
+  user_id     BigInt
+  amount      Int
+  type        String     @db.VarChar(20) // 'earned' or 'spent'
+  reason      String     @db.LongText
+  created_at  DateTime   @db.DateTime(6)
+  users_user  users_user @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "mentorship_rewards_user_id_fk")
+
+  @@index([user_id], map: "mentorship_rewards_user_id_fk")
+}
+
+model projects_insurance_claims {
+  id                BigInt            @id @default(autoincrement())
+  project_id        BigInt
+  reason            String            @db.LongText
+  details           String            @db.LongText
+  status            String            @db.VarChar(20) // 'pending', 'approved', 'rejected'
+  amount_claimed    Decimal           @db.Decimal(10, 2)
+  created_at        DateTime          @db.DateTime(6)
+  projects_projects projects_projects @relation(fields: [project_id], references: [id], onUpdate: Restrict, map: "projects_insurance_claims_project_id_fk")
+
+  @@index([project_id], map: "projects_insurance_claims_project_id_fk")
 }

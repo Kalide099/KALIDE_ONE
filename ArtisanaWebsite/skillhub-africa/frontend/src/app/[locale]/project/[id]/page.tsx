@@ -6,6 +6,9 @@ import { useLanguage } from '../../../../context/LanguageContext';
 
 import { useState, useEffect } from 'react';
 import { apiService, Project } from '../../../../services/api';
+import VoiceUpdate from '@/components/VoiceUpdate';
+import QRCheckIn from '@/components/QRCheckIn';
+import ProjectInsurance from '@/components/ProjectInsurance';
 
 export default function ProjectDetail() {
   const params = useParams();
@@ -13,6 +16,7 @@ export default function ProjectDetail() {
   const id = params?.id as string;
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeAction, setActiveAction] = useState<'voice' | 'qr' | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -133,23 +137,71 @@ export default function ProjectDetail() {
                    </div>
                 </div>
 
-                <div className="space-y-4">
-                   <button className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:shadow-lg hover:shadow-primary/20 transition-all">
-                      {t.ProjectDetail?.updateProtocol}
-                   </button>
-                   <button className="w-full py-4 glass hover:bg-white/5 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
-                      {t.ProjectDetail?.secureMessaging}
-                   </button>
-                   {isClient && project.status !== 'completed' && (
-                     <button 
-                        onClick={handleReleaseEscrow}
-                        className="w-full py-4 border border-secondary/30 text-secondary hover:bg-secondary/5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
-                     >
-                        {t.ProjectDetail?.releaseEscrow}
-                     </button>
-                   )}
+                 <div className="space-y-4">
+                    <button 
+                       onClick={() => setActiveAction('voice')}
+                       className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:shadow-lg hover:shadow-primary/20 transition-all"
+                    >
+                       {t.ProjectDetail?.updateProtocol} (Voice)
+                    </button>
+                    <button 
+                       onClick={() => setActiveAction('qr')}
+                       className="w-full py-4 border border-blue-500/30 text-blue-400 hover:bg-blue-500/5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
+                    >
+                       Field Check-In / Scan
+                    </button>
+                    <button className="w-full py-4 glass hover:bg-white/5 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
+                       {t.ProjectDetail?.secureMessaging}
+                    </button>
+                    {isClient && project.status !== 'completed' && (
+                      <button 
+                         onClick={handleReleaseEscrow}
+                         className="w-full py-4 border border-secondary/30 text-secondary hover:bg-secondary/5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
+                      >
+                         {t.ProjectDetail?.releaseEscrow}
+                      </button>
+                    )}
+                 </div>
+              </div>
+
+              {/* Insurance Node */}
+              <ProjectInsurance 
+                projectId={project.id} 
+                isInsuranceActive={project.insurance_active || false} 
+                insuranceFee={parseFloat(project.insurance_fee || '15.00')} 
+              />
+
+              {/* Action Modals */}
+              {activeAction && (
+                <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+                  <div className="w-full max-w-xl relative">
+                    <button 
+                      onClick={() => setActiveAction(null)}
+                      className="absolute -top-12 right-0 text-white font-black text-xl hover:scale-110 transition-transform"
+                    >
+                      ✕
+                    </button>
+                    
+                    {activeAction === 'voice' && (
+                      <VoiceUpdate 
+                        projectId={project.id} 
+                        onUpdateComplete={(text) => {
+                          alert(`Transcribed & Sending: ${text}`);
+                          setActiveAction(null);
+                        }} 
+                      />
+                    )}
+                    
+                    {activeAction === 'qr' && (
+                      <QRCheckIn 
+                        projectId={project.id} 
+                        mode={isClient ? 'scan' : 'generate'}
+                        onSuccess={() => setActiveAction(null)}
+                      />
+                    )}
+                  </div>
                 </div>
-             </div>
+              )}
           </div>
         </div>
       </main>

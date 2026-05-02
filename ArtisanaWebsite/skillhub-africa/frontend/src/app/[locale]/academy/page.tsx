@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
+import MentorshipTokens from '@/components/MentorshipTokens';
 
 export default function KalideAcademy() {
   const { t } = useLanguage();
@@ -63,6 +64,11 @@ export default function KalideAcademy() {
           <p className="text-slate-400 md:text-lg font-medium leading-relaxed">
             {t.Academy?.description}
           </p>
+        </div>
+
+        {/* Reputation & Rewards Node */}
+        <div className="max-w-xl mx-auto mb-16">
+           <MentorshipTokens />
         </div>
 
         {/* Tab Navigation */}

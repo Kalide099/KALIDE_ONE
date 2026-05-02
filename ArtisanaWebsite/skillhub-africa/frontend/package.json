@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "html5-qrcode": "^2.3.8",
     "jsonwebtoken": "^9.0.3",
     "next": "16.1.6",
     "next-intl": "^4.9.1",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

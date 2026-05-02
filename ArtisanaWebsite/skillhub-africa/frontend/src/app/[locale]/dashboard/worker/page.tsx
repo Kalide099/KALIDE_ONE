@@ -153,6 +153,15 @@ export default function WorkerDashboard() {
             {/* Quotes and Invoices */}
             <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mt-12 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.financialNode}</h2>
             <div className="space-y-4">
+              <Link href="/dashboard/worker/wallet" className="flex items-center justify-between p-6 glass rounded-2xl border-secondary/30 border bg-secondary/5 hover:bg-secondary/10 group transition-all">
+                <div>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-secondary group-hover:text-white transition-colors">Financial Intelligence Node</h3>
+                  <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">Manage liquid assets & Mobile Money payouts</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="text-secondary group-hover:translate-x-2 transition-transform text-xl">→</span>
+                </div>
+              </Link>
               {quotes.map((quote) => (
                 <div key={quote.id} className="p-6 glass rounded-2xl border-white/5 group hover:border-white/20 transition-all">
                   <div className="flex justify-between items-center mb-4">
