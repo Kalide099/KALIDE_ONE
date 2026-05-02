@@ -75,10 +75,15 @@ class ApiService {
       }
 
       const url = `${API_BASE_URL}${endpoint}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const response = await fetch(url, {
         ...options,
         headers,
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
 
       const data = await response.json();
 
@@ -103,21 +108,21 @@ class ApiService {
   }
 
   async register(userData: RegisterData): Promise<ApiResponse> {
-    return this.request('/auth/register/', {
+    return this.request('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
   }
 
   async login(credentials: LoginData): Promise<ApiResponse<AuthResponse>> {
-    return this.request('/auth/login/', {
+    return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
   }
 
   async getProjects(): Promise<ApiResponse<Project[]>> {
-    return this.request('/projects/');
+    return this.request('/projects');
   }
 
   async getProjectDetail(id: number): Promise<ApiResponse<Project>> {
@@ -126,7 +131,7 @@ class ApiService {
 
   async getProfessionals(): Promise<ApiResponse<Professional[]>> {
     // Note: The backend view logic filters for is_verified=True
-    return this.request('/professionals/');
+    return this.request('/professionals');
   }
 
   async getProfessionalDetail(id: number): Promise<ApiResponse<Professional>> {
@@ -134,22 +139,22 @@ class ApiService {
   }
 
   async releaseEscrow(id: number): Promise<ApiResponse> {
-    return this.request(`/projects/${id}/release-escrow/`, {
+    return this.request(`/projects/${id}/release-escrow`, {
       method: 'POST',
     });
   }
 
   // ==== ADMIN ENDPOINTS ====
   async getAdminUsers(): Promise<ApiResponse<Record<string, unknown>[]>> {
-    return this.request('/auth/admin/users/');
+    return this.request('/auth/admin/users');
   }
 
   async getAdminProjects(): Promise<ApiResponse<Record<string, unknown>[]>> {
-    return this.request('/auth/admin/projects/');
+    return this.request('/auth/admin/projects');
   }
 
   async getAdminPayments(): Promise<ApiResponse<Record<string, unknown>[]>> {
-    return this.request('/auth/admin/payments/');
+    return this.request('/auth/admin/payments');
   }
 
   async deleteUser(id: number): Promise<ApiResponse> {
