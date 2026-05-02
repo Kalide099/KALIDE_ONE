@@ -73,7 +73,7 @@ export async function POST(request: Request) {
         terms: terms || '',
         status: 'pending',
         created_at: new Date(),
-        valid_until: valid_until ? new Date(valid_until) : null,
+        valid_until: valid_until ? new Date(valid_until) : undefined,
         artisan_id: BigInt(decoded.user_id),
         client_id: BigInt(client_id),
         project_id: BigInt(project_id)

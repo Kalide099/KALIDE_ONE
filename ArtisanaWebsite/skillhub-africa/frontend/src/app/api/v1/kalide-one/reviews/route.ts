@@ -50,18 +50,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  try {
+    try {
     const body = await request.json();
     const { rating, comment, project_id, reviewee_id } = body;
+
+    if (!project_id || !reviewee_id || !rating) {
+      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
 
     const newReview = await prisma.reviews_review.create({
       data: {
         rating: parseInt(rating),
-        comment,
+        comment: comment || '',
         created_at: new Date(),
         reviewer_id: BigInt(decoded.user_id),
         reviewee_id: BigInt(reviewee_id),
-        project_id: project_id ? BigInt(project_id) : null
+        project_id: BigInt(project_id)
       }
     });
 

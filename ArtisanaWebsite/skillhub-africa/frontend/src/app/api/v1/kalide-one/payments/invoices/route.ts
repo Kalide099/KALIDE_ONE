@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         artisan_id: BigInt(decoded.user_id),
         client_id: BigInt(client_id),
         project_id: BigInt(project_id),
-        quote_id: quote_id ? BigInt(quote_id) : null
+        quote_id: quote_id ? BigInt(quote_id) : undefined
       }
     });
 

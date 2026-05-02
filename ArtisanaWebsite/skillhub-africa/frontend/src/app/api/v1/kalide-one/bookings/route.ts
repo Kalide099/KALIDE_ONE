@@ -28,11 +28,11 @@ export async function POST(request: Request) {
         created_at: new Date(),
         client_id: BigInt(decoded.user_id),
         professional_id: BigInt(professional_id),
-        project_id: project_id ? BigInt(project_id) : null,
-        team_id: team_id ? BigInt(team_id) : null,
-        scheduled_date: scheduled_date ? new Date(scheduled_date) : null,
-        start_time: start_time ? new Date(`${scheduled_date}T${start_time}`) : null,
-        end_time: end_time ? new Date(`${scheduled_date}T${end_time}`) : null,
+        project_id: project_id ? BigInt(project_id) : undefined,
+        team_id: team_id ? BigInt(team_id) : undefined,
+        scheduled_date: scheduled_date ? new Date(scheduled_date) : undefined,
+        start_time: start_time ? new Date(`${scheduled_date}T${start_time}`) : undefined,
+        end_time: end_time ? new Date(`${scheduled_date}T${end_time}`) : undefined,
       }
     });
 

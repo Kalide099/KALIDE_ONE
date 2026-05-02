@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         translated_content: JSON.stringify(translated_content),
         timestamp: new Date(),
         sender_id: BigInt(decoded.user_id),
-        conversation_id: conversation_id ? BigInt(conversation_id) : null,
+        conversation_id: conversation_id ? BigInt(conversation_id) : undefined,
         room_name: room_name || ''
       }
     });
