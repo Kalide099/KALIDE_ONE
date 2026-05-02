@@ -146,6 +146,16 @@ class ApiService {
     });
   }
 
+  async getQuotes(): Promise<ApiResponse<any[]>> {
+    return this.request('/payments/quotes');
+  }
+
+  async fundQuote(id: number): Promise<ApiResponse> {
+    return this.request(`/payments/quotes/${id}/fund`, {
+      method: 'POST',
+    });
+  }
+
   // ==== ADMIN ENDPOINTS ====
   async getAdminUsers(): Promise<ApiResponse<Record<string, unknown>[]>> {
     return this.request('/auth/admin/users');

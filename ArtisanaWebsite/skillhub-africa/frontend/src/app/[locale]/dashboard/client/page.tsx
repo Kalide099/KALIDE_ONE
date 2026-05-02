@@ -14,21 +14,59 @@ export default function ClientDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiService.getProjects();
-      if (response.success && response.data) {
-        setProjects(response.data);
+      setIsLoading(true);
+      const [projRes, quoteRes] = await Promise.all([
+        apiService.getProjects(),
+        apiService.getQuotes()
+      ]);
+
+      if (projRes.success && projRes.data) {
+        setProjects(projRes.data);
       }
       
-      // Fetch Quotes Mock for now
-      setQuotes([
-        { id: 101, artisan: 'John Plumber', amount: 450, status: 'Draft', escrow: 'Pending' },
-        { id: 102, artisan: 'Electric Pro', amount: 1200, status: 'Accepted', escrow: 'Funded' },
-      ]);
+      if (quoteRes.success && quoteRes.data) {
+        // Adapt backend structure to UI expectation
+        const formattedQuotes = quoteRes.data.map(q => ({
+            id: q.id,
+            artisan: q.users_user_payments_quote_artisan_idTousers_user?.name || 'Unknown',
+            amount: q.total_amount,
+            status: q.status === 'accepted' ? 'Accepted' : 'Draft',
+            escrow: q.status === 'accepted' ? 'Funded' : 'Pending',
+            projectTitle: q.projects_projects?.title[language] || 'Project'
+        }));
+        setQuotes(formattedQuotes);
+      }
       
       setIsLoading(false);
     };
     fetchData();
-  }, []);
+  }, [language]);
+
+  const handleFund = async (quoteId: number) => {
+    // Optimistic UI or Loading state
+    const confirmFund = window.confirm(t.Status?.confirmFund || 'Are you sure you want to fund this escrow?');
+    if (!confirmFund) return;
+
+    const res = await apiService.fundQuote(quoteId);
+    if (res.success) {
+        // Refresh data
+        const quoteRes = await apiService.getQuotes();
+        if (quoteRes.success && quoteRes.data) {
+            const formattedQuotes = quoteRes.data.map(q => ({
+                id: q.id,
+                artisan: q.users_user_payments_quote_artisan_idTousers_user?.name || 'Unknown',
+                amount: q.total_amount,
+                status: q.status === 'accepted' ? 'Accepted' : 'Draft',
+                escrow: q.status === 'accepted' ? 'Funded' : 'Pending',
+                projectTitle: q.projects_projects?.title[language] || 'Project'
+            }));
+            setQuotes(formattedQuotes);
+        }
+        alert(t.Status?.fundSuccess || 'Escrow funded successfully!');
+    } else {
+        alert(res.message || 'Funding failed');
+    }
+  };
 
   const getTitle = (p: Project) => p.title[language] || p.title['en'] || t.ClientDashboard?.untitled || 'Untitled Project';
 
@@ -147,6 +185,7 @@ export default function ClientDashboard() {
                   <div className="flex justify-between items-center mb-4">
                     <div>
                         <h3 className="font-black uppercase tracking-tight text-sm truncate pr-4">{quote.artisan}</h3>
+                        <p className="text-[9px] text-primary/70 font-bold uppercase tracking-widest">{quote.projectTitle}</p>
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">{t.ClientDashboard?.escrow || 'Escrow'}: <span className={quote.escrow === 'Funded' ? 'text-green-400' : 'text-yellow-400'}>{quote.escrow === 'Funded' ? (t.Status?.funded || 'Funded') : (t.Status?.pending || 'Pending')}</span></p>
                     </div>
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${
@@ -157,7 +196,15 @@ export default function ClientDashboard() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-white">${quote.amount}</span>
-                    <button className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">{t.ClientDashboard?.reviewFund}</button>
+                    <button 
+                      onClick={() => handleFund(Number(quote.id))}
+                      disabled={quote.escrow === 'Funded'}
+                      className={`text-[10px] font-black uppercase tracking-widest hover:underline ${
+                        quote.escrow === 'Funded' ? 'text-slate-600 cursor-not-allowed' : 'text-primary'
+                      }`}
+                    >
+                      {quote.escrow === 'Funded' ? (t.Status?.funded || 'Funded') : t.ClientDashboard?.reviewFund}
+                    </button>
                   </div>
                 </div>
               ))}
