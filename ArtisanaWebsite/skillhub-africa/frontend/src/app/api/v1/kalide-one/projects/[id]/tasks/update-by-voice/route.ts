@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { serialize } from '@/lib/api-utils';
 
 export async function POST(
   req: NextRequest,
@@ -13,10 +12,6 @@ export async function POST(
     const body = await req.json();
     const { transcript } = body;
 
-    // AI Logic: Find a task that matches the transcript keywords
-    // For this demo, we'll find the first "pending" task and mark it as "completed"
-    // if the voice intent is detected.
-    
     const task = await prisma.projects_tasks.findFirst({
       where: { 
         project_id: projectId,
@@ -25,7 +20,7 @@ export async function POST(
     });
 
     if (task) {
-      await prisma.projects_tasks.update({
+      const updatedTask = await prisma.projects_tasks.update({
         where: { id: task.id },
         data: { status: 'completed' }
       });
@@ -33,7 +28,7 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: `Task "${task.title}" automatically marked as completed via Voice-to-Task.`,
-        taskId: task.id.toString()
+        data: serialize(updatedTask)
       });
     }
 

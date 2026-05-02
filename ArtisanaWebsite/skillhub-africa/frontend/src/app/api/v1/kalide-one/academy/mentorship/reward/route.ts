@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
+import prisma from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
+import { serialize } from '@/lib/api-utils';
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -22,7 +21,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Missing sessionId' }, { status: 400 });
     }
 
-    // 1. Fetch the mentorship session
     const session = await prisma.services_mentorshipsession.findUnique({
       where: { id: BigInt(sessionId) }
     });
@@ -32,16 +30,13 @@ export async function POST(req: NextRequest) {
     }
 
     const expertId = session.expert_id;
-    const tokenAmount = amount || 10; // Default 10 tokens
+    const tokenAmount = amount || 10;
 
-    // 2. Award tokens in a transaction
     const result = await prisma.$transaction([
-      // Increment user tokens
       prisma.users_user.update({
         where: { id: expertId },
         data: { mentorship_tokens: { increment: tokenAmount } }
       }),
-      // Create reward record
       prisma.mentorship_rewards.create({
         data: {
           user_id: expertId,
@@ -56,7 +51,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Awarded ${tokenAmount} Mentorship Tokens.`,
-      newTotal: result[0].mentorship_tokens
+      data: serialize(result[0])
     });
   } catch (error) {
     console.error('Mentorship reward error:', error);

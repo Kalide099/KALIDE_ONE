@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
+import prisma from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
+import { serialize } from '@/lib/api-utils';
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -24,7 +23,6 @@ export async function POST(req: NextRequest) {
 
     const userId = BigInt(decoded.user_id);
 
-    // 1. Check wallet balance
     const wallet = await prisma.payments_wallet.findUnique({
       where: { user_id: userId }
     });
@@ -33,14 +31,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Insufficient balance' }, { status: 400 });
     }
 
-    // 2. Start a transaction (Simplified)
-    const transaction = await prisma.$transaction([
-      // Deduct balance
+    const result = await prisma.$transaction([
       prisma.payments_wallet.update({
         where: { user_id: userId },
         data: { balance: (parseFloat(wallet.balance.toString()) - parseFloat(amount)).toFixed(2) }
       }),
-      // Create transaction record
       prisma.payments_transaction.create({
         data: {
           wallet_id: wallet.id,
@@ -56,7 +51,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Payout request initiated via Mobile Money.',
-      transactionId: transaction[1].id.toString()
+      data: serialize(result[1])
     });
   } catch (error) {
     console.error('Payout error:', error);

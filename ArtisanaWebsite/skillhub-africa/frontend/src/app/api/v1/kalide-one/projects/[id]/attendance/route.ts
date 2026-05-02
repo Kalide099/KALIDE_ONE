@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { serialize } from '@/lib/api-utils';
 
 export async function POST(
   req: NextRequest,
@@ -29,10 +28,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      data: {
-        id: attendance.id.toString(),
-        timestamp: attendance.timestamp,
-      }
+      data: serialize(attendance)
     });
   } catch (error) {
     console.error('Attendance log error:', error);
@@ -63,12 +59,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: logs.map(log => ({
-        ...log,
-        id: log.id.toString(),
-        project_id: log.project_id.toString(),
-        user_id: log.user_id.toString(),
-      }))
+      data: serialize(logs)
     });
   } catch (error) {
     console.error('Fetch attendance error:', error);

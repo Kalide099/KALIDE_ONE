@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { serialize } from '@/lib/api-utils';
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,10 +8,6 @@ export async function GET(req: NextRequest) {
     const categoryId = searchParams.get('categoryId');
     const minRating = searchParams.get('minRating') || '0';
 
-    // Basic Matching Algorithm:
-    // 1. Filter by category
-    // 2. Sort by rating (desc) and completed projects (desc)
-    
     const artisans = await prisma.marketplace_professionals.findMany({
       where: {
         ...(categoryId ? { users_user: { marketplace_services: { some: { category_id: BigInt(categoryId) } } } } : {}),
@@ -36,15 +31,15 @@ export async function GET(req: NextRequest) {
       take: 5
     });
 
+    // Add matchScore mock logic
+    const results = artisans.map(artisan => ({
+      ...artisan,
+      matchScore: Math.floor(Math.random() * 20) + 80
+    }));
+
     return NextResponse.json({
       success: true,
-      data: artisans.map(artisan => ({
-        ...artisan,
-        id: artisan.id.toString(),
-        user_id: artisan.user_id.toString(),
-        // Add a "Matching Score" mock for UI
-        matchScore: Math.floor(Math.random() * 20) + 80 // 80-100%
-      }))
+      data: serialize(results)
     });
   } catch (error) {
     console.error('Matching engine error:', error);

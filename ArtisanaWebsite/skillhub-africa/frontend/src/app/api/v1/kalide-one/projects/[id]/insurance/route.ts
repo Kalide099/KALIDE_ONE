@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { serialize } from '@/lib/api-utils';
 
 export async function POST(
   req: NextRequest,
@@ -31,7 +30,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       message: 'Insurance claim submitted for administrative review.',
-      claimId: claim.id.toString()
+      data: serialize(claim)
     });
   } catch (error) {
     console.error('Insurance claim error:', error);
@@ -59,8 +58,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      insuranceActive: updatedProject.insurance_active,
-      insuranceFee: updatedProject.insurance_fee
+      data: serialize(updatedProject)
     });
   } catch (error) {
     console.error('Project insurance update error:', error);
