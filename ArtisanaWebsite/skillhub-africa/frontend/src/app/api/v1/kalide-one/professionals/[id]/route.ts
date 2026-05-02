@@ -26,7 +26,7 @@ export async function GET(
         },
         marketplace_professionals_badges: {
           include: {
-            marketplace_badge: true
+            artisans_badge: true
           }
         }
       }
