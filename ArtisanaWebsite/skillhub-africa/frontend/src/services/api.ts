@@ -44,6 +44,8 @@ export interface Project {
   deadline: string;
   client: number;
   professional?: number;
+  insurance_active?: boolean;
+  insurance_fee?: string;
 }
 
 export interface Professional {
