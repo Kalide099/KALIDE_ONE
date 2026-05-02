@@ -5,10 +5,11 @@ const prisma = new PrismaClient();
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = BigInt(params.id);
+    const { id } = await params;
+    const projectId = BigInt(id);
     const body = await req.json();
     const { transcript } = body;
 
