@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       }, { status: 401 });
     }
 
-    const isPasswordValid = verifyDjangoPassword(password, user.password);
+    const isPasswordValid = await verifyDjangoPassword(password, user.password);
 
     if (!isPasswordValid) {
       return NextResponse.json({

@@ -3,9 +3,16 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'django-insecure-your-secret-key-default-skillhub-2025';
 
-export function verifyDjangoPassword(password: string, encoded: string): boolean {
+import util from 'util';
+
+const pbkdf2 = util.promisify(crypto.pbkdf2);
+
+export async function verifyDjangoPassword(password: string, encoded: string): Promise<boolean> {
   try {
-    const [algorithm, iterationsStr, salt, hash] = encoded.split('$');
+    const parts = encoded.split('$');
+    if (parts.length !== 4) return false;
+    
+    const [algorithm, iterationsStr, salt, hash] = parts;
     
     if (algorithm !== 'pbkdf2_sha256') {
       console.warn(`Unsupported algorithm: ${algorithm}`);
@@ -13,10 +20,10 @@ export function verifyDjangoPassword(password: string, encoded: string): boolean
     }
 
     const iterations = parseInt(iterationsStr, 10);
-    const keylen = 32; // 256 bits = 32 bytes for sha256
+    const keylen = 32;
     const digest = 'sha256';
 
-    const derivedKey = crypto.pbkdf2Sync(password, salt, iterations, keylen, digest);
+    const derivedKey = await pbkdf2(password, salt, iterations, keylen, digest);
     const derivedKeyBase64 = derivedKey.toString('base64');
 
     return derivedKeyBase64 === hash;
