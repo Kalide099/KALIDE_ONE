@@ -14,9 +14,16 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const user = await prisma.users_user.findUnique({
+    const userPromise = prisma.users_user.findUnique({
       where: { email },
     });
+
+    // 10 second timeout for DB connection
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database query timed out. This often means the server cannot reach the MySQL database.')), 10000)
+    );
+
+    const user = await Promise.race([userPromise, timeoutPromise]) as any;
 
     if (!user) {
       return NextResponse.json({
