@@ -169,7 +169,19 @@
     "portfolio": "Portfolio",
     "initiateLink": "Initiate Link",
     "viewLedger": "View Verified Ledger",
-    "secureProtocol": "Securely operated by Kalide Global Protocol"
+    "secureProtocol": "Securely operated by Kalide Global Protocol",
+    "portfolio": "Past Projects Portfolio",
+    "viewProject": "View Project",
+    "clientReviews": "Verified Client Reviews",
+    "leaveReview": "Leave a Review",
+    "messageArtisan": "Message Artisan"
+  },
+  "ReviewModal": {
+    "title": "Submit a Review",
+    "rating": "Your Rating",
+    "comment": "Your Experience",
+    "placeholder": "Tell us about the quality of work, professionalism, and overall experience...",
+    "submit": "Publish Review"
   },
   "Admin": {
     "titlePrefix": "Supreme ",

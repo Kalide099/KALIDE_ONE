@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { apiService, Professional } from '@/services/api';
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
+import ReviewFormModal from '@/components/ReviewFormModal';
 
 export default function WorkerDetail() {
   const params = useParams();
@@ -12,6 +13,7 @@ export default function WorkerDetail() {
   const id = params?.id as string;
   const [worker, setWorker] = useState<Professional | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchWorker = async () => {
@@ -90,43 +92,107 @@ export default function WorkerDetail() {
                  </div>
                ))}
             </div>
+            {/* Portfolio Gallery */}
+            <div className="space-y-6 pt-8 border-t border-gray-100">
+               <h3 className="text-sm font-black uppercase tracking-widest text-primary underline decoration-2 underline-offset-8">{t.WorkerProfile?.portfolio || 'Past Projects Portfolio'}</h3>
+               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {[
+                    'https://images.unsplash.com/photo-1581092583537-20d51b4b4f1b?auto=format&fit=crop&q=80&w=800',
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=800',
+                    'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=800'
+                  ].map((img, idx) => (
+                    <div key={idx} className="relative group overflow-hidden rounded-2xl aspect-square bg-gray-100 border border-gray-200">
+                      <img src={img} alt={`Portfolio ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                        <span className="text-white text-xs font-bold tracking-widest uppercase">{t.WorkerProfile?.viewProject || 'View Project'}</span>
+                      </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
+
+            {/* Client Reviews */}
+            <div className="space-y-6 pt-8 border-t border-gray-100">
+               <div className="flex items-center justify-between">
+                 <h3 className="text-sm font-black uppercase tracking-widest text-primary underline decoration-2 underline-offset-8">{t.WorkerProfile?.clientReviews || 'Verified Client Reviews'}</h3>
+                 <button 
+                   onClick={() => setIsReviewModalOpen(true)}
+                   className="px-4 py-2 bg-gray-50 text-primary border border-gray-200 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                 >
+                   {t.WorkerProfile?.leaveReview || 'Leave a Review'}
+                 </button>
+               </div>
+               
+               <div className="space-y-4">
+                  {[
+                    { name: 'Sarah M.', date: 'Oct 2026', rating: 5, text: 'Absolutely phenomenal work. Arrived on time, was extremely professional, and the quality of the finish exceeded my expectations.' },
+                    { name: 'David K.', date: 'Sep 2026', rating: 5, text: 'Very fast and efficient. Escrow payment made the whole process stress-free. Highly recommended for any complex projects.' }
+                  ].map((review, idx) => (
+                    <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <p className="font-bold text-gray-900">{review.name}</p>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{review.date}</p>
+                        </div>
+                        <div className="flex text-orange-400 text-sm">
+                          {'★'.repeat(review.rating)}
+                        </div>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed">{review.text}</p>
+                    </div>
+                  ))}
+               </div>
+            </div>
           </div>
 
           {/* Action Sidebar */}
           <div className="space-y-8">
-             <div className="bg-white shadow-sm border border-gray-100 p-8 rounded-[3rem] border-gray-200 shadow-2xl">
+             <div className="bg-white shadow-sm border border-gray-100 p-8 rounded-[3rem] border-gray-200 shadow-2xl sticky top-28">
                 <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-8 border-l-4 border-primary pl-4">{t.WorkerProfile?.hiringSync || 'Hiring Synchronization'}</h3>
                 
                 <div className="space-y-4 mb-10">
-                   <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                   <div className="flex justify-between items-center py-4 border-b border-gray-100">
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.WorkerProfile?.serviceFee || 'Service Fee'}</span>
-                      <span className="font-bold">$0.00</span>
+                      <span className="font-bold text-gray-900">$0.00</span>
                    </div>
-                   <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                   <div className="flex justify-between items-center py-4 border-b border-gray-100">
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.WorkerProfile?.escrowProtected || 'Escrow Protected'}</span>
-                      <span className="font-bold text-green-400">{t.WorkerProfile?.locked || 'Locked'}</span>
+                      <span className="font-bold text-green-500">{t.WorkerProfile?.locked || 'Locked'}</span>
                    </div>
                 </div>
 
                 <div className="space-y-4">
                   <Link 
                     href={`/quotes/new?worker=${worker.id}`}
-                    className="block w-full py-5 bg-primary hover:bg-primary/90 text-gray-900 text-center rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-primary/20"
+                    className="block w-full py-5 bg-primary hover:bg-primary/90 text-white text-center rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-primary/20"
                   >
-                    {t.WorkerProfile?.initiateLink || 'Initiate Link'}
+                    {t.WorkerProfile?.initiateLink || 'Book Now'}
                   </Link>
-                  <button className="w-full py-5 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 text-gray-500 hover:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all">
+                  <Link 
+                    href={`/messages?to=${worker.id}`}
+                    className="block w-full py-5 bg-gray-900 hover:bg-black text-white text-center rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-gray-900/20"
+                  >
+                    {t.WorkerProfile?.messageArtisan || 'Message Artisan'}
+                  </Link>
+                  <button className="w-full py-5 bg-gray-50 shadow-sm border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all">
                     {t.WorkerProfile?.viewLedger || 'View Verified Ledger'}
                   </button>
                 </div>
                 
-                <p className="mt-8 text-[9px] text-center text-slate-600 font-black uppercase tracking-widest">
+                <p className="mt-8 text-[9px] text-center text-slate-400 font-black uppercase tracking-widest">
                   {t.WorkerProfile?.secureProtocol || 'Securely operated by Kalide Global Protocol'}
                 </p>
              </div>
           </div>
         </div>
       </main>
+
+      <ReviewFormModal 
+        isOpen={isReviewModalOpen} 
+        onClose={() => setIsReviewModalOpen(false)} 
+        workerId={id} 
+        workerName={worker.user_name} 
+      />
     </div>
   );
 }

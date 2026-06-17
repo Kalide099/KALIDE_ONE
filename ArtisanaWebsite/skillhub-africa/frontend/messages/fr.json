@@ -165,10 +165,21 @@
     "certified": "Certifié",
     "yes": "Oui",
     "no": "Non",
-    "portfolio": "Portfolio",
+    "portfolio": "Portfolio des projets passés",
     "initiateLink": "Initier le Lien",
-    "viewLedger": "Voir le Grand Livre Vérifié",
-    "secureProtocol": "Opéré de manière sécurisée par le Protocole Kalide Global"
+    "viewLedger": "Voir le registre vérifié",
+    "secureProtocol": "Exploité de manière sécurisée par le protocole global Kalide",
+    "viewProject": "Voir le projet",
+    "clientReviews": "Avis des clients vérifiés",
+    "leaveReview": "Laisser un avis",
+    "messageArtisan": "Envoyer un message"
+  },
+  "ReviewModal": {
+    "title": "Soumettre un avis",
+    "rating": "Votre évaluation",
+    "comment": "Votre expérience",
+    "placeholder": "Parlez-nous de la qualité du travail, du professionnalisme et de l'expérience globale...",
+    "submit": "Publier l'avis"
   },
   "Admin": {
     "titlePrefix": "Nœud ",
