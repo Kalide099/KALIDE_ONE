@@ -19,8 +19,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Kalide One",
-  description: "The premium bilingual platform for unified services.",
+  title: "ARTISANA - By KALIDE SARL",
+  description: "The premium bilingual platform for unified services. Made and maintained by KALIDE SARL.",
 };
 
 export default async function LocaleLayout({

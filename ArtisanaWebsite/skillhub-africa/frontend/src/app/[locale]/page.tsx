@@ -134,8 +134,11 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 sm:gap-6">
             <div className="col-span-2">
               <div className="flex items-center space-x-3 mb-8">
-                <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black text-gray-900 text-xl shadow-md">A</div>
-                <span className="text-2xl font-black tracking-tight text-gray-900">ARTISANA</span>
+                <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black text-white text-xl shadow-md group-hover:scale-110 transition-transform">A</div>
+                <div className="flex flex-col justify-center">
+                  <span className="text-2xl font-black tracking-tight text-gray-900 leading-none">ARTISANA</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Made & Maintained by KALIDE SARL</span>
+                </div>
               </div>
               <p className="text-gray-500 max-w-md mb-8 leading-relaxed text-lg">{t.Footer.desc}</p>
             </div>

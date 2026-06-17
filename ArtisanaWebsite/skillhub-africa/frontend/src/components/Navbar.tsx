@@ -21,8 +21,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">K</div>
-            <span className="text-xl font-black tracking-tighter uppercase italic text-gray-900">Kalide One</span>
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">A</div>
+            <div className="flex flex-col items-start justify-center">
+              <span className="text-xl font-black tracking-tighter uppercase italic text-gray-900 leading-none">ARTISANA</span>
+              <span className="text-[8px] font-black tracking-widest uppercase text-gray-500 mt-0.5">by KALIDE SARL</span>
+            </div>
           </Link>
         </div>
         
