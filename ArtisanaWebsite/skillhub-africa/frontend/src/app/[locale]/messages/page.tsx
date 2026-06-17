@@ -42,6 +42,7 @@ export default function NeuralMessenger() {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [ws, setWs] = useState<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -49,16 +50,60 @@ export default function NeuralMessenger() {
   };
 
   useEffect(() => {
+    // Determine WebSocket protocol based on current protocol
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Hardcoding room 'general' for now
+    const roomName = 'general';
+    // Ensure we use the correct backend port (8000 for django runserver)
+    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+
+    socket.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const incomingMessage: Message = {
+        id: Date.now(),
+        senderId: 'NET-0x00',
+        senderName: data.user || 'Unknown',
+        sourceLang: language || 'en',
+        content: data.message,
+        translatedContent: {},
+        isMe: false, // will style appropriately if it's not our own broadcast
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages(prev => [...prev, incomingMessage]);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+
+    setWs(socket);
+
+    return () => {
+      socket.close();
+    };
+  }, [language]);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !ws) return;
+
+    // Send over WebSocket
+    ws.send(JSON.stringify({
+      message: newMessage
+    }));
 
     // Add Optimistic Message
     const tempMsg: Message = {
-      id: Date.now(),
+      id: Date.now() + 1,
       senderId: 'PRO-0x3C',
       senderName: 'You',
       sourceLang: language || 'en',
@@ -70,24 +115,6 @@ export default function NeuralMessenger() {
     
     setMessages(prev => [...prev, tempMsg]);
     setNewMessage('');
-    setIsTranslating(true);
-
-    // Simulate AI Translation Delay
-    setTimeout(() => {
-      setMessages(prev => prev.map(msg => {
-        if (msg.id === tempMsg.id) {
-          return {
-            ...msg,
-            translatedContent: {
-              fr: `[Traduction IA]: ${tempMsg.content}`,
-              en: `[AI Translated]: ${tempMsg.content}`
-            }
-          };
-        }
-        return msg;
-      }));
-      setIsTranslating(false);
-    }, 1200);
   };
 
   return (

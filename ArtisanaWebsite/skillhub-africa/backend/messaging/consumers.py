@@ -41,7 +41,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message,
-                'user': user.username if user.is_authenticated else 'Anonymous'
+                'user': user.name if user.is_authenticated else 'Anonymous'
             }
         )
 

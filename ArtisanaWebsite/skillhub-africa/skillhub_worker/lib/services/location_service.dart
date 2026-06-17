@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:workmanager/workmanager.dart';
+import 'api_service.dart';
 
 class LocationService {
   static final LocationService _instance = LocationService._internal();
@@ -73,12 +75,14 @@ class LocationService {
             accuracy: LocationAccuracy.high,
             distanceFilter: 10, // Update every 10 meters
           ),
-        ).listen((Position position) {
+        ).listen((Position position) async {
           _currentPosition = position;
-          // TODO: Send location to server
-          print(
-            'Location updated: ${position.latitude}, ${position.longitude}',
-          );
+          try {
+            await ApiService().updateLocation(position.latitude, position.longitude);
+            print('Location updated to server: ${position.latitude}, ${position.longitude}');
+          } catch (e) {
+            print('Failed to send location to server: $e');
+          }
         });
   }
 
@@ -97,9 +101,16 @@ class LocationService {
     double latitude,
     double longitude,
   ) async {
-    // TODO: Implement address lookup
-    // This requires additional geocoding package
-    return 'Address lookup not implemented';
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        return '${place.street}, ${place.subLocality}, ${place.locality}, ${place.country}';
+      }
+    } catch (e) {
+      print('Address lookup failed: $e');
+    }
+    return null;
   }
 }
 
@@ -113,8 +124,12 @@ void callbackDispatcher() {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // TODO: Send location to server
-      print('Background location: ${position.latitude}, ${position.longitude}');
+      try {
+        await ApiService().updateLocation(position.latitude, position.longitude);
+        print('Background location updated to server: ${position.latitude}, ${position.longitude}');
+      } catch (e) {
+        print('Background location send error: $e');
+      }
 
       return true;
     } catch (e) {

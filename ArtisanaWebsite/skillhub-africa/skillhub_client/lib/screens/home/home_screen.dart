@@ -34,13 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Notifications')));
             },
           ),
           IconButton(
             icon: const Icon(Icons.message),
             onPressed: () {
-              // TODO: Navigate to messages
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Messages')));
             },
           ),
         ],
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Navigate to create project
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Create Project')));
         },
         child: const Icon(Icons.add),
       ),
@@ -259,21 +259,21 @@ class _ProfileScreen extends StatelessWidget {
             leading: const Icon(Icons.edit),
             title: const Text('Edit Profile'),
             onTap: () {
-              // TODO: Navigate to edit profile
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Edit Profile')));
             },
           ),
           ListTile(
             leading: const Icon(Icons.payment),
             title: const Text('Payment Methods'),
             onTap: () {
-              // TODO: Navigate to payment methods
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Payment Methods')));
             },
           ),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {
-              // TODO: Navigate to settings
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Settings')));
             },
           ),
           const Divider(),
@@ -422,6 +422,22 @@ class _ProfileStat extends StatelessWidget {
         ),
         Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
+    );
+  }
+}
+
+class PlaceholderScreen extends StatelessWidget {
+  final String title;
+
+  const PlaceholderScreen({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Text('$title screen under construction'),
+      ),
     );
   }
 }

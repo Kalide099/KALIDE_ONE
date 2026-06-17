@@ -2,12 +2,13 @@ from django.urls import path
 from .views import (
     RegisterView, LoginView, AdminUserListView, AdminProjectListView, 
     AdminPaymentListView, AnalyticsView, AdminUserDetailView, AdminWarnUserView, 
-    AdminToggleAccessView, AdminSubscriptionUpgradeView
+    AdminToggleAccessView, AdminSubscriptionUpgradeView, AvatarUploadView
 )
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('avatar/', AvatarUploadView.as_view(), name='avatar-upload'),
     path('admin/users/', AdminUserListView.as_view(), name='admin-users'),
     path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
     path('admin/users/<int:pk>/warn/', AdminWarnUserView.as_view(), name='admin-user-warn'),

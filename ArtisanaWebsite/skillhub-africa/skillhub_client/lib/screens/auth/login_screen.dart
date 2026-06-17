@@ -178,9 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Forgot password
                 TextButton(
-                  onPressed: () {
-                    // TODO: Implement forgot password
-                  },
+                  onPressed: _showForgotPasswordDialog,
                   child: const Text('Forgot Password?'),
                 ),
               ],
@@ -188,6 +186,74 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController(text: _emailController.text);
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool isLoading = false;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Reset Password'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Enter your email address to receive a password reset link.'),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          final email = emailController.text.trim();
+                          if (email.isEmpty || !email.contains('@')) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter a valid email'), backgroundColor: Colors.red),
+                            );
+                            return;
+                          }
+
+                          setState(() => isLoading = true);
+                          final authProvider = context.read<AuthProvider>();
+                          final success = await authProvider.forgotPassword(email);
+                          
+                          if (mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(success ? 'Password reset link sent to $email' : (authProvider.errorMessage ?? 'Failed to send reset link')),
+                                backgroundColor: success ? Colors.green : Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                  child: isLoading
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Send Link'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

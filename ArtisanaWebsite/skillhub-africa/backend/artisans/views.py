@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from .models import Professional, SkillCategory, PortfolioItem, ProfessionalVerification, Badge
 from .serializers import ProfessionalSerializer, SkillCategorySerializer, PortfolioItemSerializer, ProfessionalVerificationSerializer, BadgeSerializer
@@ -38,6 +39,7 @@ class ProfessionalDetailView(generics.RetrieveAPIView):
 
 class PortfolioListView(generics.ListCreateAPIView):
     serializer_class = PortfolioItemSerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
         professional_id = self.kwargs['professional_id']

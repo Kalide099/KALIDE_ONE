@@ -1,16 +1,25 @@
 from rest_framework import generics, status, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.db import models
 from django.db.models import Sum
 from .models import User
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, AvatarSerializer
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from payments.models import Payment
 from payments.serializers import PaymentSerializer
 
+class AvatarUploadView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AvatarSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_object(self):
+        return self.request.user
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

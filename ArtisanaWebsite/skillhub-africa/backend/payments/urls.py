@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     PaymentListView, WalletDetailView, TransactionListView, EscrowAccountDetailView,
-    QuoteListView, QuoteDetailView, InvoiceListView, InvoiceDetailView
+    QuoteListView, QuoteDetailView, InvoiceListView, InvoiceDetailView,
+    CreateCheckoutSessionView, PayoutRequestView
 )
 
 urlpatterns = [
@@ -13,4 +14,6 @@ urlpatterns = [
     path('quotes/<int:pk>/', QuoteDetailView.as_view(), name='quote-detail'),
     path('invoices/', InvoiceListView.as_view(), name='invoice-list'),
     path('invoices/<int:pk>/', InvoiceDetailView.as_view(), name='invoice-detail'),
+    path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
+    path('payouts/', PayoutRequestView.as_view(), name='payout-request'),
 ]

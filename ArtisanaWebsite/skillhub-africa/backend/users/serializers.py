@@ -5,8 +5,13 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'phone', 'country', 'city', 'role', 'is_active', 'created_at']
+        fields = ['id', 'name', 'email', 'phone', 'country', 'city', 'role', 'avatar', 'is_active', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['avatar']
 
 
 class RegisterSerializer(serializers.ModelSerializer):

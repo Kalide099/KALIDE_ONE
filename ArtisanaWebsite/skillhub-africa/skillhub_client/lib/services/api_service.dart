@@ -137,6 +137,18 @@ class ApiService {
     await clearAuthToken();
   }
 
+  Future<void> forgotPassword(String email) async {
+    final response = await _post(
+      '/auth/forgot-password',
+      body: {'email': email},
+      includeAuth: false,
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to request password reset: ${response.body}');
+    }
+  }
+
   // User endpoints
   Future<User> getCurrentUser() async {
     final response = await _get('/auth/user');
@@ -153,6 +165,13 @@ class ApiService {
       return User.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to update user: ${response.body}');
+    }
+  }
+
+  Future<void> updateFCMToken(String token) async {
+    final response = await _post('/auth/device-token', body: {'token': token});
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to update FCM token: ${response.body}');
     }
   }
 

@@ -61,7 +61,8 @@ class PortfolioItem(models.Model):
     professional = models.ForeignKey(User, on_delete=models.CASCADE, related_name='portfolio')
     title = models.JSONField(default=dict, help_text='{"en": "Title", "fr": "Titre"}')
     description = models.JSONField(default=dict, help_text='{"en": "Description", "fr": "Description"}')
-    image_url = models.URLField()
+    image_file = models.ImageField(upload_to='portfolios/', null=True, blank=True)
+    image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

@@ -1,12 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../providers/job_provider.dart';
 import '../../models/job.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class JobDetailsScreen extends StatelessWidget {
+class JobDetailsScreen extends StatefulWidget {
   final Job job;
 
   const JobDetailsScreen({super.key, required this.job});
+
+  @override
+  State<JobDetailsScreen> createState() => _JobDetailsScreenState();
+}
+
+class _JobDetailsScreenState extends State<JobDetailsScreen> {
+  bool _isSaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedStatus();
+  }
+
+  Future<void> _checkSavedStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isSaved = prefs.getBool('saved_job_${widget.job.id}') ?? false;
+    });
+  }
+
+  Future<void> _toggleSaveStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final newStatus = !_isSaved;
+    await prefs.setBool('saved_job_${widget.job.id}', newStatus);
+    setState(() {
+      _isSaved = newStatus;
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(newStatus ? 'Job saved!' : 'Job removed from saved.'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +58,7 @@ class JobDetailsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              // TODO: Implement share functionality
+              Share.share('Check out this job on SkillHub: ${widget.job.title} - ${widget.job.description}');
             },
           ),
         ],
@@ -193,10 +232,8 @@ class JobDetailsScreen extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
-                  // TODO: Implement save job functionality
-                },
-                child: const Text('Save Job'),
+                onPressed: _toggleSaveStatus,
+                child: Text(_isSaved ? 'Saved' : 'Save Job'),
               ),
             ),
             const SizedBox(width: 16),

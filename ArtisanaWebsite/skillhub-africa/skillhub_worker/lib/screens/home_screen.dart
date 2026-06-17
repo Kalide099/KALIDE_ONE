@@ -34,13 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Notifications')));
             },
           ),
           IconButton(
             icon: const Icon(Icons.account_circle),
             onPressed: () {
-              // TODO: Navigate to profile
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Profile')));
             },
           ),
         ],
@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Active Jobs',
-                    '2', // TODO: Get from provider
+                    '0', // Note: Active jobs count would normally come from a provider, hardcoded for now as API lacks endpoint or field
                     Icons.play_circle,
                     Colors.green,
                   ),
@@ -135,19 +135,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           switch (index) {
             case 0:
               // Already on home
               break;
             case 1:
-              // TODO: Navigate to jobs
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'My Jobs')));
               break;
             case 2:
-              // TODO: Navigate to messages
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Messages')));
               break;
             case 3:
-              // TODO: Navigate to profile
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PlaceholderScreen(title: 'Profile')));
               break;
           }
         },
@@ -254,6 +255,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class PlaceholderScreen extends StatelessWidget {
+  final String title;
+
+  const PlaceholderScreen({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Text('$title screen under construction'),
       ),
     );
   }

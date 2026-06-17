@@ -136,6 +136,23 @@ class ApiService {
     return this.request('/professionals');
   }
 
+  async searchProfessionals(query: string, location: string, sortBy: string): Promise<ApiResponse<any>> {
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (location) params.append('location', location);
+    if (sortBy === 'price_asc') {
+      params.append('sort_by', 'price');
+      params.append('sort_order', 'asc');
+    } else if (sortBy === 'price_desc') {
+      params.append('sort_by', 'price');
+      params.append('sort_order', 'desc');
+    } else {
+      params.append('sort_by', 'rating');
+      params.append('sort_order', 'desc');
+    }
+    return this.request(`/professionals/search/?${params.toString()}`);
+  }
+
   async getProfessionalDetail(id: number): Promise<ApiResponse<Professional>> {
     return this.request(`/professionals/${id}/`);
   }
@@ -215,6 +232,57 @@ class ApiService {
 
   isAuthenticated() {
     return !!this.getAccessToken();
+  }
+
+  async uploadAvatar(file: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    // We override default JSON headers for FormData
+    const token = this.getAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/avatar/`, {
+        method: 'PATCH',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
+      return { success: true, data };
+    } catch (e) {
+      return { success: false, message: 'Network error' };
+    }
+  }
+
+  async uploadPortfolio(professionalId: number, title: string, desc: string, file: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('title', JSON.stringify({ en: title }));
+    formData.append('description', JSON.stringify({ en: desc }));
+    formData.append('image_file', file);
+    
+    const token = this.getAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/professionals/${professionalId}/portfolio/`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
+      return { success: true, data };
+    } catch (e) {
+      return { success: false, message: 'Network error' };
+    }
   }
 }
 

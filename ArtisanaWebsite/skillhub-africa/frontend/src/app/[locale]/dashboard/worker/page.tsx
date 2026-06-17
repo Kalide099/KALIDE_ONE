@@ -10,8 +10,9 @@ export default function WorkerDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeModal, setActiveModal] = useState<string | null>(null);
+    const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +31,15 @@ export default function WorkerDashboard() {
     };
     fetchData();
   }, []);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatarUploading(true);
+      await apiService.uploadAvatar(e.target.files[0]);
+      setAvatarUploading(false);
+      // Ideally refresh user data here
+    }
+  };
 
   const getTitle = (p: Project) => p.title[language] || p.title['en'] || 'Untitled Project';
 
@@ -50,6 +60,10 @@ export default function WorkerDashboard() {
             <span className="text-lg font-black tracking-tighter uppercase italic">Kalide One</span>
           </div>
           <div className="flex items-center space-x-6">
+            <label className="cursor-pointer hidden sm:flex items-center space-x-2 px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 rounded-full transition-all text-[10px] font-black uppercase tracking-widest text-slate-300">
+              {avatarUploading ? 'Uploading...' : 'Update Avatar'}
+              <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
+            </label>
             <Link href="/upgrade" className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-secondary to-purple-500 rounded-full hover:scale-105 transition-all shadow-lg shadow-secondary/20">
               <span className="text-[10px] font-black uppercase tracking-widest text-white">{t.WorkerDashboard?.upgradeNode}</span>
             </Link>

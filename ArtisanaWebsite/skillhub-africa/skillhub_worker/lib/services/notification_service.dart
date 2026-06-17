@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'api_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -68,9 +69,12 @@ class NotificationService {
   }
 
   Future<void> _sendTokenToServer(String token) async {
-    // TODO: Implement API call to send FCM token to backend
     debugPrint('Sending FCM token to server: $token');
-    // await ApiService().updateFCMToken(token);
+    try {
+      await ApiService().updateFCMToken(token);
+    } catch (e) {
+      debugPrint('Error updating FCM token: $e');
+    }
   }
 
   void _onMessageReceived(RemoteMessage message) {
