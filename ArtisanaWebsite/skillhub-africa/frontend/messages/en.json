@@ -52,6 +52,12 @@
       "terms": "Terms",
       "privacy": "Privacy",
       "safety": "Safety"
+    },
+    "contact": {
+      "title": "Headquarters Address",
+      "address": "1674, Benin",
+      "phone": "+229 01 66 98 33 83",
+      "email": "kalideglobal@gmail.com"
     }
   },
   "ServiceBundles": {
