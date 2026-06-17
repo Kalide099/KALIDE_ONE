@@ -58,12 +58,12 @@ export default function Register() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px]" />
 
       <div className="w-full max-w-2xl relative">
-        <div className="glass p-12 md:p-16 rounded-[3rem] border-white/5 shadow-2xl">
+        <div className="bg-white shadow-sm border border-gray-100 p-12 md:p-16 rounded-[3rem] border-gray-200 shadow-2xl">
           <div className="text-center mb-12">
-            <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
+            <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
               {t.Auth?.registerBadge || 'New Node Deployment'}
             </div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-white mb-2">{t.Auth?.registerTitle || 'Initialize Account'}</h1>
+            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.registerTitle || 'Initialize Account'}</h1>
             <p className="text-slate-500 font-medium text-sm">{t.Auth?.registerDesc || 'Join the unified Kalide One network.'}</p>
           </div>
 
@@ -85,7 +85,7 @@ export default function Register() {
                 name="name"
                 type="text"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
                 placeholder={t.Auth?.fields?.name || "Full Identity Name"}
                 value={formData.name}
                 onChange={handleChange}
@@ -94,7 +94,7 @@ export default function Register() {
                 name="email"
                 type="email"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
                 placeholder={t.Auth?.fields?.email || "Communication Email"}
                 value={formData.email}
                 onChange={handleChange}
@@ -103,7 +103,7 @@ export default function Register() {
                 name="phone"
                 type="tel"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
                 placeholder={t.Auth?.fields?.phone || "Uplink Phone"}
                 value={formData.phone}
                 onChange={handleChange}
@@ -111,7 +111,7 @@ export default function Register() {
               <select
                 name="role"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10 appearance-none"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10 appearance-none"
                 value={formData.role}
                 onChange={handleChange}
               >
@@ -123,7 +123,7 @@ export default function Register() {
                 name="country"
                 type="text"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
                 placeholder={t.Auth?.fields?.country || "Regional Country"}
                 value={formData.country}
                 onChange={handleChange}
@@ -132,7 +132,7 @@ export default function Register() {
                 name="city"
                 type="text"
                 required
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
                 placeholder={t.Auth?.fields?.city || "City Station"}
                 value={formData.city}
                 onChange={handleChange}
@@ -142,7 +142,7 @@ export default function Register() {
               name="password"
               type="password"
               required
-              className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+              className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
               placeholder={t.Auth?.fields?.password || "Primary Access Key"}
               value={formData.password}
               onChange={handleChange}
@@ -151,7 +151,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50"
+              className="w-full py-5 bg-primary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50"
             >
               {isLoading ? (t.Auth?.actions?.registering || 'Deploying...') : (t.Auth?.actions?.register || 'Confirm Registration')}
             </button>

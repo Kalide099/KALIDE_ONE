@@ -15,7 +15,7 @@ export default function UpgradeNode() {
       features: t.Upgrade?.plans?.free?.features || [],
       current: true,
       buttonText: t.Upgrade?.plans?.free?.btn,
-      theme: 'border-white/10 text-slate-400',
+      theme: 'border-gray-200 text-gray-500',
     },
     {
       id: 'pro',
@@ -41,18 +41,18 @@ export default function UpgradeNode() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900">
       {/* Background Ambience */}
       <div className="hero-glow top-0 right-0 w-[600px] h-[600px] opacity-10" />
       <div className="hero-glow-purple bottom-0 left-0 w-[500px] h-[500px] opacity-10 blur-3xl pointer-events-none" />
 
-      <header className="glass sticky top-0 z-50 border-b border-white/5 h-20">
+      <header className="bg-white shadow-sm border border-gray-100 sticky top-0 z-50 border-b border-gray-200 h-20">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard/worker" className="text-secondary hover:text-white transition-colors">
+            <Link href="/dashboard/worker" className="text-secondary hover:text-gray-900 transition-colors">
               <span className="font-black text-xl">←</span>
             </Link>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-secondary to-purple-500 flex items-center justify-center font-black text-white">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-secondary to-purple-500 flex items-center justify-center font-black text-gray-900">
               ⬆
             </div>
             <span className="text-lg font-black tracking-tighter uppercase italic">{t.Upgrade?.headerTitle}</span>
@@ -65,13 +65,13 @@ export default function UpgradeNode() {
 
       <main className="max-w-7xl mx-auto py-24 px-6 relative z-10 pt-32">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-6 animate-pulse">
+          <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-6 animate-pulse">
             {t.Upgrade?.badge}
           </div>
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase italic mb-6">
             {t.Upgrade?.titlePrefix}<span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-purple-400">{t.Upgrade?.titleHighlight}</span>
           </h1>
-          <p className="text-slate-400 text-lg font-medium leading-relaxed">
+          <p className="text-gray-500 text-lg font-medium leading-relaxed">
             {t.Upgrade?.description}
           </p>
         </div>
@@ -80,10 +80,10 @@ export default function UpgradeNode() {
           {plans.map((plan) => (
             <div 
               key={plan.id}
-              className={`glass rounded-[3rem] p-8 md:p-10 border transition-all duration-500 ${plan.theme}`}
+              className={`bg-white shadow-sm border border-gray-100 rounded-[3rem] p-8 md:p-10 border transition-all duration-500 ${plan.theme}`}
             >
               {plan.id === 'pro' && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg shadow-secondary/30">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-gray-900 text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg shadow-secondary/30">
                   {t.Upgrade?.standard}
                 </div>
               )}
@@ -100,7 +100,7 @@ export default function UpgradeNode() {
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-start space-x-4">
                     <span className={`text-sm ${plan.id === 'pro' ? 'text-secondary' : plan.id === 'elite' ? 'text-purple-400' : 'text-slate-500'}`}>✓</span>
-                    <span className="text-sm font-medium text-slate-300">{feature}</span>
+                    <span className="text-sm font-medium text-gray-600">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -108,9 +108,9 @@ export default function UpgradeNode() {
               <button 
                 className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all relative overflow-hidden group ${
                   plan.current 
-                    ? 'bg-white/5 text-slate-400 cursor-not-allowed' 
+                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
                     : plan.id === 'pro'
-                      ? 'bg-secondary text-white hover:bg-secondary/90 shadow-xl shadow-secondary/20'
+                      ? 'bg-secondary text-gray-900 hover:bg-secondary/90 shadow-xl shadow-secondary/20'
                       : 'border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500'
                 }`}
                 disabled={plan.current}

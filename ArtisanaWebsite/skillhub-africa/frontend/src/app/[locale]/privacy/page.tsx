@@ -5,26 +5,26 @@ export default function Privacy() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white pt-32 pb-12 px-6">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900 pt-32 pb-12 px-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-12">
-          <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+          <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
             {t.Legal?.privacy?.badge}
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">{t.Legal?.privacy?.titlePrefix}<span className="gradient-text">{t.Legal?.privacy?.titleHighlight}</span></h1>
-          <p className="text-slate-400 font-medium mt-2">{t.Legal?.privacy?.description}</p>
+          <p className="text-gray-500 font-medium mt-2">{t.Legal?.privacy?.description}</p>
         </div>
 
-        <div className="glass rounded-[2rem] border-white/5 p-8 md:p-12 space-y-8 text-slate-300 font-medium leading-relaxed">
+        <div className="bg-white shadow-sm border border-gray-100 rounded-[2rem] border-gray-200 p-8 md:p-12 space-y-8 text-gray-600 font-medium leading-relaxed">
           <section>
-            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">{t.Legal?.privacy?.sec1Title}</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900 mb-4">{t.Legal?.privacy?.sec1Title}</h2>
             <p>
               {t.Legal?.privacy?.sec1Content}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">{t.Legal?.privacy?.sec2Title}</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900 mb-4">{t.Legal?.privacy?.sec2Title}</h2>
             <p>
               {t.Legal?.privacy?.sec2Content}
             </p>
@@ -37,7 +37,7 @@ export default function Privacy() {
         </div>
 
         <div className="mt-12 text-center">
-          <a href="/" className="inline-block px-8 py-4 glass text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all">
+          <a href="/" className="inline-block px-8 py-4 bg-white shadow-sm border border-gray-100 text-gray-900 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-all">
             {t.return}
           </a>
         </div>

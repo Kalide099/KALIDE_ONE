@@ -52,7 +52,7 @@ export default function Landing() {
                 {t.Hero.description}
               </p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/register" className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-white rounded-2xl font-bold uppercase tracking-wide text-sm hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/30 text-center transform hover:-translate-y-1">
+                <Link href="/register" className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-gray-900 rounded-2xl font-bold uppercase tracking-wide text-sm hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/30 text-center transform hover:-translate-y-1">
                   {t.Hero.ctaHiring}
                 </Link>
                 <Link href="/services" className="w-full sm:w-auto px-10 py-5 bg-white text-gray-800 border-2 border-gray-200 rounded-2xl font-bold uppercase tracking-wide text-sm hover:border-gray-300 hover:bg-gray-50 transition-all text-center">
@@ -97,7 +97,7 @@ export default function Landing() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {categories.map((cat, i) => (
                   <div key={i} className="group p-10 bg-white rounded-[2rem] border border-gray-100 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer">
-                    <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-sm">
+                    <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-gray-900 transition-all shadow-sm">
                       {cat.icon}
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">{cat.title}</h3>
@@ -110,7 +110,7 @@ export default function Landing() {
 
           {/* CTA Section */}
           <section className="py-32 px-6 bg-white">
-            <div className="max-w-6xl mx-auto bg-gradient-to-br from-orange-500 to-orange-700 text-white p-16 md:p-24 rounded-[3rem] text-center shadow-2xl relative overflow-hidden">
+            <div className="max-w-6xl mx-auto bg-gradient-to-br from-orange-500 to-orange-700 text-gray-900 p-16 md:p-24 rounded-[3rem] text-center shadow-2xl relative overflow-hidden">
               {/* Subtle pattern overlay */}
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
               <div className="relative z-10">
@@ -120,7 +120,7 @@ export default function Landing() {
                   <Link href="/register?role=worker" className="px-10 py-5 bg-white text-orange-700 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-gray-50 hover:scale-105 transition-all shadow-xl shadow-black/10">
                     {t.CTA.workerBtn}
                   </Link>
-                  <Link href="/register?role=client" className="px-10 py-5 bg-transparent border-2 border-white text-white rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:scale-105 transition-all">
+                  <Link href="/register?role=client" className="px-10 py-5 bg-transparent border-2 border-white text-gray-900 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:scale-105 transition-all">
                     {t.CTA.clientBtn}
                   </Link>
                 </div>
@@ -133,7 +133,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 sm:gap-6">
             <div className="col-span-2">
               <div className="flex items-center space-x-3 mb-8">
-                <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black text-white text-xl shadow-md">A</div>
+                <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black text-gray-900 text-xl shadow-md">A</div>
                 <span className="text-2xl font-black tracking-tight text-gray-900">ARTISANA</span>
               </div>
               <p className="text-gray-500 max-w-md mb-8 leading-relaxed text-lg">{t.Footer.desc}</p>

@@ -25,16 +25,16 @@ export default function KalideSupply() {
   const activeProducts = products.filter(p => p.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900">
       <div className="hero-glow top-0 right-0 w-[400px] h-[400px] opacity-10 blur-3xl pointer-events-none" />
 
-      <header className="glass sticky top-0 z-50 border-b border-white/5 h-20">
+      <header className="bg-white shadow-sm border border-gray-100 sticky top-0 z-50 border-b border-gray-200 h-20">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard/worker" className="text-secondary hover:text-white transition-colors">
+            <Link href="/dashboard/worker" className="text-secondary hover:text-gray-900 transition-colors">
               <span className="font-black text-xl">←</span>
             </Link>
-            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-white">
+            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-gray-900">
               S
             </div>
             <span className="text-lg font-black tracking-tighter uppercase italic">{t.Supply?.headerTitle}</span>
@@ -43,7 +43,7 @@ export default function KalideSupply() {
             <div className="px-4 py-2 bg-orange-500/10 border border-orange-500/30 rounded-full text-xs font-bold text-orange-400">
                 {t.Supply?.escrowStatus}
             </div>
-            <button className="px-4 py-2 glass hover:bg-white/5 rounded-full text-xs font-black uppercase tracking-widest transition-all">
+            <button className="px-4 py-2 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-full text-xs font-black uppercase tracking-widest transition-all">
               {t.Supply?.cart} ({cartCount})
             </button>
           </div>
@@ -59,7 +59,7 @@ export default function KalideSupply() {
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic mb-2">
               {t.Supply?.titlePrefix}<span className="text-orange-400">{t.Supply?.titleHighlight}</span>
             </h1>
-            <p className="text-slate-400 md:text-lg font-medium max-w-2xl">
+            <p className="text-gray-500 md:text-lg font-medium max-w-2xl">
               {t.Supply?.description}
             </p>
           </div>
@@ -77,8 +77,8 @@ export default function KalideSupply() {
               onClick={() => setActiveCategory(cat.id)}
               className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] whitespace-nowrap transition-all ${
                 activeCategory === cat.id
-                  ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
-                  : 'glass text-slate-400 hover:text-white border-white/5'
+                  ? 'bg-orange-500 text-gray-900 shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+                  : 'bg-white shadow-sm border border-gray-100 text-gray-500 hover:text-gray-900 border-gray-200'
               }`}
             >
               {cat.name}
@@ -89,14 +89,14 @@ export default function KalideSupply() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {activeProducts.map(product => (
-            <div key={product.id} className="glass rounded-[2rem] p-6 border-white/5 hover:border-orange-500/30 transition-all group flex flex-col">
-              <div className="w-full h-40 bg-black/40 rounded-2xl mb-6 flex items-center justify-center border border-white/5 group-hover:border-orange-500/20 transition-all">
+            <div key={product.id} className="bg-white shadow-sm border border-gray-100 rounded-[2rem] p-6 border-gray-200 hover:border-orange-500/30 transition-all group flex flex-col">
+              <div className="w-full h-40 bg-black/40 rounded-2xl mb-6 flex items-center justify-center border border-gray-200 group-hover:border-orange-500/20 transition-all">
                 <span className="text-4xl font-black text-slate-600">{product.imgUrl}</span>
               </div>
               <h3 className="font-bold text-sm mb-1">{product.name}</h3>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">{product.vendor}</p>
               
-              <div className="flex items-end justify-between mt-auto pt-4 border-t border-white/5">
+              <div className="flex items-end justify-between mt-auto pt-4 border-t border-gray-200">
                 <div>
                   <span className="text-xl font-black">{product.price}</span>
                 </div>
@@ -105,8 +105,8 @@ export default function KalideSupply() {
                   onClick={() => product.inStock && setCartCount(prev => prev + 1)}
                   className={`px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] transition-all ${
                     product.inStock 
-                      ? 'bg-orange-500 hover:bg-orange-400 text-white shadow-lg shadow-orange-500/20 active:scale-95' 
-                      : 'bg-white/5 text-slate-500 cursor-not-allowed'
+                      ? 'bg-orange-500 hover:bg-orange-400 text-gray-900 shadow-lg shadow-orange-500/20 active:scale-95' 
+                      : 'bg-gray-100 text-slate-500 cursor-not-allowed'
                   }`}
                 >
                   {product.inStock ? t.Supply?.add : t.Supply?.outStock}

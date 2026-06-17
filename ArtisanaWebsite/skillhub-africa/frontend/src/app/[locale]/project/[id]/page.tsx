@@ -54,14 +54,14 @@ export default function ProjectDetail() {
   const isClient = currentUser?.role === 'client';
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900">
       {/* Background Decor */}
       <div className="hero-glow top-0 left-0 w-[500px] h-[500px] opacity-10" />
       
-      <header className="glass sticky top-0 z-50 border-b border-white/5 h-20">
+      <header className="bg-white shadow-sm border border-gray-100 sticky top-0 z-50 border-b border-gray-200 h-20">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href={isClient ? "/dashboard/client" : "/dashboard/worker"} className="text-slate-500 hover:text-white transition-colors">
+            <Link href={isClient ? "/dashboard/client" : "/dashboard/worker"} className="text-slate-500 hover:text-gray-900 transition-colors">
               <span className="text-xl">←</span>
             </Link>
             <div className="h-4 w-px bg-white/10" />
@@ -80,27 +80,27 @@ export default function ProjectDetail() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
              <div>
-                <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
+                <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-6">
                   {t.ProjectDetail?.moduleID}: #{project.id}
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black tracking-tight uppercase mb-6 italic">{getTitle()}</h2>
-                <p className="text-xl text-slate-400 font-medium leading-relaxed">{getDesc()}</p>
+                <p className="text-xl text-gray-500 font-medium leading-relaxed">{getDesc()}</p>
              </div>
 
              <div className="grid grid-cols-2 gap-8">
-                <div className="p-6 glass rounded-2xl border-white/5">
+                <div className="p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200">
                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{t.ProjectDetail?.budgetNode}</p>
                    <p className="text-2xl font-black">${parseFloat(project.budget).toLocaleString()}</p>
                 </div>
-                <div className="p-6 glass rounded-2xl border-white/5">
+                <div className="p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200">
                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{t.ProjectDetail?.completionNode}</p>
                    <p className="text-2xl font-black">{project.status === 'completed' ? '100%' : '45%'}</p>
                 </div>
              </div>
 
              <div className="space-y-6">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">{t.ProjectDetail?.syncTimeline}</h3>
-                <div className="relative pl-8 border-l-2 border-white/5 space-y-12">
+                <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">{t.ProjectDetail?.syncTimeline}</h3>
+                <div className="relative pl-8 border-l-2 border-gray-200 space-y-12">
                    <div className="relative">
                       <div className="absolute left-[-37px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-[#0f172a]" />
                       <p className="font-black uppercase text-xs tracking-widest mb-1">{t.ProjectDetail?.initialization}</p>
@@ -117,12 +117,12 @@ export default function ProjectDetail() {
 
           {/* Sidebar Actions */}
           <div className="space-y-8">
-             <div className="glass p-8 rounded-[2rem] border-white/5">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-8 underline decoration-primary decoration-4 underline-offset-8">{t.ProjectDetail?.entityAccess}</h3>
+             <div className="bg-white shadow-sm border border-gray-100 p-8 rounded-[2rem] border-gray-200">
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-8 underline decoration-primary decoration-4 underline-offset-8">{t.ProjectDetail?.entityAccess}</h3>
                 
                 <div className="space-y-6 mb-12">
                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-black text-xs">C</div>
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-black text-xs">C</div>
                       <div>
                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.ProjectDetail?.clientNode}</p>
                          <p className="text-xs font-bold">{project.client}</p>
@@ -140,7 +140,7 @@ export default function ProjectDetail() {
                  <div className="space-y-4">
                     <button 
                        onClick={() => setActiveAction('voice')}
-                       className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:shadow-lg hover:shadow-primary/20 transition-all"
+                       className="w-full py-4 bg-primary text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] hover:shadow-lg hover:shadow-primary/20 transition-all"
                     >
                        {t.ProjectDetail?.updateProtocol} (Voice)
                     </button>
@@ -150,7 +150,7 @@ export default function ProjectDetail() {
                     >
                        Field Check-In / Scan
                     </button>
-                    <button className="w-full py-4 glass hover:bg-white/5 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
+                    <button className="w-full py-4 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
                        {t.ProjectDetail?.secureMessaging}
                     </button>
                     {isClient && project.status !== 'completed' && (
@@ -177,7 +177,7 @@ export default function ProjectDetail() {
                   <div className="w-full max-w-xl relative">
                     <button 
                       onClick={() => setActiveAction(null)}
-                      className="absolute -top-12 right-0 text-white font-black text-xl hover:scale-110 transition-transform"
+                      className="absolute -top-12 right-0 text-gray-900 font-black text-xl hover:scale-110 transition-transform"
                     >
                       ✕
                     </button>

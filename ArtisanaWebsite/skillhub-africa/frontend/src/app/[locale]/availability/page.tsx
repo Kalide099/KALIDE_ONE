@@ -55,8 +55,8 @@ export default function AvailabilityManager() {
           onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), i))}
           className={`h-12 w-full flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all ${
             isSelected 
-              ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110 z-10' 
-              : 'hover:bg-white/10 text-slate-300'
+              ? 'bg-primary text-gray-900 shadow-lg shadow-primary/20 scale-110 z-10' 
+              : 'hover:bg-white/10 text-gray-600'
           }`}
         >
           <span className="font-bold text-sm">{i}</span>
@@ -68,16 +68,16 @@ export default function AvailabilityManager() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900">
       <div className="hero-glow top-0 right-0 w-[500px] h-[500px] opacity-10" />
 
-      <header className="glass sticky top-0 z-50 border-b border-white/5 h-20">
+      <header className="bg-white shadow-sm border border-gray-100 sticky top-0 z-50 border-b border-gray-200 h-20">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard/worker" className="text-secondary hover:text-white transition-colors">
+            <Link href="/dashboard/worker" className="text-secondary hover:text-gray-900 transition-colors">
               <span className="font-black text-xl">←</span>
             </Link>
-            <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center font-black text-white">A</div>
+            <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center font-black text-gray-900">A</div>
             <span className="text-lg font-black tracking-tighter uppercase italic">{t.Availability?.headerTitle}</span>
           </div>
           <div className="flex items-center space-x-6">
@@ -90,18 +90,18 @@ export default function AvailabilityManager() {
         {/* Left Column: Calendar UI */}
         <div className="lg:col-span-5 space-y-8">
           <div className="mb-8">
-            <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
+            <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
               {t.Availability?.badge}
             </div>
             <h1 className="text-4xl font-black tracking-tighter uppercase italic">{t.Availability?.title}</h1>
             <p className="text-slate-500 font-medium text-sm mt-2">{t.Availability?.description}</p>
           </div>
 
-          <div className="glass p-8 rounded-[2.5rem] border-white/5 shadow-2xl">
+          <div className="bg-white shadow-sm border border-gray-100 p-8 rounded-[2.5rem] border-gray-200 shadow-2xl">
             <div className="flex justify-between items-center mb-8">
               <button 
                 onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-secondary/20 hover:text-secondary flex items-center justify-center transition-all"
+                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-secondary/20 hover:text-secondary flex items-center justify-center transition-all"
               >
                 ←
               </button>
@@ -110,7 +110,7 @@ export default function AvailabilityManager() {
               </h2>
               <button 
                 onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-secondary/20 hover:text-secondary flex items-center justify-center transition-all"
+                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-secondary/20 hover:text-secondary flex items-center justify-center transition-all"
               >
                 →
               </button>
@@ -128,11 +128,11 @@ export default function AvailabilityManager() {
 
         {/* Right Column: Time Blocks UI */}
         <div className="lg:col-span-7">
-          <div className="glass p-8 md:p-12 rounded-[3rem] border-white/5 min-h-[600px] h-full">
-            <div className="flex justify-between items-end border-b border-white/5 pb-8 mb-8">
+          <div className="bg-white shadow-sm border border-gray-100 p-8 md:p-12 rounded-[3rem] border-gray-200 min-h-[600px] h-full">
+            <div className="flex justify-between items-end border-b border-gray-200 pb-8 mb-8">
               <div>
                 <h2 className="text-2xl font-black uppercase tracking-tighter mb-2">{t.Availability?.blockMatrix}</h2>
-                <p className="text-slate-400 font-medium text-sm">
+                <p className="text-gray-500 font-medium text-sm">
                   {selectedDate?.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function AvailabilityManager() {
                     slot.status === 'booked' 
                       ? 'border-secondary/20 bg-secondary/5' 
                       : slot.status === 'available'
-                        ? 'border-white/10 bg-black/20 hover:border-white/20 hover:bg-black/40 cursor-pointer'
+                        ? 'border-gray-200 bg-gray-100 hover:border-white/20 hover:bg-black/40 cursor-pointer'
                         : 'border-red-500/10 bg-red-500/5 opacity-50 cursor-pointer'
                   }`}
                   onClick={() => toggleSlot(slot.id)}

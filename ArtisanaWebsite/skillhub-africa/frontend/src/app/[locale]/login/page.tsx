@@ -66,12 +66,12 @@ export default function Login() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px]" />
       
       <div className="w-full max-w-xl relative">
-        <div className="glass p-12 md:p-20 rounded-[3rem] border-white/5 shadow-2xl">
+        <div className="bg-white shadow-sm border border-gray-100 p-12 md:p-20 rounded-[3rem] border-gray-200 shadow-2xl">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
+            <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
               {t.Auth?.loginBadge || 'Secure Access Node'}
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-white mb-2">{t.Auth?.loginTitle || 'Protocol Access'}</h1>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.loginTitle || 'Protocol Access'}</h1>
             <p className="text-slate-500 font-medium">{t.Auth?.loginDesc || 'Secure authentication for system-wide operations.'}</p>
           </div>
 
@@ -94,7 +94,7 @@ export default function Login() {
                   name="email"
                   type="email"
                   required
-                  className="w-full bg-white/5 border border-white/10 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-white font-medium placeholder:text-slate-600"
+                  className="w-full bg-gray-100 border border-gray-200 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-gray-900 font-medium placeholder:text-slate-600"
                   placeholder={t.Auth?.fields?.email || "Official Email Node"}
                   value={formData.email}
                   onChange={handleChange}
@@ -105,7 +105,7 @@ export default function Login() {
                   name="password"
                   type="password"
                   required
-                  className="w-full bg-white/5 border border-white/10 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-white font-medium placeholder:text-slate-600"
+                  className="w-full bg-gray-100 border border-gray-200 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-gray-900 font-medium placeholder:text-slate-600"
                   placeholder={t.Auth?.fields?.password || "Access Key"}
                   value={formData.password}
                   onChange={handleChange}
@@ -116,7 +116,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50 active:scale-95"
+              className="w-full py-5 bg-primary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50 active:scale-95"
             >
               {isLoading ? (t.Auth?.actions?.loggingIn || 'Verifying...') : (t.Auth?.actions?.login || 'Identify Access')}
             </button>
@@ -131,7 +131,7 @@ export default function Login() {
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-slate-400 transition-colors">
+          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-gray-500 transition-colors">
             {t.Auth?.actions?.returnAccess || 'Return to Command Center'}
           </Link>
         </div>
