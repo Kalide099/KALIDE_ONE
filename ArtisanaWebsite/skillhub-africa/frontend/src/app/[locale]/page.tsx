@@ -11,9 +11,9 @@ export default function Landing() {
   const [currentImage, setCurrentImage] = useState(0);
 
   const backgroundImages = [
-    'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=2070', // Pottery
-    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=80&w=2070', // Woodworking
-    'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=2070'  // Artist
+    'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=100&w=2070', // Pottery
+    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=100&w=2070', // Woodworking
+    'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=100&w=2070'  // Artist
   ];
 
   useEffect(() => {
@@ -33,77 +33,75 @@ export default function Landing() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-stone-50 text-stone-900 overflow-x-hidden font-sans">
-      {/* Dynamic Background Effects */}
-      <div className="absolute hero-glow top-0 left-[-10%] z-[0] opacity-40" />
-      <div className="absolute hero-glow top-[40%] right-[-10%] z-[0] opacity-40" />
+    <div className="relative min-h-screen bg-white text-gray-900 overflow-x-hidden font-sans">
       
       {/* Content Layer */}
       <div className="relative z-10">
         <main>
           {/* Hero Section */}
-          <section className="pt-24 md:pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+          <section className="pt-28 md:pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 text-left">
-              <div className="inline-block px-4 py-1.5 bg-orange-100 text-orange-800 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mb-8">
+              <div className="inline-block px-5 py-2 bg-orange-100 text-orange-700 rounded-full text-xs font-bold uppercase tracking-widest mb-8 border border-orange-200 shadow-sm">
                 {t.Hero.badge}
               </div>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-stone-900">
-                {t.Hero.titlePrefix} <span className="text-orange-700 italic">{t.Hero.titleHighlight}</span> <br />
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-8 text-gray-900 drop-shadow-sm">
+                {t.Hero.titlePrefix} <span className="text-orange-600 italic underline decoration-orange-200 decoration-8 underline-offset-4">{t.Hero.titleHighlight}</span> <br />
                 {t.Hero.titleSuffix}
               </h1>
-              <p className="text-lg md:text-xl text-stone-600 leading-relaxed mb-10 max-w-xl">
+              <p className="text-xl md:text-2xl text-gray-600 leading-relaxed mb-12 max-w-xl font-medium">
                 {t.Hero.description}
               </p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/register" className="w-full sm:w-auto px-8 py-4 bg-orange-700 text-white rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-orange-800 transition-colors shadow-lg shadow-orange-700/20 text-center">
+                <Link href="/register" className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-white rounded-2xl font-bold uppercase tracking-wide text-sm hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/30 text-center transform hover:-translate-y-1">
                   {t.Hero.ctaHiring}
                 </Link>
-                <Link href="/services" className="w-full sm:w-auto px-8 py-4 bg-white text-stone-700 border border-stone-200 rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-stone-50 transition-colors text-center">
+                <Link href="/services" className="w-full sm:w-auto px-10 py-5 bg-white text-gray-800 border-2 border-gray-200 rounded-2xl font-bold uppercase tracking-wide text-sm hover:border-gray-300 hover:bg-gray-50 transition-all text-center">
                   {t.Hero.ctaExplore}
                 </Link>
               </div>
 
-              <div className="mt-16 flex items-center gap-8 opacity-70 grayscale hover:grayscale-0 transition-all text-sm font-semibold text-stone-500">
-                <div>{t.Hero.trusted1}</div>
-                <div>{t.Hero.trusted2}</div>
-                <div>{t.Hero.trusted3}</div>
-                <div>{t.Hero.trusted4}</div>
+              <div className="mt-16 flex items-center gap-10 text-sm font-bold text-gray-400">
+                <div className="hover:text-orange-500 transition-colors cursor-pointer">{t.Hero.trusted1}</div>
+                <div className="hover:text-orange-500 transition-colors cursor-pointer">{t.Hero.trusted2}</div>
+                <div className="hover:text-orange-500 transition-colors cursor-pointer">{t.Hero.trusted3}</div>
+                <div className="hover:text-orange-500 transition-colors cursor-pointer">{t.Hero.trusted4}</div>
               </div>
             </div>
             
             {/* Right side imagery */}
-            <div className="flex-1 w-full relative h-[400px] lg:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <div className="flex-1 w-full relative h-[500px] lg:h-[700px] rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white">
               {backgroundImages.map((img, i) => (
                 <Image
                   key={img}
                   src={img}
                   alt="Artisan Showcase"
                   fill
-                  className={`object-cover transition-opacity duration-1000 ease-in-out ${
+                  className={`object-cover transition-opacity duration-700 ease-in-out ${
                     i === currentImage ? 'opacity-100' : 'opacity-0'
                   }`}
                   priority={i === 0}
                 />
               ))}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              {/* Very light gradient to ensure any overlay text would pop, but minimal blur */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
           </section>
 
           {/* Categories Section */}
-          <section id="services" className="py-24 px-6 bg-stone-100/50">
+          <section id="services" className="py-32 px-6 bg-gray-50">
             <div className="max-w-7xl mx-auto">
-              <div className="mb-16 text-center">
-                <h2 className="text-3xl font-extrabold tracking-tight mb-4 text-stone-900">{t.Categories.title}</h2>
-                <div className="h-1.5 w-20 bg-orange-600 rounded-full mx-auto" />
+              <div className="mb-20 text-center">
+                <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-gray-900">{t.Categories.title}</h2>
+                <div className="h-2 w-24 bg-orange-500 rounded-full mx-auto shadow-sm" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {categories.map((cat, i) => (
-                  <div key={i} className="group p-8 bg-white rounded-3xl border border-stone-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-                    <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                  <div key={i} className="group p-10 bg-white rounded-[2rem] border border-gray-100 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer">
+                    <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all shadow-sm">
                       {cat.icon}
                     </div>
-                    <h3 className="text-xl font-bold text-stone-900 mb-3">{cat.title}</h3>
-                    <p className="text-stone-600 leading-relaxed">{cat.desc}</p>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{cat.title}</h3>
+                    <p className="text-gray-600 leading-relaxed text-lg">{cat.desc}</p>
                   </div>
                 ))}
               </div>
@@ -111,48 +109,53 @@ export default function Landing() {
           </section>
 
           {/* CTA Section */}
-          <section className="py-24 px-6">
-            <div className="max-w-5xl mx-auto bg-stone-900 text-white p-12 md:p-20 rounded-[3rem] text-center shadow-2xl relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=2070')] bg-cover bg-center" />
+          <section className="py-32 px-6 bg-white">
+            <div className="max-w-6xl mx-auto bg-gradient-to-br from-orange-500 to-orange-700 text-white p-16 md:p-24 rounded-[3rem] text-center shadow-2xl relative overflow-hidden">
+              {/* Subtle pattern overlay */}
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
               <div className="relative z-10">
-                <h2 className="text-4xl md:text-5xl font-extrabold mb-6">{t.CTA.title}</h2>
-                <p className="text-lg text-stone-300 font-medium mb-10 max-w-2xl mx-auto">{t.CTA.desc}</p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <Link href="/register?role=worker" className="px-8 py-4 bg-lime-600 text-white rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-lime-700 transition-colors shadow-lg shadow-lime-700/20">{t.CTA.workerBtn}</Link>
-                  <Link href="/register?role=client" className="px-8 py-4 bg-white text-stone-900 rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-stone-100 transition-colors">{t.CTA.clientBtn}</Link>
+                <h2 className="text-5xl md:text-6xl font-extrabold mb-8 drop-shadow-md">{t.CTA.title}</h2>
+                <p className="text-xl md:text-2xl text-orange-50 font-medium mb-12 max-w-3xl mx-auto drop-shadow-sm">{t.CTA.desc}</p>
+                <div className="flex flex-col sm:flex-row justify-center gap-6">
+                  <Link href="/register?role=worker" className="px-10 py-5 bg-white text-orange-700 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-gray-50 hover:scale-105 transition-all shadow-xl shadow-black/10">
+                    {t.CTA.workerBtn}
+                  </Link>
+                  <Link href="/register?role=client" className="px-10 py-5 bg-transparent border-2 border-white text-white rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:scale-105 transition-all">
+                    {t.CTA.clientBtn}
+                  </Link>
                 </div>
               </div>
             </div>
           </section>
         </main>
 
-        <footer className="py-16 px-6 border-t border-stone-200 bg-white">
+        <footer className="py-20 px-6 border-t border-gray-100 bg-gray-50">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 sm:gap-6">
             <div className="col-span-2">
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-orange-700 rounded-lg flex items-center justify-center font-black text-white">A</div>
-                <span className="text-lg font-black tracking-tight text-stone-900">ARTISANA</span>
+              <div className="flex items-center space-x-3 mb-8">
+                <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center font-black text-white text-xl shadow-md">A</div>
+                <span className="text-2xl font-black tracking-tight text-gray-900">ARTISANA</span>
               </div>
-              <p className="text-stone-500 max-w-sm mb-8 leading-relaxed">{t.Footer.desc}</p>
+              <p className="text-gray-500 max-w-md mb-8 leading-relaxed text-lg">{t.Footer.desc}</p>
             </div>
             <div>
-              <h4 className="font-bold uppercase tracking-wider text-xs text-stone-400 mb-6">{t.Footer?.links?.platform || 'Platform'}</h4>
-              <ul className="space-y-4 text-sm font-medium text-stone-600">
-                <li><Link href="/services" className="hover:text-orange-700 transition-colors">{t.Navigation.services}</Link></li>
-                <li><Link href="/bundles" className="hover:text-orange-700 transition-colors">{t.Navigation.bundles}</Link></li>
-                <li><Link href="/verification" className="hover:text-orange-700 transition-colors">{t.Footer?.links?.verification || 'Verification'}</Link></li>
+              <h4 className="font-bold uppercase tracking-widest text-sm text-gray-400 mb-8">{t.Footer?.links?.platform || 'Platform'}</h4>
+              <ul className="space-y-5 text-base font-medium text-gray-600">
+                <li><Link href="/services" className="hover:text-orange-600 transition-colors">{t.Navigation.services}</Link></li>
+                <li><Link href="/bundles" className="hover:text-orange-600 transition-colors">{t.Navigation.bundles}</Link></li>
+                <li><Link href="/verification" className="hover:text-orange-600 transition-colors">{t.Footer?.links?.verification || 'Verification'}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold uppercase tracking-wider text-xs text-stone-400 mb-6">{t.Footer?.links?.legal || 'Legal'}</h4>
-              <ul className="space-y-4 text-sm font-medium text-stone-600">
-                <li><Link href="/terms" className="hover:text-orange-700 transition-colors">{t.Footer?.links?.terms || 'Terms'}</Link></li>
-                <li><Link href="/privacy" className="hover:text-orange-700 transition-colors">{t.Footer?.links?.privacy || 'Privacy'}</Link></li>
+              <h4 className="font-bold uppercase tracking-widest text-sm text-gray-400 mb-8">{t.Footer?.links?.legal || 'Legal'}</h4>
+              <ul className="space-y-5 text-base font-medium text-gray-600">
+                <li><Link href="/terms" className="hover:text-orange-600 transition-colors">{t.Footer?.links?.terms || 'Terms'}</Link></li>
+                <li><Link href="/privacy" className="hover:text-orange-600 transition-colors">{t.Footer?.links?.privacy || 'Privacy'}</Link></li>
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-stone-100 text-center">
-              <p className="text-xs font-medium text-stone-400">{t.Footer.copy}</p>
+          <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-gray-200 text-center">
+              <p className="text-sm font-semibold text-gray-400">{t.Footer.copy}</p>
           </div>
         </footer>
       </div>
