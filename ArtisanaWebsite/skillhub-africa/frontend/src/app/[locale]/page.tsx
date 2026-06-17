@@ -11,9 +11,10 @@ export default function Landing() {
   const [currentImage, setCurrentImage] = useState(0);
 
   const backgroundImages = [
-    'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=100&w=2070', // Pottery
-    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&q=100&w=2070', // Woodworking
-    'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=100&w=2070'  // Artist
+    'https://images.unsplash.com/photo-1581092583537-20d51b4b4f1b?auto=format&fit=crop&q=100&w=2070', // Welder / Heavy Craft
+    'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=100&w=2070', // Pottery / Detail Craft
+    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=100&w=2070', // Carpenter / Woodwork
+    'https://images.unsplash.com/photo-1508247926149-adab375db609?auto=format&fit=crop&q=100&w=2070'  // Mechanic / Engineering
   ];
 
   useEffect(() => {
