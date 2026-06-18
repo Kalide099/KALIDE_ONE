@@ -37,7 +37,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       success: false, 
       message: 'Failed to fetch professionals',
-      debug: error.message 
     }, { status: 500 });
   }
 }

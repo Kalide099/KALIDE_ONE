@@ -1,13 +1,27 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../../context/LanguageContext';
+import { apiService } from '@/services/api';
 
 export default function Services() {
   const { t } = useLanguage();
   const router = useRouter();
 
   const handleInitiate = () => {
-    router.push('/register');
+    const user = apiService.getCurrentUser();
+    if (!user) {
+      router.push('/register');
+      return;
+    }
+
+    const role = String(user.role || '').toLowerCase();
+    if (role === 'admin') {
+      router.push('/dashboard/admin');
+    } else if (role === 'worker' || role === 'artisan' || role === 'team_leader') {
+      router.push('/dashboard/worker');
+    } else {
+      router.push('/workers');
+    }
   };
 
   const services = [

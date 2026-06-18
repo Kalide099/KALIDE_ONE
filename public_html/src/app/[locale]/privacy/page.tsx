@@ -1,4 +1,5 @@
 'use client';
+import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Privacy() {
@@ -30,16 +31,41 @@ export default function Privacy() {
             </p>
           </section>
 
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">Your Privacy Rights</h2>
+            <p>
+              You can request access, correction, or deletion of your personal information by contacting support. We respond within a reasonable legal timeframe.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">Data Retention</h2>
+            <p>
+              We keep data only for as long as needed to provide services, meet legal obligations, and resolve disputes. Data that is no longer required is deleted or anonymized.
+            </p>
+          </section>
+
           <div className="p-6 rounded-2xl bg-secondary/10 border border-secondary/20">
             <h3 className="text-secondary font-black uppercase tracking-tight mb-2">{t.Legal?.privacy?.noticeTitle}</h3>
             <p className="text-sm text-secondary/80">{t.Legal?.privacy?.noticeContent}</p>
           </div>
+
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">Related Policies</h2>
+            <p>
+              See our{' '}
+              <Link href="/terms" className="text-primary hover:underline">Terms</Link>
+              {' '}and{' '}
+              <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link>
+              {' '}for additional details.
+            </p>
+          </section>
         </div>
 
         <div className="mt-12 text-center">
-          <a href="/" className="inline-block px-8 py-4 glass text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all">
+          <Link href="/" className="inline-block px-8 py-4 glass text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all">
             {t.return}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

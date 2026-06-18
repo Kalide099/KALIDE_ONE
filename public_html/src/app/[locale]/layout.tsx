@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
 import { LanguageProvider } from '../../context/LanguageContext';
 import Navbar from '@/components/Navbar';
+import CookieConsentBanner from '@/components/CookieConsentBanner';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default async function LocaleLayout({
           <LanguageProvider>
             <Navbar />
             {children}
+            <CookieConsentBanner />
           </LanguageProvider>
         </NextIntlClientProvider>
       </body>

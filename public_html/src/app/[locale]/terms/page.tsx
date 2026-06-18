@@ -1,4 +1,5 @@
 'use client';
+import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Terms() {
@@ -36,12 +37,37 @@ export default function Terms() {
               {t.Legal?.terms?.sec3Content}
             </p>
           </section>
+
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">4. Accounts and Eligibility</h2>
+            <p>
+              You must provide accurate account details and keep your login information private. You are responsible for actions taken from your account.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">5. Prohibited Use</h2>
+            <p>
+              Fraud, abuse, harassment, data scraping, impersonation, and any illegal activity are not allowed. Accounts involved in violations may be suspended or removed.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white mb-4">6. Related Policies</h2>
+            <p>
+              Please also review our{' '}
+              <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+              {' '}and{' '}
+              <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link>
+              {' '}to understand how your information is managed.
+            </p>
+          </section>
         </div>
 
         <div className="mt-12 text-center">
-          <a href="/" className="inline-block px-8 py-4 glass text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all">
+          <Link href="/" className="inline-block px-8 py-4 glass text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all">
             {t.return}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

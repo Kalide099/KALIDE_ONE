@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
-import { serialize } from '@/lib/api-utils';
+import { serialize } from '@/lib/utils';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('Authorization');
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
     return NextResponse.json(serialize(projects));
   } catch (error: any) {
     console.error('Error fetching projects:', error);
-    return NextResponse.json({ message: 'Internal Server Error', debug: error.message }, { status: 500 });
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 

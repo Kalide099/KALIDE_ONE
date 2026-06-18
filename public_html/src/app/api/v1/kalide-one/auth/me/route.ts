@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { serialize } from '@/lib/utils';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'django-insecure-your-secret-key-default-skillhub-2025';
+import { verifyToken } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
@@ -13,10 +11,14 @@ export async function GET(request: Request) {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyToken(token);
+
+    if (!decoded) {
+      return NextResponse.json({ success: false, message: 'Session expired or invalid' }, { status: 401 });
+    }
     
     const user = await prisma.users_user.findUnique({
-      where: { id: BigInt(decoded.user_id || decoded.id) },
+      where: { id: BigInt(decoded.user_id) },
       include: {
         marketplace_professionals: true,
         payments_usersubscription: {

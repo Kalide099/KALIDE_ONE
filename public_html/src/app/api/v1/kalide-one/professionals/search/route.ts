@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@/generated/prisma/client';
-import { serialize } from '@/lib/api-utils';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { serialize } from '@/lib/utils';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

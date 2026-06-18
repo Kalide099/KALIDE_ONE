@@ -34,6 +34,7 @@ export default function SupremeAdminDashboard() {
   
   const [selectedDossier, setSelectedDossier] = useState<AdminUser | null>(null);
   const [activeTab, setActiveTab] = useState('Users');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const features = ['Users', 'Projects', 'Services', 'Academy', 'Justice', 'Workers', 'Quotes', 'Supply', 'Verification'];
 
@@ -75,6 +76,10 @@ export default function SupremeAdminDashboard() {
     }
     fetchData(activeTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
   }, [activeTab]);
 
   const handleLogout = () => {
@@ -129,7 +134,7 @@ export default function SupremeAdminDashboard() {
       <div className="hero-glow top-0 right-0 w-[600px] h-[600px] bg-red-600/10 blur-[100px] pointer-events-none fixed" />
 
       {/* Left Sidebar Navigation */}
-      <aside className="glass w-64 h-screen border-r border-red-500/20 shadow-[30px_0_30px_rgba(220,38,38,0.02)] flex flex-col z-50 shrink-0">
+      <aside className="hidden lg:flex glass w-64 h-screen border-r border-red-500/20 shadow-[30px_0_30px_rgba(220,38,38,0.02)] flex-col z-50 shrink-0">
         <div className="h-24 p-6 flex items-center space-x-4 border-b border-white/5 shrink-0">
           <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center font-black text-white shadow-[0_0_15px_rgba(220,38,38,0.5)]">
             K
@@ -166,9 +171,76 @@ export default function SupremeAdminDashboard() {
         </div>
       </aside>
 
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
+      <aside className={`lg:hidden fixed left-0 top-0 z-[100] h-screen w-72 glass border-r border-red-500/20 p-4 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="h-16 flex items-center justify-between border-b border-white/5 mb-4 px-2">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center font-black text-white">K</div>
+            <span className="text-sm font-black uppercase tracking-widest">Admin Menu</span>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 font-black text-xl">X</button>
+        </div>
+
+        <nav className="space-y-2 overflow-y-auto h-[calc(100%-5rem)] pr-1">
+          {features.map((item) => (
+            <button
+              key={item}
+              onClick={() => setActiveTab(item)}
+              className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                activeTab === item
+                  ? 'bg-red-500/10 text-red-500 border border-red-500/20'
+                  : 'text-slate-300 border border-transparent hover:bg-white/5 hover:text-red-400'
+              }`}
+            >
+              {item}
+            </button>
+          ))}
+
+          <button
+            onClick={handleLogout}
+            className="w-full mt-4 px-4 py-3 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+          >
+            {t.Admin?.sidebar?.exit || 'System Exit'}
+          </button>
+        </nav>
+      </aside>
+
       {/* Main Content Area */}
       <div className="flex-1 h-screen overflow-y-auto relative scrollbar-hide">
         <main className="max-w-6xl mx-auto py-12 px-6 lg:px-12 relative z-10">
+        <div className="lg:hidden mb-6 max-[360px]:mb-4">
+          <div className="glass rounded-2xl border border-white/10 p-4 max-[360px]:p-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-black">Current Module</p>
+              <p className="text-sm max-[360px]:text-xs font-black uppercase tracking-widest text-red-400 break-words">{activeTab}</p>
+            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="shrink-0 px-4 max-[360px]:px-3 py-2 bg-red-500/15 border border-red-500/30 rounded-xl text-[10px] max-[360px]:text-[9px] font-black uppercase tracking-widest text-red-300"
+            >
+              Modules
+            </button>
+          </div>
+          <div className="mt-3 grid grid-cols-3 max-[360px]:grid-cols-2 gap-2">
+            {features.slice(0, 6).map((item) => (
+              <button
+                key={item}
+                onClick={() => setActiveTab(item)}
+                className={`min-h-9 py-2 px-2 rounded-lg text-[9px] max-[360px]:text-[8px] font-black uppercase tracking-widest border break-words ${
+                  activeTab === item ? 'border-red-500/40 text-red-300 bg-red-500/10' : 'border-white/10 text-slate-300 bg-white/5'
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="mb-16">
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic mb-4">
             {t.Admin?.titlePrefix} <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">{t.Admin?.titleHighlight}</span>
@@ -206,7 +278,64 @@ export default function SupremeAdminDashboard() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="md:hidden space-y-4 max-[360px]:space-y-3">
+              {users.map(user => (
+                <div key={user.id} className="glass rounded-2xl p-4 max-[360px]:p-3 border border-white/10">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.id}</p>
+                      <p className="text-sm font-black text-slate-300">#{user.id}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                      user.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-500'
+                    }`}>
+                      {user.is_active ? (t.Admin?.table?.active || 'Active') : (t.Admin?.table?.suspended || 'Suspended')}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <p className="text-sm max-[360px]:text-xs font-bold text-white break-words">{user.name}</p>
+                    <p className="text-xs text-slate-400 break-all">{user.email}</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                      user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
+                      user.role === 'client' ? 'bg-blue-500/20 text-blue-400' :
+                      'bg-purple-500/20 text-purple-400'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 max-[360px]:grid-cols-1 gap-2">
+                    <button
+                      onClick={() => setSelectedDossier(user)}
+                      className="px-3 py-2 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                    >
+                      {t.Admin?.actions?.dossier}
+                    </button>
+                    <button
+                      onClick={() => handleToggleAccess(user.id)}
+                      className="px-3 py-2 border border-slate-500/30 text-slate-400 hover:bg-slate-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                    >
+                      {user.is_active ? t.Admin?.actions?.suspend : t.Admin?.actions?.unsuspend}
+                    </button>
+                    <button
+                      onClick={() => handleWarn(user.id, user.name)}
+                      className="px-3 py-2 border border-orange-500/30 text-orange-400 hover:bg-orange-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                    >
+                      {t.Admin?.actions?.warn}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="px-3 py-2 bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                    >
+                      {t.Admin?.actions?.erase}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-white/5">
@@ -281,7 +410,30 @@ export default function SupremeAdminDashboard() {
                 <span>{t.Admin?.tabs?.projects}</span>
               </h2>
             </div>
-            <div className="overflow-x-auto">
+            <div className="md:hidden space-y-4 max-[360px]:space-y-3">
+              {projects.map(project => (
+                <div key={project.id} className="glass rounded-2xl p-4 max-[360px]:p-3 border border-white/10">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.id}</p>
+                      <p className="text-sm font-black text-slate-300">#{project.id}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest">
+                      {project.status}
+                    </span>
+                  </div>
+
+                  <p className="text-sm max-[360px]:text-xs font-bold text-white mb-2 break-words">{project.title?.en || 'Project'}</p>
+                  <p className="text-xs font-black text-red-400 mb-4">${project.budget}</p>
+
+                  <button className="w-full px-3 py-2 border border-white/20 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">
+                    {t.Admin?.actions?.inspect}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-white/5">
@@ -322,7 +474,22 @@ export default function SupremeAdminDashboard() {
                 <span>{t.Admin?.tabs?.ledger}</span>
               </h2>
             </div>
-            <div className="overflow-x-auto">
+            <div className="md:hidden space-y-4 max-[360px]:space-y-3">
+              {payments.map((payment, i) => (
+                <div key={i} className="glass rounded-2xl p-4 max-[360px]:p-3 border border-white/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs max-[360px]:text-[10px] font-black uppercase tracking-widest text-slate-300 break-words pr-2">
+                      {t.Admin?.tabs?.syncRequest || 'Node Sync Request'}
+                    </p>
+                    <p className="text-[11px] max-[360px]:text-[10px] text-slate-500 shrink-0">{new Date(payment.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <p className="text-lg font-black text-red-500 mb-1">${payment.amount}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-green-400">{payment.status}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-white/5">

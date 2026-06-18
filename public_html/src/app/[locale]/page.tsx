@@ -146,6 +146,7 @@ export default function Landing() {
               <ul className="space-y-4 text-sm font-bold text-slate-300">
                 <li><Link href="/terms" className="hover:text-primary">{t.Footer?.links?.terms || 'Terms'}</Link></li>
                 <li><Link href="/privacy" className="hover:text-primary">{t.Footer?.links?.privacy || 'Privacy'}</Link></li>
+                <li><Link href="/cookies" className="hover:text-primary">{t.Footer?.links?.cookies || 'Cookies'}</Link></li>
                 <li><Link href="/safety" className="hover:text-primary">{t.Footer?.links?.safety || 'Safety'}</Link></li>
               </ul>
             </div>
