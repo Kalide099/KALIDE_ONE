@@ -5,10 +5,14 @@ import Image from 'next/image';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useLanguage } from '../../context/LanguageContext';
 import { Link } from '../../i18n/routing';
+import { getAuthenticatedRouteFallback, isUserAuthenticated } from '@/lib/auth-navigation';
 
 export default function Landing() {
   const { t } = useLanguage();
   const [currentImage, setCurrentImage] = useState(0);
+  const [joinHref, setJoinHref] = useState('/register');
+  const [workerJoinHref, setWorkerJoinHref] = useState('/register?role=worker');
+  const [clientJoinHref, setClientJoinHref] = useState('/register?role=client');
 
   const backgroundImages = [
     'https://images.unsplash.com/photo-1581092583537-20d51b4b4f1b?auto=format&fit=crop&q=100&w=2070', // Welder / Heavy Craft
@@ -22,6 +26,14 @@ export default function Landing() {
       setCurrentImage((prev) => (prev + 1) % backgroundImages.length);
     }, 5000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isUserAuthenticated()) return;
+    const dashboard = getAuthenticatedRouteFallback();
+    setJoinHref(dashboard);
+    setWorkerJoinHref(dashboard);
+    setClientJoinHref(dashboard);
   }, []);
 
   const categories = [
@@ -53,7 +65,7 @@ export default function Landing() {
                 {t.Hero.description}
               </p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/register" className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-gray-900 rounded-2xl font-bold uppercase tracking-wide text-sm hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/30 text-center transform hover:-translate-y-1">
+                <Link href={joinHref} className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-gray-900 rounded-2xl font-bold uppercase tracking-wide text-sm hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/30 text-center transform hover:-translate-y-1">
                   {t.Hero.ctaHiring}
                 </Link>
                 <Link href="/services" className="w-full sm:w-auto px-10 py-5 bg-white text-gray-800 border-2 border-gray-200 rounded-2xl font-bold uppercase tracking-wide text-sm hover:border-gray-300 hover:bg-gray-50 transition-all text-center">
@@ -118,10 +130,10 @@ export default function Landing() {
                 <h2 className="text-5xl md:text-6xl font-extrabold mb-8 drop-shadow-md">{t.CTA.title}</h2>
                 <p className="text-xl md:text-2xl text-orange-50 font-medium mb-12 max-w-3xl mx-auto drop-shadow-sm">{t.CTA.desc}</p>
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
-                  <Link href="/register?role=worker" className="px-10 py-5 bg-white text-orange-700 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-gray-50 hover:scale-105 transition-all shadow-xl shadow-black/10">
+                  <Link href={workerJoinHref} className="px-10 py-5 bg-white text-orange-700 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-gray-50 hover:scale-105 transition-all shadow-xl shadow-black/10">
                     {t.CTA.workerBtn}
                   </Link>
-                  <Link href="/register?role=client" className="px-10 py-5 bg-transparent border-2 border-white text-gray-900 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:scale-105 transition-all">
+                  <Link href={clientJoinHref} className="px-10 py-5 bg-transparent border-2 border-white text-gray-900 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:scale-105 transition-all">
                     {t.CTA.clientBtn}
                   </Link>
                 </div>

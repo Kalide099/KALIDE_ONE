@@ -4,10 +4,15 @@ import React, { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import { getAuthenticatedRouteFallback, isUserAuthenticated } from '@/lib/auth-navigation';
 
 export default function Navbar() {
   const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isAuthenticated = isUserAuthenticated();
+  const authTarget = isAuthenticated ? getAuthenticatedRouteFallback() : '/login';
+  const joinTarget = isAuthenticated ? getAuthenticatedRouteFallback() : '/register';
+  const authLabel = isAuthenticated ? 'Dashboard' : (t.Navigation?.login || 'Login');
 
   const navLinks = [
     { href: '/', label: t.Navigation?.home || 'Home', isAnchor: false },
@@ -44,8 +49,8 @@ export default function Navbar() {
           ))}
           <div className="w-px h-4 bg-gray-200" />
           <LanguageSwitcher />
-          <Link href="/login" className="hover:text-primary transition-colors">{t.Navigation?.login || 'Login'}</Link>
-          <Link href="/register" className="px-6 py-3 bg-primary text-white rounded-full hover:bg-primary/90 hover:scale-105 transition-all shadow-xl shadow-primary/20">
+          <Link href={authTarget} className="hover:text-primary transition-colors">{authLabel}</Link>
+          <Link href={joinTarget} className="px-6 py-3 bg-primary text-white rounded-full hover:bg-primary/90 hover:scale-105 transition-all shadow-xl shadow-primary/20">
             {t.Navigation?.join || 'Join Hub'}
           </Link>
         </nav>
@@ -79,8 +84,8 @@ export default function Navbar() {
               <div className="flex justify-center scale-125 py-4">
                 <LanguageSwitcher />
               </div>
-              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="hover:text-primary">{t.Navigation?.login || 'Login'}</Link>
-              <Link href="/register" onClick={() => setIsMenuOpen(false)} className="px-10 py-5 bg-primary text-white rounded-2xl shadow-2xl shadow-primary/30">
+              <Link href={authTarget} onClick={() => setIsMenuOpen(false)} className="hover:text-primary">{authLabel}</Link>
+              <Link href={joinTarget} onClick={() => setIsMenuOpen(false)} className="px-10 py-5 bg-primary text-white rounded-2xl shadow-2xl shadow-primary/30">
                 {t.Navigation?.join || 'Join Hub'}
               </Link>
             </nav>

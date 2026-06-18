@@ -136,6 +136,31 @@ export interface Professional {
 }
 
 class ApiService {
+  private async refreshAccessToken(): Promise<boolean> {
+    try {
+      const refresh = localStorage.getItem('refresh_token');
+      if (!refresh) return false;
+
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh }),
+      });
+
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      if (!data?.access) return false;
+
+      localStorage.setItem('access_token', data.access);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -161,6 +186,44 @@ class ApiService {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
+
+      if (
+        response.status === 401 &&
+        endpoint !== '/auth/login' &&
+        endpoint !== '/auth/register' &&
+        endpoint !== '/auth/refresh'
+      ) {
+        const refreshed = await this.refreshAccessToken();
+        if (refreshed) {
+          const retryToken = localStorage.getItem('access_token');
+          const retryHeaders: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...((options.headers as Record<string, string>) || {}),
+          };
+          if (retryToken) {
+            retryHeaders['Authorization'] = `Bearer ${retryToken}`;
+          }
+
+          const retryResponse = await fetch(url, {
+            ...options,
+            headers: retryHeaders,
+          });
+
+          const retryData = await retryResponse.json();
+          if (!retryResponse.ok) {
+            return {
+              success: false,
+              message: retryData.message || 'An error occurred',
+              errors: retryData.errors,
+            };
+          }
+
+          return {
+            success: true,
+            data: retryData,
+          };
+        }
+      }
 
       const data = await response.json();
 

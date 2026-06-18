@@ -20,7 +20,7 @@ export default function WorkerWallet() {
     const fetchWallet = async () => {
       const response = await fetch('/api/v1/kalide-one/payments/wallets/me', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       });
       const data = await response.json();
@@ -40,7 +40,7 @@ export default function WorkerWallet() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
         body: JSON.stringify(payoutForm)
       });

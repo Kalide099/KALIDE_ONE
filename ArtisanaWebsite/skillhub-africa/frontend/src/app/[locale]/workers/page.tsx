@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { apiService, Professional } from '@/services/api';
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
+import { getAuthenticatedRouteFallback, isUserAuthenticated } from '@/lib/auth-navigation';
 
 export default function Workers() {
   const { t } = useLanguage();
@@ -14,6 +15,7 @@ export default function Workers() {
   const [location, setLocation] = useState('');
   const [sortBy, setSortBy] = useState('rating');
   const [isSearching, setIsSearching] = useState(false);
+  const [joinHref, setJoinHref] = useState('/register');
 
   const fetchWorkers = async () => {
     setIsSearching(true);
@@ -27,6 +29,12 @@ export default function Workers() {
 
   useEffect(() => {
     fetchWorkers();
+  }, []);
+
+  useEffect(() => {
+    if (isUserAuthenticated()) {
+      setJoinHref(getAuthenticatedRouteFallback());
+    }
   }, []);
 
   const handleSearch = () => {
@@ -83,7 +91,7 @@ export default function Workers() {
         ) : workers.length === 0 ? (
           <div className="py-20 text-center bg-white shadow-sm border border-gray-100 rounded-[3rem] border-gray-200">
             <p className="text-slate-500 font-black uppercase tracking-widest mb-4">{t.Workers?.noNodes}</p>
-            <Link href="/register" className="text-primary font-bold underline">{t.Workers?.applyJoin}</Link>
+            <Link href={joinHref} className="text-primary font-bold underline">{t.Workers?.applyJoin}</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

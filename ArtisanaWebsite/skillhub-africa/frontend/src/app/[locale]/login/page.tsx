@@ -2,10 +2,11 @@
 
 import { Link } from '../../../i18n/routing';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../../context/LanguageContext';
 import { apiService, LoginData } from '../../../services/api';
+import { getAuthenticatedRouteFallback, getDashboardRoute, isUserAuthenticated } from '@/lib/auth-navigation';
 
 export default function Login() {
   const { t } = useLanguage();
@@ -17,6 +18,12 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (isUserAuthenticated()) {
+      router.replace(getAuthenticatedRouteFallback());
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,13 +48,7 @@ export default function Login() {
 
         const userRole = response.data.user.role;
         setTimeout(() => {
-          if (userRole === 'admin') {
-            router.push('/dashboard/admin');
-          } else if (userRole === 'worker') {
-            router.push('/dashboard/worker');
-          } else {
-            router.push('/dashboard/client');
-          }
+          router.push(getDashboardRoute(userRole));
         }, 1500);
       } else {
         setError(response.message || t.Auth?.actions?.error || 'Verification failed. Please check your credentials.');

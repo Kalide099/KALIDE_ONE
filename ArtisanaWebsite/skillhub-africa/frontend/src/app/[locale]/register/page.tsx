@@ -2,10 +2,11 @@
 
 import { Link } from '../../../i18n/routing';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../../context/LanguageContext';
 import { apiService, RegisterData } from '../../../services/api';
+import { getAuthenticatedRouteFallback, isUserAuthenticated } from '@/lib/auth-navigation';
 
 export default function Register() {
   const { t } = useLanguage();
@@ -22,6 +23,12 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (isUserAuthenticated()) {
+      router.replace(getAuthenticatedRouteFallback());
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

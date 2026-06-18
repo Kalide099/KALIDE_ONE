@@ -51,10 +51,14 @@ export function generateTokens(user: { id: bigint | number; email: string; name:
     role: user.role
   };
 
-  const access = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
-  const refresh = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  const access = generateAccessToken(payload);
+  const refresh = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
 
   return { access, refresh };
+}
+
+export function generateAccessToken(payload: { user_id: number; email: string; role: string }) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string) {
