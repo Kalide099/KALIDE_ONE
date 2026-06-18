@@ -31,5 +31,35 @@ export function getAuthenticatedRouteFallback(): string {
 
 export function isUserAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
-  return Boolean(localStorage.getItem('access_token'));
+
+  const token = localStorage.getItem('access_token');
+  if (!token) return false;
+
+  try {
+    const tokenParts = token.split('.');
+    if (tokenParts.length < 2) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      return false;
+    }
+
+    const payload = JSON.parse(atob(tokenParts[1])) as { exp?: number };
+    if (!payload?.exp) return true;
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (payload.exp <= nowInSeconds) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      return false;
+    }
+
+    return true;
+  } catch {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    return false;
+  }
 }
