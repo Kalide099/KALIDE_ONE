@@ -59,7 +59,7 @@ export default function WorkerWallet() {
     }
   };
 
-  if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-secondary font-black uppercase animate-pulse">Initializing Financial Node...</div>;
+  if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-secondary font-black uppercase animate-pulse">Loading wallet...</div>;
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-900">
@@ -68,7 +68,7 @@ export default function WorkerWallet() {
           <div className="flex items-center space-x-4">
             <Link href="/dashboard/worker" className="text-slate-500 hover:text-gray-900 transition-colors">←</Link>
             <div className="h-4 w-px bg-white/10" />
-            <h1 className="text-sm font-black uppercase tracking-widest italic">Financial Intelligence Node</h1>
+            <h1 className="text-sm font-black uppercase tracking-widest italic">Wallet</h1>
           </div>
         </div>
       </header>
@@ -84,7 +84,7 @@ export default function WorkerWallet() {
             </h2>
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Escrow Securely Synchronized</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Escrow Secured</span>
             </div>
           </div>
 
@@ -117,7 +117,7 @@ export default function WorkerWallet() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Phone Number (Uplink)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Phone Number</label>
                 <input 
                   type="text" 
                   required
@@ -132,7 +132,7 @@ export default function WorkerWallet() {
                 disabled={isRequesting}
                 className="w-full py-5 bg-secondary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
               >
-                {isRequesting ? "Initializing Payout Protocol..." : "Request Mobile Money Payout"}
+                {isRequesting ? "Processing payout..." : "Request Mobile Money Payout"}
               </button>
             </form>
           </div>
@@ -140,10 +140,10 @@ export default function WorkerWallet() {
 
         {/* Transaction History */}
         <div className="mt-16 space-y-8">
-          <h3 className="text-xl font-black uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-4">Transaction Ledger</h3>
+          <h3 className="text-xl font-black uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-4">Transaction History</h3>
           <div className="space-y-4">
             {wallet?.payments_transaction?.length === 0 ? (
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs text-center py-12">No transactions recorded in this node.</p>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs text-center py-12">No transactions yet.</p>
             ) : (
               wallet?.payments_transaction?.map((tx: any) => (
                 <div key={tx.id} className="bg-white shadow-sm border border-gray-100 p-6 rounded-2xl border-gray-200 flex items-center justify-between">

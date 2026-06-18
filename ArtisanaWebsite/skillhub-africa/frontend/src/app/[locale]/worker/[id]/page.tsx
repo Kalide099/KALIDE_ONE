@@ -28,8 +28,8 @@ export default function WorkerDetail() {
     fetchWorker();
   }, [id]);
 
-  if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-primary animate-pulse italic">{t.WorkerProfile?.synchronizing || 'Synchronizing Node Data...'}</div>;
-  if (!worker) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-red-500">{t.WorkerProfile?.notIdentified || 'Node Not Identified'}</div>;
+  if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-primary animate-pulse italic">{t.WorkerProfile?.synchronizing || 'Loading profile data...'}</div>;
+  if (!worker) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-red-500">{t.WorkerProfile?.notIdentified || 'Profile Not Found'}</div>;
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-900">
@@ -75,7 +75,7 @@ export default function WorkerDetail() {
             <div className="space-y-6">
                <h3 className="text-sm font-black uppercase tracking-widest text-primary underline decoration-2 underline-offset-8">{t.WorkerProfile?.missionProfile || 'Mission Profile'}</h3>
                <p className="text-lg text-gray-600 leading-relaxed font-medium">
-                  {typeof worker.bio === 'string' ? worker.bio : 'Verified elite professional bridging global standards with local artisan mastery. Expertly trained and ready for synchronization.'}
+                  {typeof worker.bio === 'string' ? worker.bio : 'Verified professional with strong hands-on experience and high-quality work standards.'}
                </p>
             </div>
 
@@ -84,7 +84,7 @@ export default function WorkerDetail() {
                  { label: t.WorkerProfile?.rating || 'Rating', val: `★ ${worker.rating}` },
                  { label: t.WorkerProfile?.experience || 'Experience', val: `${worker.experience_years} ${t.WorkerProfile?.years || 'Years'}` },
                  { label: t.WorkerProfile?.hourlyRate || 'Hourly Rate', val: `$${worker.hourly_rate}` },
-                 { label: t.WorkerProfile?.verified || 'Verified', val: worker.is_verified ? (t.WorkerProfile?.yes || 'Protocol 1') : (t.WorkerProfile?.no || 'None') }
+                 { label: t.WorkerProfile?.verified || 'Verified', val: worker.is_verified ? (t.WorkerProfile?.yes || 'Yes') : (t.WorkerProfile?.no || 'No') }
                ].map((stat, i) => (
                  <div key={i} className="bg-white shadow-sm border border-gray-100 p-6 rounded-3xl border-gray-200">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{stat.label}</p>
@@ -148,7 +148,7 @@ export default function WorkerDetail() {
           {/* Action Sidebar */}
           <div className="space-y-8">
              <div className="bg-white shadow-sm border border-gray-100 p-8 rounded-[3rem] border-gray-200 shadow-2xl sticky top-28">
-                <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-8 border-l-4 border-primary pl-4">{t.WorkerProfile?.hiringSync || 'Hiring Synchronization'}</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-8 border-l-4 border-primary pl-4">{t.WorkerProfile?.hiringSync || 'Hiring Details'}</h3>
                 
                 <div className="space-y-4 mb-10">
                    <div className="flex justify-between items-center py-4 border-b border-gray-100">
@@ -175,12 +175,12 @@ export default function WorkerDetail() {
                     {t.WorkerProfile?.messageArtisan || 'Message Artisan'}
                   </Link>
                   <button className="w-full py-5 bg-gray-50 shadow-sm border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all">
-                    {t.WorkerProfile?.viewLedger || 'View Verified Ledger'}
+                    {t.WorkerProfile?.viewLedger || 'View Verified History'}
                   </button>
                 </div>
                 
                 <p className="mt-8 text-[9px] text-center text-slate-400 font-black uppercase tracking-widest">
-                  {t.WorkerProfile?.secureProtocol || 'Securely operated by Kalide Global Protocol'}
+                  {t.WorkerProfile?.secureProtocol || 'Securely managed by Kalide Global'}
                 </p>
              </div>
           </div>

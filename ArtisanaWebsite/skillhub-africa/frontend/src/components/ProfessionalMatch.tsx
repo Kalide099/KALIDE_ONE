@@ -68,7 +68,7 @@ export default function ProfessionalMatch() {
               href={`/worker/${artisan.user_id}`}
               className="block w-full py-3 bg-secondary/10 hover:bg-secondary text-secondary hover:text-white text-center rounded-xl font-black uppercase tracking-widest text-[9px] transition-all"
             >
-              Initiate Contact Protocol
+              Contact Now
             </Link>
           </div>
         ))}

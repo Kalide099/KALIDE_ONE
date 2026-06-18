@@ -43,7 +43,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
       })
     });
     if (response.ok) {
-      alert("Claim submitted successfully. Our safety node will review it shortly.");
+      alert("Claim submitted successfully. Our safety team will review it shortly.");
       setShowClaimModal(false);
     }
   };
@@ -55,7 +55,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
       <div className="flex items-center justify-between">
         <div>
           <h4 className="text-xl font-black uppercase tracking-tighter italic">Micro-Insurance</h4>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Project Security Protocol</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Project Safety Plan</p>
         </div>
         <button 
           onClick={handleToggleInsurance}
@@ -73,7 +73,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
           <span className="font-black">Artisana Gold (Accidents & Theft)</span>
         </div>
         <div className="flex justify-between text-xs">
-          <span className="text-slate-500 font-bold">Protocol Fee</span>
+          <span className="text-slate-500 font-bold">Service Fee</span>
           <span className="font-black">${insuranceFee || 15.00} / Project</span>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
           onClick={handleToggleInsurance}
           className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
         >
-          Initialize Protection Node
+          Enable Protection
         </button>
       )}
 
@@ -98,7 +98,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
         <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
           <div className="glass w-full max-w-lg rounded-[3rem] p-10 border-blue-500/20 relative">
             <button onClick={() => setShowClaimModal(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white font-black">✕</button>
-            <h2 className="text-2xl font-black uppercase tracking-tighter italic mb-8">Submit Claim Protocol</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tighter italic mb-8">Submit a Claim</h2>
             <form onSubmit={handleSubmitClaim} className="space-y-6">
               <div>
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Reason for Claim</label>
@@ -130,7 +130,7 @@ export default function ProjectInsurance({ projectId, isInsuranceActive, insuran
                 />
               </div>
               <button type="submit" className="w-full py-5 bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-500/20">
-                Transmit Claim to Safety Node
+                Send Claim to Safety Team
               </button>
             </form>
           </div>

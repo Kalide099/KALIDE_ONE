@@ -45,7 +45,7 @@ export default function Register() {
       const response = await apiService.register(formData);
 
       if (response.success) {
-        setSuccess(t.Auth?.actions?.registerSuccess || 'Account provisioned successfully. Redirecting to login node...');
+        setSuccess(t.Auth?.actions?.registerSuccess || 'Account created successfully. Redirecting to sign in...');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -53,7 +53,7 @@ export default function Register() {
         setError(response.message || t.Auth?.actions?.registerError || 'Provisioning failed. Review parameters.');
       }
     } catch (err) {
-      setError(t.Auth?.actions?.uplinkError || 'Communication uplink error. Try again.');
+      setError(t.Auth?.actions?.uplinkError || 'Communication error. Try again.');
     } finally {
       setIsLoading(false);
     }
@@ -68,9 +68,9 @@ export default function Register() {
         <div className="bg-white shadow-sm border border-gray-100 p-12 md:p-16 rounded-[3rem] border-gray-200 shadow-2xl">
           <div className="text-center mb-12">
             <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
-              {t.Auth?.registerBadge || 'New Node Deployment'}
+              {t.Auth?.registerBadge || 'Create Your Account'}
             </div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.registerTitle || 'Initialize Account'}</h1>
+            <h1 className="text-4xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.registerTitle || 'Create Account'}</h1>
             <p className="text-slate-500 font-medium text-sm">{t.Auth?.registerDesc || 'Join the unified Kalide One network.'}</p>
           </div>
 
@@ -111,7 +111,7 @@ export default function Register() {
                 type="tel"
                 required
                 className="w-full bg-gray-100 border border-gray-200 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-gray-900 font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
-                placeholder={t.Auth?.fields?.phone || "Uplink Phone"}
+                placeholder={t.Auth?.fields?.phone || "Phone Number"}
                 value={formData.phone}
                 onChange={handleChange}
               />
@@ -122,9 +122,9 @@ export default function Register() {
                 value={formData.role}
                 onChange={handleChange}
               >
-                <option value="client" className="bg-[#0f172a]">{t.Auth?.fields?.role?.client || 'Client Node'}</option>
-                <option value="artisan" className="bg-[#0f172a]">{t.Auth?.fields?.role?.artisan || 'Professional Node'}</option>
-                <option value="team_leader" className="bg-[#0f172a]">{t.Auth?.fields?.role?.team || 'Team Manager Node'}</option>
+                <option value="client" className="bg-[#0f172a]">{t.Auth?.fields?.role?.client || 'Client'}</option>
+                <option value="artisan" className="bg-[#0f172a]">{t.Auth?.fields?.role?.artisan || 'Professional'}</option>
+                <option value="team_leader" className="bg-[#0f172a]">{t.Auth?.fields?.role?.team || 'Team Manager'}</option>
               </select>
               <input
                 name="country"

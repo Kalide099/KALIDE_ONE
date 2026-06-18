@@ -60,8 +60,8 @@
     }
   },
   "ServiceBundles": {
-    "title": "Protocoles de Service Industriels",
-    "description": "Déployez des équipes pré-vérifiées et synchronisées pour des opérations à grande échelle.",
+    "title": "Packs de Services Industriels",
+    "description": "Réservez des équipes pré-vérifiées pour des opérations à grande échelle.",
     "cta": "Initier le Contrat",
     "highVoltage": {
       "title": "Haute Tension",
@@ -83,23 +83,23 @@
     }
   },
   "Auth": {
-    "registerBadge": "Nouveau Déploiement de Nœud",
-    "registerTitle": "Initialiser le Compte",
+    "registerBadge": "Créer Votre Compte",
+    "registerTitle": "Créer un Compte",
     "registerDesc": "Rejoignez le réseau unifié Kalide One.",
-    "loginBadge": "Nœud d'Accès Sécurisé",
-    "loginTitle": "Accès au Protocole",
+    "loginBadge": "Accès Sécurisé",
+    "loginTitle": "Connexion",
     "loginDesc": "Authentification sécurisée pour les opérations à l'échelle du système.",
     "fields": {
       "name": "Nom d'Identité Complet",
       "email": "Email de Communication",
-      "phone": "Téléphone de Liaison",
+      "phone": "Numéro de Téléphone",
       "country": "Pays Régional",
       "city": "Station Urbaine",
       "password": "Clé d'Accès Primaire",
       "role": {
-        "client": "Nœud Client",
-        "artisan": "Nœud Professionnel",
-        "team": "Nœud Gestionnaire d'Équipe"
+        "client": "Client",
+        "artisan": "Professionnel",
+        "team": "Responsable d'Équipe"
       }
     },
     "actions": {
@@ -107,16 +107,16 @@
       "registering": "Déploiement...",
       "login": "Identifier l'Accès",
       "loggingIn": "Vérification...",
-      "noAccount": "Pas encore de nœud d'accès ?",
+      "noAccount": "Pas encore de compte ?",
       "hasAccount": "Déjà identifié ?",
-      "createNode": "Provisionner un Compte",
+      "createNode": "Créer un Compte",
       "returnAccess": "Retour à l'Accès",
       "success": "Authentification réussie. Initialisation de la session...",
-      "registerSuccess": "Compte provisionné avec succès. Redirection vers le nœud de connexion...",
+      "registerSuccess": "Compte créé avec succès. Redirection vers la connexion...",
       "error": "Échec de la vérification. Veuillez vérifier vos identifiants.",
       "registerError": "Échec de l'approvisionnement. Vérifiez les paramètres.",
-      "networkError": "Échec de la synchronisation réseau. Veuillez réessayer.",
-      "uplinkError": "Erreur de liaison montante de communication. Réessayez."
+      "networkError": "Erreur réseau. Veuillez réessayer.",
+      "uplinkError": "Erreur de communication. Réessayez."
     }
   },
   "Marketplace": {
@@ -125,7 +125,7 @@
     "startingAt": "À partir de"
   },
   "Academy": {
-    "brainNode": "Nœud Cerveau Global",
+    "brainNode": "Centre d'Apprentissage Global",
     "reputation": "Réputation",
     "publish": "+ Publier",
     "badge": "Académie Kalide & Mentorat",
@@ -140,7 +140,7 @@
     "actions": {
       "viewMatrix": "Voir la Matrice de Disponibilité",
       "bookAR": "Réserver Assistance AR à Distance",
-      "purchase": "Acheter le Nœud",
+      "purchase": "Acheter l'Accès",
       "searchForum": "Recherche dans le réseau neural...",
       "loadThreads": "Charger les anciens fils ↓"
     },
@@ -148,10 +148,10 @@
     "awards": "Récompenses"
   },
   "WorkerProfile": {
-    "synchronizing": "Synchronisation des Données du Nœud...",
-    "notIdentified": "Nœud Non Identifié",
+    "synchronizing": "Chargement du profil...",
+    "notIdentified": "Profil introuvable",
     "missionProfile": "Profil de Mission",
-    "hiringSync": "Synchronisation de Recrutement",
+    "hiringSync": "Détails de Recrutement",
     "serviceFee": "Frais de Service",
     "escrowProtected": "Sécurisé par Escrow",
     "locked": "Verrouillé",
@@ -167,8 +167,8 @@
     "no": "Non",
     "portfolio": "Portfolio des projets passés",
     "initiateLink": "Initier le Lien",
-    "viewLedger": "Voir le registre vérifié",
-    "secureProtocol": "Exploité de manière sécurisée par le protocole global Kalide",
+    "viewLedger": "Voir l'historique vérifié",
+    "secureProtocol": "Géré de manière sécurisée par Kalide Global",
     "viewProject": "Voir le projet",
     "clientReviews": "Avis des clients vérifiés",
     "leaveReview": "Laisser un avis",
@@ -183,10 +183,10 @@
     "submit": "Publier l'avis"
   },
   "Admin": {
-    "titlePrefix": "Nœud ",
+    "titlePrefix": "Contrôle ",
     "titleHighlight": "Suprême",
     "description": "Accès Total accordé. Toutes les commandes ont un impact irréversible sur l'ensemble du système.",
-    "initializing": "Initialisation du Nœud de Contrôle Suprême...",
+    "initializing": "Chargement du panneau admin...",
     "sidebar": {
       "title": "Contrôle Omni",
       "systems": "Systèmes Centraux",
@@ -202,12 +202,12 @@
       "projects": "Matrice de Projet Globale",
       "ledger": "Grand Livre Financier",
       "offline": "Module Hors Ligne",
-      "syncRequest": "Requête de Sync de Nœud"
+      "syncRequest": "Demande de mise à jour"
     },
     "table": {
-      "id": "ID du Nœud",
+      "id": "ID Utilisateur",
       "entity": "Entité / Nom",
-      "email": "Nœud Email",
+      "email": "Email",
       "status": "Statut d'Accès",
       "actions": "Actions de Contrôle",
       "active": "Actif",
@@ -216,7 +216,7 @@
       "budget": "Budget",
       "transaction": "Type de Transaction",
       "amount": "Valeur",
-      "date": "Date de Sync"
+      "date": "Date"
     },
     "actions": {
       "dossier": "Dossier",
@@ -236,13 +236,13 @@
       "contactInfo": "Téléphone / Emplacement"
     },
     "protocols": {
-      "eraseConfirm": "PROTOCOLE STRICT : Êtes-vous sûr de vouloir effacer complètement ce nœud de la base de données ?",
-      "erased": "Nœud effacé.",
+      "eraseConfirm": "Êtes-vous sûr de vouloir supprimer définitivement ce compte de la base de données ?",
+      "erased": "Compte supprimé.",
       "warnPrompt": "Envoi d'un avertissement de fraude à {name}. Entrez le motif (ou laissez par défaut) :",
       "warnDefault": "Violation des conditions générales de Kalide Global",
       "warnSent": "Avertissement envoyé."
     },
-    "offlineDesc": "Ce sous-système fonctionne actuellement en mode local uniquement. La synchronisation à distance est désactivée pour ce type de nœud."
+    "offlineDesc": "Cette section fonctionne actuellement en mode local uniquement. Les mises à jour à distance sont désactivées pour ce type de compte."
   },
   "Playground": {
     "badge": "Nœud d'Intelligence : Python 3.11",
@@ -299,24 +299,24 @@
     }
   },
   "kyc": {
-    "successTitle": "Synchronisation du Nœud de Vérification",
+    "successTitle": "Vérification en cours",
     "successDesc": "Vos documents KYC ont été cryptés et transmis en toute sécurité. Les administrateurs de Kalide One examineront votre profil sous 24 à 48 heures.",
     "returnDash": "Retour au Tableau de Bord",
     "headerTitle": "Vérification KYC",
-    "nodeUntrusted": "Nœud : Non approuvé",
-    "nodeVerified": "Nœud : Vérifié",
+    "nodeUntrusted": "Statut : Non vérifié",
+    "nodeVerified": "Statut : Vérifié",
     "moduleBadge": "Module Confiance & Sécurité",
     "mainTitle": "Demander le Badge de Confiance",
     "mainDesc": "Pour débloquer l'Escrow et les Opérations à haut ticket, vous devez vérifier votre identité auprès du réseau.",
     "submit": "Soumettre au Système de Confiance Kalide"
   },
   "Apply": {
-    "badge": "Nœud Global Kalide",
+    "badge": "Kalide Global",
     "titlePrefix": "Candidature ",
     "titleHighlight": "Officielle",
     "description": "Soumettez votre dossier pour vérification, partenariat ou bourses d'académie. Toutes les soumissions font l'objet d'un examen administratif strict.",
     "successTitle": "Candidature Reçue",
-    "successDesc": "Votre dossier a été crypté et transmis en toute sécurité au Nœud de Contrôle Omni de Kalide pour examen. Vous serez notifié dès approbation.",
+    "successDesc": "Votre dossier a été transmis en toute sécurité à l'équipe Kalide pour examen. Vous serez notifié dès approbation.",
     "returnHub": "Retour au Hub",
     "classification": "Classification de la Candidature",
     "types": {
@@ -340,24 +340,24 @@
   },
   "Availability": {
     "headerTitle": "Matrice de Disponibilité",
-    "nodeStatus": "Nœud : Actif",
-    "badge": "Nœud de Planification",
+    "nodeStatus": "Statut : Actif",
+    "badge": "Planning",
     "title": "Moteur Temporel",
     "description": "Cartographiez vos blocs de services disponibles dans le réseau Kalide.",
     "blockMatrix": "Matrice de Blocs",
     "newBlock": "+ Nouveau Bloc",
     "status": {
-      "reserved": "Nœud Réservé",
+      "reserved": "Réservé",
       "open": "Ouvert à la Réservation",
       "offline": "Hors ligne"
     },
-    "syncSuccess": "Protocole Synchronisé avec Succès ✓",
+    "syncSuccess": "Planning mis à jour avec succès ✓",
     "commit": "Valider les Modifications du Calendrier",
     "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
     "weekdaysShort": ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]
   },
   "Justice": {
-    "headerTitle": "Nœud de Justice",
+    "headerTitle": "Centre de Justice",
     "badge": "Résolution Algorithmique",
     "titlePrefix": "Justice ",
     "titleHighlight": "Kalide",
@@ -366,8 +366,8 @@
     "settlementTitle": "Répartition Proposée du Règlement",
     "accept": "Accepter le Règlement de l'IA",
     "escalate": "Transférer à un Arbitre Humain",
-    "protocolAccepted": "Protocole Accepté",
-    "redistributing": "Les fonds sont en cours de redistribution. Les transactions seront visibles prochainement dans votre Nœud Financier.",
+    "protocolAccepted": "Décision Acceptée",
+    "redistributing": "Les fonds sont en cours de redistribution. Les transactions seront bientôt visibles dans votre portefeuille.",
     "table": {
       "project": "Projet",
       "status": "Statut",
@@ -378,7 +378,7 @@
     }
   },
   "Supply": {
-    "headerTitle": "Nœud d'Approvisionnement",
+    "headerTitle": "Centre d'Approvisionnement",
     "badge": "Réseau de Partenaires B2B",
     "titlePrefix": "Kalide ",
     "titleHighlight": "Supply",
@@ -396,11 +396,11 @@
   },
   "Upgrade": {
     "headerTitle": "Paliers du Réseau",
-    "nodeFree": "Nœud : Gratuit (Limité)",
+    "nodeFree": "Plan : Gratuit (Limité)",
     "badge": "Améliorations de l'Écosystème Kalide",
     "titlePrefix": "Augmentez votre ",
     "titleHighlight": "Bande Passante",
-    "description": "Améliorez votre séquence de nœuds professionnels pour débloquer des projets illimités, des escrows sans commission et une visibilité algorithmique maximale via notre moteur de mise en relation Kalide.",
+    "description": "Améliorez votre plan professionnel pour débloquer des projets illimités, des escrows sans commission et une meilleure visibilité dans la recherche.",
     "standard": "Standard du Réseau",
     "periods": {
       "forever": "à vie",
@@ -408,19 +408,19 @@
     },
     "plans": {
       "free": {
-        "name": "Nœud Gratuit",
+        "name": "Plan Gratuit",
         "btn": "Plan Actuel",
         "features": ["Max 3 Projets Actifs", "Visibilité Standard dans la Recherche", "Matrice de Réservation de Base", "Support Escrow Standard"]
       },
       "pro": {
-        "name": "Nœud Pro",
+        "name": "Plan Pro",
         "btn": "Passer à Pro",
         "features": ["Projets Actifs Illimités", "Algorithme d'IA de Visibilité Boostée", "Messagerie Neurale (Traduction Auto)", "Règles de Jalons Escrow Personnalisées", "Badge Kalide \"Pro Vérifié\""]
       },
       "elite": {
         "name": "Pack Elite",
         "btn": "Débloquer Elite",
-        "features": ["Tout ce qui est dans le Nœud Pro", "Capacité de Création d'Équipes/Packs", "Gestionnaire de Succès Kalide Dédié", "0% de Frais de Commission Escrow", "Top 1% de Placement dans la Recherche IA"]
+        "features": ["Tout ce qui est dans le Plan Pro", "Capacité de Création d'Équipes/Packs", "Gestionnaire de Succès Kalide Dédié", "0% de Frais de Commission Escrow", "Top 1% de Placement dans la Recherche IA"]
       }
     }
   },
@@ -429,14 +429,14 @@
     "subtitle": "Gestion des livrables actifs et des clusters de services optimisés.",
     "assignedOps": "Opérations Assignées",
     "serviceModules": "Modules de Service",
-    "financialNode": "Nœud Financier",
+    "financialNode": "Portefeuille",
     "networkIntel": "Intelligence Réseau",
-    "upgradeNode": "Améliorer le Nœud",
+    "upgradeNode": "Améliorer le Plan",
     "kycNeeded": "Vérification KYC Requise",
     "disconnect": "Déconnexion",
     "noOps": "Aucune opération assignée pour le moment",
-    "enterProject": "Entrer dans le Nœud du Projet",
-    "editNode": "Modifier le Nœud",
+    "enterProject": "Ouvrir le Projet",
+    "editNode": "Modifier le Service",
     "viewQuote": "Voir le Devis",
     "newService": "+ Ajouter un Nouveau Cluster de Services",
     "newQuote": "Générer un Nouveau Devis",
@@ -446,46 +446,46 @@
     "messengerDesc": "Chat client traduit automatiquement en temps réel",
     "academy": "Global Brain / Académie",
     "academyDesc": "Mentorats AR, VOD & Forum",
-    "justice": "Nœud de Justice",
+    "justice": "Centre de Justice",
     "justiceDesc": "Résolution de litiges par IA",
     "availabilityDesc": "Configurez votre calendrier de travail actif",
-    "nodeID": "Nœud : Professionnel",
-    "outputNode": "Nœud de Sortie Professionnel",
+    "nodeID": "Professionnel",
+    "outputNode": "Profil Professionnel",
     "verifiedBookings": "réservations vérifiées",
     "newBadge": "NOUVEAU",
     "activeBadge": "ACTIF",
-    "editService": "Modifier le Nœud de Service",
+    "editService": "Modifier le Service",
     "serviceTitle": "Titre du Service",
     "priceHr": "Prix ($/hr)",
     "commitUpdates": "Valider les Mises à Jour",
-    "appendNode": "Ajouter un Nouveau Nœud",
+    "appendNode": "Ajouter un Nouveau Service",
     "servicePlaceholder": "Titre du Service (ex: Intégration Intelligente)",
     "baseFee": "Frais de Base ($/hr)",
-    "initializeNode": "Initialiser le Nœud",
+    "initializeNode": "Enregistrer le Service",
     "classifiedQuote": "Devis Classifié",
     "refID": "Réf ID : QT-",
-    "projectNode": "Nœud Projet :",
+    "projectNode": "Projet :",
     "baseValuation": "Évaluation de Base :",
     "escrowGuarantee": "Garantie Escrow :",
     "verifiedByKalide": "Vérifié par Kalide",
     "downloadPDF": "Télécharger PDF",
-    "transmitClient": "Transmettre au Client"
+    "transmitClient": "Envoyer au Client"
   },
   "ProjectDetail": {
     "loading": "Initialisation du Module...",
-    "notFound": "Nœud Non Trouvé",
+    "notFound": "Projet introuvable",
     "status": "Statut",
     "moduleID": "ID du Module Projet",
-    "budgetNode": "Nœud de Budget",
-    "completionNode": "Nœud de Complétion",
-    "syncTimeline": "Timeline de Synchronisation",
+    "budgetNode": "Budget",
+    "completionNode": "Avancement",
+    "syncTimeline": "Chronologie du Projet",
     "initialization": "Initialisation",
     "targetCompletion": "Complétion Cible",
     "entityAccess": "Accès Entité",
-    "clientNode": "Nœud Client",
+    "clientNode": "Client",
     "assignedProfessional": "Professionnel Assigné",
     "unassigned": "Non assigné",
-    "updateProtocol": "Mettre à Jour le Protocole",
+    "updateProtocol": "Mettre à Jour",
     "secureMessaging": "Messagerie Sécurisée",
     "releaseEscrow": "Libérer l'Escrow",
     "releaseSuccess": "Escrow libéré avec succès",
@@ -493,20 +493,20 @@
   },
   "Workers": {
     "badge": "Artisans d'Élite",
-    "titlePrefix": "Nœuds de",
-    "titleHighlight": "Compétences Vérifiés",
-    "noNodes": "Aucun Nœud Vérifié Trouvé",
+    "titlePrefix": "Professionnels",
+    "titleHighlight": "Vérifiés",
+    "noNodes": "Aucun professionnel vérifié trouvé",
     "applyJoin": "Postuler pour rejoindre les rangs",
-    "verifiedNode": "Nœud Vérifié",
+    "verifiedNode": "Vérifié",
     "generalArtisan": "Artisan Général",
     "rating": "Note",
     "rate": "Tarif",
-    "viewProtocol": "Voir le Protocole",
-    "requestSync": "Demander Sync",
+    "viewProtocol": "Voir le Profil",
+    "requestSync": "Demander un Devis",
     "newRating": "Nouveau"
   },
   "Messenger": {
-    "clientNode": "Nœud Client",
+    "clientNode": "Client",
     "translationActive": "Traduction Neurale Active",
     "yourLang": "Votre Langue",
     "english": "Anglais",
@@ -521,7 +521,7 @@
   },
   "Quotes": {
     "generator": "Générateur de Devis",
-    "drafting": "Nœud : Brouillon",
+    "drafting": "Statut : Brouillon",
     "editMode": "Mode Édition",
     "previewPDF": "Aperçu PDF",
     "secureInit": "Initialisation de l'Escrow Sécurisée",
@@ -541,7 +541,7 @@
     "termsConditions": "Conditions & Escrow",
     "defaultTerms": "Conditions de paiement standard : 50% d'acompte, 50% à la livraison.",
     "officialQuote": "Devis Officiel",
-    "generatedBy": "Généré par le Réseau de Nœuds Kalide One",
+    "generatedBy": "Généré par Kalide One",
     "reference": "Référence du Devis",
     "date": "Date",
     "issuedTo": "Émis pour",
@@ -556,27 +556,27 @@
     "deploy": "Déployer sur l'Escrow",
     "transmitting": "Transmission...",
     "legalNotice": "Les fonds seront conservés en toute sécurité dans un contrat intelligent d'escrow jusqu'à la complétion du jalon.",
-    "success": "Devis déployé avec succès sur le Nœud d'Escrow du Client !"
+    "success": "Devis envoyé avec succès vers l'escrow du client !"
   },
   "ClientDashboard": {
-    "nodeID": "ID du Nœud",
+    "nodeID": "ID Client",
     "disconnect": "Déconnexion",
     "matrix": "Matrice d'Intelligence Client",
     "title": "Contrôle des Opérations",
-    "subtitle": "Surveillez vos déploiements, gérez les escrows et synchronisez avec des artisans vérifiés.",
+    "subtitle": "Suivez vos projets, gérez les escrows et collaborez avec des professionnels vérifiés.",
     "activeDeployments": "Déploiements Actifs",
-    "noDeployments": "Aucun nœud actif trouvé dans le réseau.",
+    "noDeployments": "Aucun projet actif trouvé.",
     "deployNew": "Déployer Nouvelle Mission +",
     "budget": "Budget",
     "projectID": "ID Projet",
     "openModule": "Ouvrir Module",
-    "fastAccess": "Nœuds d'Accès Rapide",
+    "fastAccess": "Accès Rapide",
     "deployWorker": "Déployer Artisan Unique",
     "workerDesc": "Embauche directe de spécialistes vérifiés.",
     "syncTeam": "Sync Équipe Spécialisée",
-    "teamDesc": "Exécution multi-nœuds gérée.",
+    "teamDesc": "Exécution multi-personnes gérée.",
     "marketplace": "Marché Global",
-    "marketplaceDesc": "Parcourir les nœuds de talents disponibles.",
+    "marketplaceDesc": "Parcourir les professionnels disponibles.",
     "escrowQuotes": "Devis d'Escrow Financier",
     "reviewFund": "Réviser & Financer",
     "untitled": "Projet sans titre",

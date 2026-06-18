@@ -50,7 +50,7 @@ export default function MentorshipTokens() {
 
       <div className="mb-12">
         <span className="text-5xl font-black tracking-tighter text-white">{tokens}</span>
-        <span className="text-xs font-black uppercase tracking-widest text-slate-500 ml-4">Stored in Node</span>
+        <span className="text-xs font-black uppercase tracking-widest text-slate-500 ml-4">Available Balance</span>
       </div>
 
       <div className="space-y-4">

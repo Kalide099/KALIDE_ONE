@@ -54,7 +54,7 @@ export default function Login() {
         setError(response.message || t.Auth?.actions?.error || 'Verification failed. Please check your credentials.');
       }
     } catch (err) {
-      setError(t.Auth?.actions?.networkError || 'Network synchronization failed. Please try again.');
+      setError(t.Auth?.actions?.networkError || 'Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -70,9 +70,9 @@ export default function Login() {
         <div className="bg-white shadow-sm border border-gray-100 p-12 md:p-20 rounded-[3rem] border-gray-200 shadow-2xl">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
-              {t.Auth?.loginBadge || 'Secure Access Node'}
+              {t.Auth?.loginBadge || 'Secure Access'}
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.loginTitle || 'Protocol Access'}</h1>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.loginTitle || 'Sign In'}</h1>
             <p className="text-slate-500 font-medium">{t.Auth?.loginDesc || 'Secure authentication for system-wide operations.'}</p>
           </div>
 
@@ -96,7 +96,7 @@ export default function Login() {
                   type="email"
                   required
                   className="w-full bg-gray-100 border border-gray-200 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-gray-900 font-medium placeholder:text-slate-600"
-                  placeholder={t.Auth?.fields?.email || "Official Email Node"}
+                  placeholder={t.Auth?.fields?.email || "Email Address"}
                   value={formData.email}
                   onChange={handleChange}
                 />
@@ -124,8 +124,8 @@ export default function Login() {
 
             <div className="text-center pt-8">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                {t.Auth?.actions?.noAccount || 'No access node yet?'} {' '}
-                <Link href="/register" className="text-primary hover:underline font-black">{t.Auth?.actions?.createNode || 'Provision Account'}</Link>
+                {t.Auth?.actions?.noAccount || 'No account yet?'} {' '}
+                <Link href="/register" className="text-primary hover:underline font-black">{t.Auth?.actions?.createNode || 'Create Account'}</Link>
               </span>
             </div>
           </form>

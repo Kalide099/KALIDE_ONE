@@ -90,7 +90,7 @@ export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps
     <div className="glass p-8 rounded-[2.5rem] border-white/5 text-center space-y-6">
       <div className="space-y-2">
         <h3 className="text-xl font-black uppercase tracking-tighter italic">
-          {mode === 'generate' ? "Your Check-In Node" : "Field Attendance Scanner"}
+          {mode === 'generate' ? "Your Check-In Code" : "Field Attendance Scanner"}
         </h3>
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
           {mode === 'generate' ? "Present this to the client on-site" : "Scan the artisan's ID to verify attendance"}
@@ -108,13 +108,13 @@ export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps
       {isLoading && (
         <div className="flex items-center justify-center space-x-2 text-primary animate-pulse">
           <span className="w-2 h-2 rounded-full bg-primary" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Processing Node...</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">Processing...</span>
         </div>
       )}
       
       {scanResult && !isLoading && (
         <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-green-400">Node Verified Successfully</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-green-400">Check-In Verified Successfully</p>
         </div>
       )}
     </div>
