@@ -22,6 +22,7 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -151,15 +152,26 @@ export default function Register() {
                 onChange={handleChange}
               />
             </div>
-            <input
-              name="password"
-              type="password"
-              required
-              className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
-              placeholder={t.Auth?.fields?.password || 'Password'}
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 pr-14 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium placeholder:text-slate-600 focus:ring-4 focus:ring-primary/10"
+                placeholder={t.Auth?.fields?.password || 'Password'}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xl"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
 
             <label className="block">
               <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Profile Photo (Required)</span>
