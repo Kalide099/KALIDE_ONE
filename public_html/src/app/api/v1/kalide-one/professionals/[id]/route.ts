@@ -45,6 +45,7 @@ export async function GET(
     return NextResponse.json({ 
       success: false, 
       message: 'Failed to fetch professional detail',
+      debug: error.message 
     }, { status: 500 });
   }
 }

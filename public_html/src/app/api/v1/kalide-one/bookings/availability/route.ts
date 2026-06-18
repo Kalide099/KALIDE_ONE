@@ -1,44 +1,31 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { PrismaClient } from '@/generated/prisma/client';
 import { verifyToken } from '@/lib/auth';
-import { serialize } from '@/lib/utils';
+import { serialize } from '@/lib/api-utils';
+
+const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const professional_id = searchParams.get('professional_id');
   const date = searchParams.get('date');
-  const availableOnly = searchParams.get('availableOnly') === 'true';
-  const includeBooked = searchParams.get('includeBooked') === 'true';
 
   try {
     const where: any = {};
     if (professional_id) where.professional_id = BigInt(professional_id);
     if (date) where.date = new Date(date);
 
-    if (availableOnly) {
-      where.is_booked = false;
-      where.start_time = { gte: new Date() };
-    }
-
-    if (!includeBooked && !availableOnly) {
-      where.is_booked = false;
-    }
-
     const availability = await prisma.bookings_availability.findMany({
       where,
-      orderBy: [
-        { date: 'asc' },
-        { start_time: 'asc' }
-      ]
+      orderBy: {
+        date: 'asc'
+      }
     });
 
-    return NextResponse.json({
-      success: true,
-      data: serialize(availability)
-    });
+    return NextResponse.json(serialize(availability));
   } catch (error) {
     console.error('Error fetching availability:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -69,9 +56,9 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, data: serialize(newAvailability) }, { status: 201 });
+    return NextResponse.json(serialize(newAvailability), { status: 201 });
   } catch (error) {
     console.error('Error creating availability:', error);
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }

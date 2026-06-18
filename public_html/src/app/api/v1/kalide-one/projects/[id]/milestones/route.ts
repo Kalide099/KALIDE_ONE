@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { PrismaClient } from '@/generated/prisma/client';
 import { verifyToken } from '@/lib/auth';
-import { serialize } from '@/lib/utils';
+import { serialize } from '@/lib/api-utils';
+
+const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
@@ -21,20 +23,8 @@ export async function GET(
   }
 
   try {
-    const project = await prisma.projects_projects.findUnique({ where: { id: BigInt(id) } });
-    if (!project) {
-      return NextResponse.json({ message: 'Project not found' }, { status: 404 });
-    }
-
-    const userId = BigInt(decoded.user_id);
-    const isParticipant = project.client_id === userId || project.professional_id === userId;
-    if (!isParticipant) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
-    }
-
     const milestones = await prisma.projects_milestones.findMany({
-      where: { project_id: BigInt(id) },
-      orderBy: { due_date: 'asc' },
+      where: { project_id: BigInt(id) }
     });
 
     return NextResponse.json(serialize(milestones));
@@ -64,19 +54,6 @@ export async function POST(
   try {
     const body = await request.json();
     const { title, description, amount, due_date } = body;
-
-    if (!title || !description || !amount || !due_date) {
-      return NextResponse.json({ message: 'title, description, amount and due_date are required' }, { status: 400 });
-    }
-
-    const project = await prisma.projects_projects.findUnique({ where: { id: BigInt(id) } });
-    if (!project) {
-      return NextResponse.json({ message: 'Project not found' }, { status: 404 });
-    }
-
-    if (project.client_id !== BigInt(decoded.user_id)) {
-      return NextResponse.json({ message: 'Only the project client can create milestones' }, { status: 403 });
-    }
 
     const newMilestone = await prisma.projects_milestones.create({
       data: {

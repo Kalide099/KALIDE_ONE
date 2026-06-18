@@ -54,27 +54,27 @@ sys.stdout = io.StringIO()
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white pt-32 pb-12 px-6">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900 pt-32 pb-12 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div>
-            <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-4">
+            <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-4">
               {t.Playground?.badge}
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">{t.Playground?.titlePrefix} <span className="gradient-text">{t.Playground?.titleHighlight}</span></h1>
-            <p className="text-slate-400 font-medium mt-2">{t.Playground?.description}</p>
+            <p className="text-gray-500 font-medium mt-2">{t.Playground?.description}</p>
           </div>
           <div className="flex space-x-4">
              <button 
                 onClick={() => setCode('')} 
-                className="px-6 py-3 glass rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition-all"
+                className="px-6 py-3 bg-white shadow-sm border border-gray-100 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-gray-100 transition-all"
              >
                {t.Playground?.clear}
              </button>
              <button 
                 onClick={runCode}
                 disabled={isLoading || isRunning}
-                className="px-10 py-3 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform shadow-2xl shadow-primary/30 disabled:opacity-50"
+                className="px-10 py-3 bg-primary text-gray-900 rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform shadow-2xl shadow-primary/30 disabled:opacity-50"
              >
                {isLoading ? (t.Playground?.booting || 'Booting...') : isRunning ? (t.Playground?.executing || 'Executing...') : (t.Playground?.run || 'Run Sequence')}
              </button>
@@ -83,9 +83,9 @@ sys.stdout = io.StringIO()
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[600px]">
           {/* Editor Area */}
-          <div className="glass rounded-[2rem] border-white/5 overflow-hidden flex flex-col relative group">
+          <div className="bg-white shadow-sm border border-gray-100 rounded-[2rem] border-gray-200 overflow-hidden flex flex-col relative group">
             <div className="absolute top-0 left-0 w-full h-1 bg-primary/20 group-focus-within:bg-primary transition-colors" />
-            <div className="bg-white/5 px-6 py-3 border-b border-white/5 flex items-center justify-between">
+            <div className="bg-gray-100 px-6 py-3 border-b border-gray-200 flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">source_code.py</span>
               <div className="flex space-x-2">
                 <div className="w-2 h-2 rounded-full bg-red-500/50" />
@@ -96,15 +96,15 @@ sys.stdout = io.StringIO()
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="flex-1 bg-transparent p-8 font-mono text-sm outline-none resize-none text-slate-300 focus:text-white transition-colors"
+              className="flex-1 bg-transparent p-8 font-mono text-sm outline-none resize-none text-gray-600 focus:text-gray-900 transition-colors"
               spellCheck={false}
             />
           </div>
 
           {/* Output Area */}
           <div className="flex flex-col gap-8">
-            <div className="glass rounded-[2rem] border-white/5 overflow-hidden flex flex-col flex-1 bg-black/40">
-              <div className="bg-white/5 px-6 py-3 border-b border-white/5 flex items-center justify-between">
+            <div className="bg-white shadow-sm border border-gray-100 rounded-[2rem] border-gray-200 overflow-hidden flex flex-col flex-1 bg-black/40">
+              <div className="bg-gray-100 px-6 py-3 border-b border-gray-200 flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">{t.Playground?.terminal}</span>
                 <span className="text-[10px] font-bold text-slate-500">{t.Playground?.uptime || 'Uptime: 100%'}</span>
               </div>
@@ -115,19 +115,19 @@ sys.stdout = io.StringIO()
           </div>
         </div>
 
-        <div className="mt-12 p-8 glass rounded-[2.5rem] border-primary/20 flex flex-col md:flex-row items-center gap-8">
+        <div className="mt-12 p-8 bg-white shadow-sm border border-gray-100 rounded-[2.5rem] border-primary/20 flex flex-col md:flex-row items-center gap-8">
            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl shrink-0 animate-pulse">
              💡
            </div>
            <div>
              <h4 className="text-lg font-black uppercase tracking-tight mb-1">{t.Playground?.edgeTitle}</h4>
-             <p className="text-slate-400 text-sm font-medium">{t.Playground?.edgeDesc}</p>
+             <p className="text-gray-500 text-sm font-medium">{t.Playground?.edgeDesc}</p>
            </div>
         </div>
       </div>
 
       <footer className="mt-20 text-center">
-         <a href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-slate-400 transition-colors">
+         <a href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-gray-500 transition-colors">
             {t.return || 'Return to Command Center'}
           </a>
       </footer>

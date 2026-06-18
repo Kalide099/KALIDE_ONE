@@ -43,15 +43,20 @@
   },
   "Footer": {
     "desc": "La plateforme bilingue unifiée pour l'intelligence et les services vérifiés, connectant la demande mondiale avec des talents exceptionnels.",
-    "copy": "© 2026 Kalide One. Nœud Opérationnel Bilingue.",
+    "copy": "© 2026 ARTISANA. Conçu et maintenu par KALIDE SARL. Tous droits réservés.",
     "links": {
       "platform": "Plateforme",
       "legal": "Légal",
       "verification": "Vérification",
-      "support": "Support Global",
-      "terms": "Conditions",
-      "privacy": "Confidentialité",
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
       "safety": "Sécurité"
+    },
+    "contact": {
+      "title": "ADRESSE DU SIÈGE SOCIAL",
+      "address": "1674, Benin",
+      "phone": "+229 01 66 98 33 83",
+      "email": "kalideglobal@gmail.com"
     }
   },
   "ServiceBundles": {
@@ -160,10 +165,22 @@
     "certified": "Certifié",
     "yes": "Oui",
     "no": "Non",
-    "portfolio": "Portfolio",
+    "portfolio": "Portfolio des projets passés",
     "initiateLink": "Initier le Lien",
-    "viewLedger": "Voir le Grand Livre Vérifié",
-    "secureProtocol": "Opéré de manière sécurisée par le Protocole Kalide Global"
+    "viewLedger": "Voir le registre vérifié",
+    "secureProtocol": "Exploité de manière sécurisée par le protocole global Kalide",
+    "viewProject": "Voir le projet",
+    "clientReviews": "Avis des clients vérifiés",
+    "leaveReview": "Laisser un avis",
+    "messageArtisan": "Envoyer un message"
+  },
+  "ReviewModal": {
+    "title": "Soumettre un avis",
+    "rating": "Votre évaluation",
+    "comment": "Votre expérience",
+    "placeholder": "Parlez-nous de la qualité du travail, du professionnalisme et de l'expérience globale...",
+    "cancel": "Annuler",
+    "submit": "Publier l'avis"
   },
   "Admin": {
     "titlePrefix": "Nœud ",
@@ -179,23 +196,6 @@
       "users": "Utilisateurs Actifs",
       "projects": "Projets Globaux",
       "escrow": "Volume Escrow"
-    },
-    "performance": {
-      "activeUsers": "Utilisateurs Actifs",
-      "activeUsersSub": "actifs",
-      "activeProjects": "Projets Actifs",
-      "completedSub": "terminés",
-      "platformVolume": "Volume Plateforme",
-      "invoiceTotal": "total factures",
-      "escrowVolume": "Volume Escrow",
-      "remainingEscrow": "restant en escrow",
-      "marketplaceRating": "Note Marketplace",
-      "winRate": "Taux de gain",
-      "trend": {
-        "up": "En hausse",
-        "down": "En baisse",
-        "steady": "Stable"
-      }
     },
     "tabs": {
       "users": "Contrôle de la Matrice Utilisateur",
@@ -469,24 +469,7 @@
     "escrowGuarantee": "Garantie Escrow :",
     "verifiedByKalide": "Vérifié par Kalide",
     "downloadPDF": "Télécharger PDF",
-    "transmitClient": "Transmettre au Client",
-    "performance": {
-      "winRate": "Taux de gain",
-      "acceptedQuotes": "acceptés",
-      "responseRate": "Taux de réponse",
-      "repliesProcessed": "réponses traitées",
-      "earnings": "Revenus",
-      "receivedPayouts": "paiements reçus",
-      "repeatClients": "Clients récurrents",
-      "withProjects": "avec 2+ projets",
-      "rating": "Note",
-      "reviews": "avis",
-      "trend": {
-        "up": "En hausse",
-        "down": "En baisse",
-        "steady": "Stable"
-      }
-    }
+    "transmitClient": "Transmettre au Client"
   },
   "ProjectDetail": {
     "loading": "Initialisation du Module...",
@@ -605,22 +588,6 @@
       "active": "Actif",
       "draft": "Brouillon",
       "accepted": "Accepté"
-    },
-    "performance": {
-      "activeProjects": "Projets Actifs",
-      "active": "Actifs",
-      "completed": "terminés",
-      "totalSpend": "Dépenses Totales",
-      "committedBudget": "Budget engagé",
-      "qualityRating": "Note Qualité",
-      "reviews": "avis",
-      "onTimeCompletion": "Livraison à temps",
-      "onTimeLabel": "complétion à temps",
-      "trend": {
-        "up": "En hausse",
-        "down": "En baisse",
-        "steady": "Stable"
-      }
     }
   },
   "Status": {
@@ -630,7 +597,9 @@
     "cancelled": "Annulé",
     "draft": "Brouillon",
     "accepted": "Accepté",
-    "funded": "Financé"
+    "funded": "Financé",
+    "confirmFund": "Êtes-vous sûr de vouloir financer cet engagement ?",
+    "fundSuccess": "Engagement financé avec succès !"
   },
   "return": "Retour au Centre de Commandement"
 }

@@ -1,0 +1,24 @@
+{
+  "Navigation": {
+    "services": "Ayyuka",
+    "bundles": "Kunshin",
+    "login": "Shiga",
+    "join": "Haɗu",
+    "home": "Gida"
+  },
+  "Hero": {
+    "badge": "Cibiyar Basira ta Harsuna Biyu",
+    "titleHighlight": "KALIDE ONE",
+    "description": "Nemo kwararrun ma'aikata don ayyukanku.",
+    "ctaHiring": "Fara Daukar Ma'aikata"
+  },
+  "Status": {
+    "completed": "An kammala",
+    "in_progress": "Ana kan yi",
+    "pending": "Ana jira"
+  },
+  "WorkerDashboard": {
+    "title": "Dashboard na Ma'aikata",
+    "subtitle": "Kula da ayyukanku da samun kudin shiga."
+  }
+}

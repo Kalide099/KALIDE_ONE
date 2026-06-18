@@ -3,54 +3,22 @@
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import { useState, useEffect } from 'react';
-import { apiService, PerformanceDashboard, Project } from '@/services/api';
-import { DEFAULT_TREND_THRESHOLDS, getPresenceTrend, getTrendByThreshold, getTrendThresholds, TREND_BADGE_CLASSES } from '@/lib/performance-trends';
+import { apiService, Project } from '@/services/api';
 
 export default function WorkerDashboard() {
   const { t, language } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
-  const [performance, setPerformance] = useState<PerformanceDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeModal, setActiveModal] = useState<string | null>(null);
+    const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [trendThresholds, setTrendThresholdsState] = useState(DEFAULT_TREND_THRESHOLDS);
-
-  const formatCurrency = (value: number) =>
-    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-
-  const formatPercent = (value: number) =>
-    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-
-  const trendLabels = t.WorkerDashboard?.performance?.trend || {
-    up: 'Up',
-    down: 'Down',
-    steady: 'Steady',
-  };
-
-  useEffect(() => {
-    const syncThresholds = () => setTrendThresholdsState(getTrendThresholds());
-    syncThresholds();
-
-    window.addEventListener('storage', syncThresholds);
-    return () => {
-      window.removeEventListener('storage', syncThresholds);
-    };
-  }, []);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [projectsResponse, performanceResponse] = await Promise.all([
-        apiService.getProjects(),
-        apiService.getPerformanceDashboard(),
-      ]);
-
-      if (projectsResponse.success && projectsResponse.data) {
-        setProjects(projectsResponse.data);
-      }
-
-      if (performanceResponse.success && performanceResponse.data) {
-        setPerformance(performanceResponse.data);
+      const response = await apiService.getProjects();
+      if (response.success && response.data) {
+        setProjects(response.data);
       }
       
       // Fetch Quotes Mock for now until API is updated
@@ -64,30 +32,16 @@ export default function WorkerDashboard() {
     fetchData();
   }, []);
 
-  const getTitle = (p: Project) => p.title[language] || p.title['en'] || 'Untitled Project';
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatarUploading(true);
+      await apiService.uploadAvatar(e.target.files[0]);
+      setAvatarUploading(false);
+      // Ideally refresh user data here
+    }
+  };
 
-  const workerMetrics = performance?.worker;
-  const winRateTrend = getTrendByThreshold(
-    workerMetrics?.win_rate ?? 0,
-    trendThresholds.worker.winRate.up,
-    trendThresholds.worker.winRate.down
-  );
-  const responseRateTrend = getTrendByThreshold(
-    workerMetrics?.response_rate ?? 0,
-    trendThresholds.worker.responseRate.up,
-    trendThresholds.worker.responseRate.down
-  );
-  const earningsTrend = getPresenceTrend(workerMetrics?.earnings_total ?? 0);
-  const repeatClientsTrend = getTrendByThreshold(
-    workerMetrics?.repeat_clients ?? 0,
-    trendThresholds.worker.repeatClients.up,
-    trendThresholds.worker.repeatClients.down
-  );
-  const ratingTrend = getTrendByThreshold(
-    workerMetrics?.average_rating ?? 0,
-    trendThresholds.worker.rating.up,
-    trendThresholds.worker.rating.down
-  );
+  const getTitle = (p: Project) => p.title[language] || p.title['en'] || 'Untitled Project';
 
   const services = [
     { id: 1, title: 'Plumbing Service', price: 50, bookings: 5 },
@@ -95,136 +49,64 @@ export default function WorkerDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900">
       {/* Background Decor */}
       <div className="hero-glow top-0 left-0 w-[400px] h-[400px] opacity-20" />
 
-      <header className="glass sticky top-0 z-50 border-b border-white/5 h-20 max-[360px]:h-16">
-        <div className="max-w-7xl mx-auto px-6 max-[360px]:px-3 h-full flex items-center justify-between gap-2">
+      <header className="bg-white shadow-sm border border-gray-100 sticky top-0 z-50 border-b border-gray-200 h-20">
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black text-white">K</div>
-            <span className="text-lg max-[360px]:text-sm font-black tracking-tighter uppercase italic">Kalide One</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black text-gray-900">K</div>
+            <span className="text-lg font-black tracking-tighter uppercase italic">Kalide One</span>
           </div>
-          <div className="flex items-center gap-2 max-[360px]:gap-1">
-            <Link href="/profile" className="px-3 sm:px-4 max-[360px]:px-2 py-2 max-[360px]:py-1.5 border border-white/20 bg-white/5 rounded-full text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-white/90">
-              Profile
+          <div className="flex items-center space-x-6">
+            <label className="cursor-pointer hidden sm:flex items-center space-x-2 px-4 py-2 border border-gray-200 bg-gray-100 hover:bg-white/10 rounded-full transition-all text-[10px] font-black uppercase tracking-widest text-gray-600">
+              {avatarUploading ? 'Uploading...' : 'Update Avatar'}
+              <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} />
+            </label>
+            <Link href="/upgrade" className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-secondary to-purple-500 rounded-full hover:scale-105 transition-all shadow-lg shadow-secondary/20">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-900">{t.WorkerDashboard?.upgradeNode}</span>
             </Link>
-            <Link href="/upgrade" className="flex items-center space-x-2 px-3 sm:px-4 max-[360px]:px-2 py-2 max-[360px]:py-1.5 bg-gradient-to-r from-secondary to-purple-500 rounded-full hover:scale-105 transition-all shadow-lg shadow-secondary/20">
-              <span className="text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-white max-w-20 max-[360px]:max-w-12 truncate">{t.WorkerDashboard?.upgradeNode}</span>
-            </Link>
-            <Link href="/verification" className="flex items-center space-x-2 px-3 sm:px-4 max-[360px]:px-2 py-2 max-[360px]:py-1.5 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 rounded-full transition-all group">
+            <Link href="/verification" className="hidden sm:flex items-center space-x-2 px-4 py-2 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 rounded-full transition-all group">
               <span className="w-2 h-2 rounded-full bg-blue-500 group-hover:animate-ping" />
-              <span className="text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-blue-400 max-w-20 max-[360px]:max-w-12 truncate">{t.WorkerDashboard?.kycNeeded}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">{t.WorkerDashboard?.kycNeeded}</span>
             </Link>
-            <span className="hidden md:block text-xs font-black uppercase tracking-widest text-secondary">{t.WorkerDashboard?.nodeID}-0x3C</span>
-            <Link href="/" className="px-6 max-[360px]:px-3 py-2 max-[360px]:py-1.5 glass hover:bg-white/5 rounded-full text-xs max-[360px]:text-[9px] font-black uppercase tracking-widest transition-all">
+            <span className="hidden sm:block text-xs font-black uppercase tracking-widest text-secondary">{t.WorkerDashboard?.nodeID}-0x3C</span>
+            <Link href="/" className="px-6 py-2 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-full text-xs font-black uppercase tracking-widest transition-all">
               {t.WorkerDashboard?.disconnect}
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-12 max-[360px]:py-6 px-6 max-[360px]:px-3 pt-32 max-[360px]:pt-24">
-        <div className="mb-16 max-[360px]:mb-8">
-          <div className="inline-block px-4 max-[360px]:px-3 py-1 glass rounded-full text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-secondary mb-4">
+      <main className="max-w-7xl mx-auto py-12 px-6 pt-32">
+        <div className="mb-16">
+          <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-secondary mb-4">
             {t.WorkerDashboard?.outputNode}
           </div>
-          <h1 className="text-4xl max-[360px]:text-2xl md:text-6xl font-black tracking-tighter uppercase italic mb-2">{t.WorkerDashboard?.title}</h1>
-          <p className="text-slate-500 font-medium max-[360px]:text-xs">{t.WorkerDashboard?.subtitle}</p>
-        </div>
-
-        <div className="mb-10 grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <div className="glass rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.winRate || 'Win Rate'}</p>
-              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[winRateTrend]}`}>
-                {trendLabels[winRateTrend]}
-              </span>
-            </div>
-            <p className="text-xl font-black mt-2">{formatPercent(workerMetrics?.win_rate ?? 0)}%</p>
-            <p className="text-xs text-slate-400">
-              {workerMetrics?.quotes_accepted ?? 0}/{workerMetrics?.quotes_submitted ?? 0} {t.WorkerDashboard?.performance?.acceptedQuotes || 'accepted'}
-            </p>
-          </div>
-          <div className="glass rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.responseRate || 'Response Rate'}</p>
-              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[responseRateTrend]}`}>
-                {trendLabels[responseRateTrend]}
-              </span>
-            </div>
-            <p className="text-xl font-black mt-2">{formatPercent(workerMetrics?.response_rate ?? 0)}%</p>
-            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.repliesProcessed || 'quote replies processed'}</p>
-          </div>
-          <div className="glass rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.earnings || 'Earnings'}</p>
-              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[earningsTrend]}`}>
-                {trendLabels[earningsTrend]}
-              </span>
-            </div>
-            <p className="text-xl font-black mt-2">${formatCurrency(workerMetrics?.earnings_total ?? 0)}</p>
-            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.receivedPayouts || 'received payouts'}</p>
-          </div>
-          <div className="glass rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.repeatClients || 'Repeat Clients'}</p>
-              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[repeatClientsTrend]}`}>
-                {trendLabels[repeatClientsTrend]}
-              </span>
-            </div>
-            <p className="text-xl font-black mt-2">{workerMetrics?.repeat_clients ?? 0}</p>
-            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.withProjects || 'with 2+ projects'}</p>
-          </div>
-          <div className="glass rounded-2xl p-4 border border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.rating || 'Rating'}</p>
-              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[ratingTrend]}`}>
-                {trendLabels[ratingTrend]}
-              </span>
-            </div>
-            <p className="text-xl font-black mt-2">{(workerMetrics?.average_rating ?? 0).toFixed(2)} / 5</p>
-            <p className="text-xs text-slate-400">{workerMetrics?.reviews_count ?? 0} {t.WorkerDashboard?.performance?.reviews || 'reviews'}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 max-[360px]:gap-2 mb-10 max-[360px]:mb-6 lg:hidden">
-          <Link href="/dashboard/worker/teams" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-cyan-300 break-words">
-            Team Hub
-          </Link>
-          <Link href="/messages" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-blue-300 break-words">
-            {t.WorkerDashboard?.messenger || 'Messages'}
-          </Link>
-          <Link href="/academy" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-purple-300 break-words">
-            {t.WorkerDashboard?.academy || 'Academy'}
-          </Link>
-          <Link href="/supply" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-orange-300 break-words">
-            {t.WorkerDashboard?.supplyB2B || 'Supply'}
-          </Link>
-          <Link href="/justice" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-red-300 break-words">
-            {t.WorkerDashboard?.justice || 'Disputes'}
-          </Link>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic mb-2">{t.WorkerDashboard?.title}</h1>
+          <p className="text-slate-500 font-medium">{t.WorkerDashboard?.subtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* My Projects */}
           <div className="lg:col-span-2 space-y-8">
-            <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.assignedOps}</h2>
+            <h2 className="text-xl font-black uppercase tracking-widest text-gray-500 mb-8 border-b border-gray-200 pb-4">{t.WorkerDashboard?.assignedOps}</h2>
             
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[1, 2].map(i => <div key={i} className="h-64 glass rounded-[2.5rem] animate-pulse" />)}
+                {[1, 2].map(i => <div key={i} className="h-64 bg-white shadow-sm border border-gray-100 rounded-[2.5rem] animate-pulse" />)}
               </div>
             ) : projects.length === 0 ? (
-              <div className="p-12 glass rounded-[2.5rem] text-center border-dashed border-white/10">
+              <div className="p-12 bg-white shadow-sm border border-gray-100 rounded-[2.5rem] text-center border-dashed border-gray-200">
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-4">{t.WorkerDashboard?.noOps}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-[360px]:gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {projects.map((project) => (
-                  <div key={project.id} className="group glass p-8 max-[360px]:p-4 rounded-[2.5rem] max-[360px]:rounded-2xl border-white/5 hover:border-secondary/50 transition-all">
+                  <div key={project.id} className="group bg-white shadow-sm border border-gray-100 p-8 rounded-[2.5rem] border-gray-200 hover:border-secondary/50 transition-all">
                     <div className="flex justify-between items-start mb-8">
-                      <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl font-black group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl font-black group-hover:scale-110 transition-transform">
                         {getTitle(project).charAt(0)}
                       </div>
                       <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
@@ -233,11 +115,11 @@ export default function WorkerDashboard() {
                         {project.status === 'completed' ? (t.Status?.completed || 'Completed') : (t.Status?.in_progress || 'Active')}
                       </span>
                     </div>
-                    <h3 className="text-2xl max-[360px]:text-lg font-black uppercase tracking-tight mb-2 break-words line-clamp-2">{getTitle(project)}</h3>
-                    <p className="text-slate-500 text-xs max-[360px]:text-[10px] font-bold mb-8 italic break-words">{t.WorkerDashboard?.origin || 'Origin'}: Node {project.client}</p>
+                    <h3 className="text-2xl font-black uppercase tracking-tight mb-2 truncate">{getTitle(project)}</h3>
+                    <p className="text-slate-500 text-xs font-bold mb-8 italic truncate">{t.WorkerDashboard?.origin || 'Origin'}: Node {project.client}</p>
                     <Link
                       href={`/project/${project.id}`}
-                      className="w-full py-4 max-[360px]:py-3 bg-white/5 hover:bg-secondary text-center rounded-xl font-black uppercase tracking-widest text-[10px] max-[360px]:text-[9px] transition-all"
+                      className="w-full py-4 bg-gray-100 hover:bg-secondary text-center rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
                     >
                       {t.WorkerDashboard?.enterProject}
                     </Link>
@@ -248,33 +130,26 @@ export default function WorkerDashboard() {
           </div>
 
           <div className="space-y-8">
-            <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.serviceModules}</h2>
+            <h2 className="text-xl font-black uppercase tracking-widest text-gray-500 mb-8 border-b border-gray-200 pb-4">{t.WorkerDashboard?.serviceModules}</h2>
             <div className="space-y-4">
-              <Link href="/dashboard/worker/teams" className="flex items-center justify-between p-6 max-[360px]:p-4 glass rounded-2xl border-cyan-500/20 border hover:border-cyan-500/50 group transition-all">
+              <Link href="/availability" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200 border hover:border-secondary/50 group transition-all">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] text-cyan-300 group-hover:text-white transition-colors break-words">Team Management</h3>
-                  <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">Invite, assign roles, set permissions</p>
-                </div>
-                <span className="text-cyan-300 group-hover:translate-x-2 transition-transform">→</span>
-              </Link>
-              <Link href="/availability" className="flex items-center justify-between p-6 max-[360px]:p-4 glass rounded-2xl border-white/5 border hover:border-secondary/50 group transition-all">
-                <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] text-secondary group-hover:text-white transition-colors break-words">{t.Availability?.headerTitle}</h3>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-secondary group-hover:text-gray-900 transition-colors">{t.Availability?.headerTitle}</h3>
                   <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">{t.WorkerDashboard?.availabilityDesc}</p>
                 </div>
                 <span className="text-secondary group-hover:translate-x-2 transition-transform">→</span>
               </Link>
               {services.map((service) => (
-                <div key={service.id} className="p-6 max-[360px]:p-4 glass rounded-2xl border-white/5 group hover:border-white/20 transition-all">
+                <div key={service.id} className="p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200 group hover:border-white/20 transition-all">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] break-words pr-2">{service.title}</h3>
-                    <span className="text-xs max-[360px]:text-[10px] font-bold text-slate-400 shrink-0">${service.price}/hr</span>
+                    <h3 className="font-black uppercase tracking-tight text-sm">{service.title}</h3>
+                    <span className="text-xs font-bold text-gray-500">${service.price}/hr</span>
                   </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] max-[360px]:text-[8px] font-black text-slate-500 uppercase tracking-widest break-words">{service.bookings} {t.WorkerDashboard?.verifiedBookings}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{service.bookings} {t.WorkerDashboard?.verifiedBookings}</span>
                     <button 
                       onClick={() => { setSelectedService(service); setActiveModal('edit-service'); }}
-                      className="text-secondary text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest hover:underline shrink-0"
+                      className="text-secondary text-[10px] font-black uppercase tracking-widest hover:underline"
                     >
                       {t.WorkerDashboard?.editNode}
                     </button>
@@ -283,36 +158,36 @@ export default function WorkerDashboard() {
               ))}
               <button 
                 onClick={() => setActiveModal('new-service')}
-                className="w-full py-5 border border-dashed border-white/10 hover:border-secondary/50 hover:bg-secondary/5 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-500 hover:text-secondary transition-all"
+                className="w-full py-5 border border-dashed border-gray-200 hover:border-secondary/50 hover:bg-secondary/5 rounded-2xl font-black uppercase tracking-widest text-[10px] text-slate-500 hover:text-secondary transition-all"
               >
                 {t.WorkerDashboard?.newService}
               </button>
             </div>
 
             {/* Quotes and Invoices */}
-            <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mt-12 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.financialNode}</h2>
+            <h2 className="text-xl font-black uppercase tracking-widest text-gray-500 mt-12 mb-8 border-b border-gray-200 pb-4">{t.WorkerDashboard?.financialNode}</h2>
             <div className="space-y-4">
-              <Link href="/dashboard/worker/wallet" className="flex items-center justify-between p-6 max-[360px]:p-4 glass rounded-2xl border-secondary/30 border bg-secondary/5 hover:bg-secondary/10 group transition-all">
+              <Link href="/dashboard/worker/wallet" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-secondary/30 border bg-secondary/5 hover:bg-secondary/10 group transition-all">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] text-secondary group-hover:text-white transition-colors break-words">Financial Wallet</h3>
-                  <p className="text-[10px] max-[360px]:text-[8px] text-slate-500 font-medium uppercase tracking-widest mt-1 break-words">Manage balances and payout methods</p>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-secondary group-hover:text-gray-900 transition-colors">Financial Intelligence Node</h3>
+                  <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">Manage liquid assets & Mobile Money payouts</p>
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="text-secondary group-hover:translate-x-2 transition-transform text-xl">→</span>
                 </div>
               </Link>
               {quotes.map((quote) => (
-                <div key={quote.id} className="p-6 glass rounded-2xl border-white/5 group hover:border-white/20 transition-all">
+                <div key={quote.id} className="p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200 group hover:border-white/20 transition-all">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-black uppercase tracking-tight text-sm truncate pr-4">{quote.project}</h3>
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${
-                      quote.status === 'Accepted' ? 'bg-green-500/10 text-green-400' : 'bg-slate-500/10 text-slate-400'
+                      quote.status === 'Accepted' ? 'bg-green-500/10 text-green-400' : 'bg-slate-500/10 text-gray-500'
                     }`}>
                       {quote.status === 'Accepted' ? (t.Status?.accepted || 'Accepted') : (t.Status?.draft || 'Draft')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">${quote.amount}</span>
+                    <span className="text-xs font-bold text-gray-900">${quote.amount}</span>
                     <button 
                       onClick={() => { setSelectedService(quote); setActiveModal('view-quote'); }}
                       className="text-secondary text-[10px] font-black uppercase tracking-widest hover:underline"
@@ -322,14 +197,14 @@ export default function WorkerDashboard() {
                   </div>
                 </div>
               ))}
-              <Link href="/quotes/new" className="block w-full py-5 glass text-center border-secondary/20 hover:border-secondary hover:bg-secondary/5 rounded-2xl font-black uppercase tracking-widest text-[10px] text-secondary transition-all shadow-lg shadow-secondary/10">
+              <Link href="/quotes/new" className="block w-full py-5 bg-white shadow-sm border border-gray-100 text-center border-secondary/20 hover:border-secondary hover:bg-secondary/5 rounded-2xl font-black uppercase tracking-widest text-[10px] text-secondary transition-all shadow-lg shadow-secondary/10">
                 {t.WorkerDashboard?.newQuote}
               </Link>
 
               {/* Kalide Supply Link */}
-              <Link href="/supply" className="flex items-center justify-between p-6 glass rounded-2xl border-orange-500/20 border hover:border-orange-500/50 group transition-all shadow-[0_0_15px_rgba(249,115,22,0.1)]">
+              <Link href="/supply" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-orange-500/20 border hover:border-orange-500/50 group transition-all shadow-[0_0_15px_rgba(249,115,22,0.1)]">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm text-orange-400 group-hover:text-white transition-colors">{t.WorkerDashboard?.supplyB2B}</h3>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-orange-400 group-hover:text-gray-900 transition-colors">{t.WorkerDashboard?.supplyB2B}</h3>
                   <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">{t.WorkerDashboard?.supplyDesc}</p>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -340,23 +215,23 @@ export default function WorkerDashboard() {
             
             
             {/* Communication & Intelligence Node */}
-            <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mt-12 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.networkIntel}</h2>
+            <h2 className="text-xl font-black uppercase tracking-widest text-gray-500 mt-12 mb-8 border-b border-gray-200 pb-4">{t.WorkerDashboard?.networkIntel}</h2>
             <div className="space-y-4">
-              <Link href="/messages" className="flex items-center justify-between p-6 glass rounded-2xl border-white/5 border hover:border-blue-500/50 group transition-all">
+              <Link href="/messages" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-gray-200 border hover:border-blue-500/50 group transition-all">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm text-blue-400 group-hover:text-white transition-colors">{t.WorkerDashboard?.messenger}</h3>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-blue-400 group-hover:text-gray-900 transition-colors">{t.WorkerDashboard?.messenger}</h3>
                   <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">{t.WorkerDashboard?.messengerDesc}</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="bg-blue-500 text-white text-[10px] font-black px-2 py-1 rounded-full">1 {t.WorkerDashboard?.newBadge}</span>
+                  <span className="bg-blue-500 text-gray-900 text-[10px] font-black px-2 py-1 rounded-full">1 {t.WorkerDashboard?.newBadge}</span>
                   <span className="text-blue-400 group-hover:translate-x-2 transition-transform">→</span>
                 </div>
               </Link>
 
               {/* Academy Link */}
-              <Link href="/academy" className="flex items-center justify-between p-6 glass rounded-2xl border-purple-500/20 border hover:border-purple-500/50 group transition-all shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+              <Link href="/academy" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-purple-500/20 border hover:border-purple-500/50 group transition-all shadow-[0_0_15px_rgba(168,85,247,0.1)]">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm text-purple-400 group-hover:text-white transition-colors">{t.WorkerDashboard?.academy}</h3>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-purple-400 group-hover:text-gray-900 transition-colors">{t.WorkerDashboard?.academy}</h3>
                   <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">{t.WorkerDashboard?.academyDesc}</p>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -366,13 +241,13 @@ export default function WorkerDashboard() {
               </Link>
 
               {/* Justice Node Link */}
-              <Link href="/justice" className="flex items-center justify-between p-6 glass rounded-2xl border-red-500/20 border hover:border-red-500/50 group transition-all shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+              <Link href="/justice" className="flex items-center justify-between p-6 bg-white shadow-sm border border-gray-100 rounded-2xl border-red-500/20 border hover:border-red-500/50 group transition-all shadow-[0_0_15px_rgba(239,68,68,0.1)]">
                 <div>
-                  <h3 className="font-black uppercase tracking-tight text-sm text-red-400 group-hover:text-white transition-colors">{t.WorkerDashboard?.justice}</h3>
+                  <h3 className="font-black uppercase tracking-tight text-sm text-red-400 group-hover:text-gray-900 transition-colors">{t.WorkerDashboard?.justice}</h3>
                   <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">{t.WorkerDashboard?.justiceDesc}</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full">1 {t.WorkerDashboard?.activeBadge}</span>
+                  <span className="bg-red-500 text-gray-900 text-[10px] font-black px-2 py-1 rounded-full">1 {t.WorkerDashboard?.activeBadge}</span>
                   <span className="text-red-400 group-hover:translate-x-2 transition-transform">→</span>
                 </div>
               </Link>
@@ -384,8 +259,8 @@ export default function WorkerDashboard() {
       {/* Dynamic Modals */}
       {activeModal && (
         <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="glass w-full max-w-lg rounded-[3rem] p-8 border-secondary/20 relative">
-            <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 text-slate-500 hover:text-white font-black">X</button>
+          <div className="bg-white shadow-sm border border-gray-100 w-full max-w-lg rounded-[3rem] p-8 border-secondary/20 relative">
+            <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 text-slate-500 hover:text-gray-900 font-black">X</button>
             
             {activeModal === 'edit-service' && (
               <div className="space-y-6">
@@ -393,14 +268,14 @@ export default function WorkerDashboard() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">{t.WorkerDashboard?.serviceTitle}</label>
-                    <input type="text" defaultValue={selectedService?.title} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold" />
+                    <input type="text" defaultValue={selectedService?.title} className="w-full bg-gray-100 border border-gray-200 rounded-xl p-4 text-gray-900 font-bold" />
                   </div>
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">{t.WorkerDashboard?.priceHr}</label>
-                    <input type="number" defaultValue={selectedService?.price} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold" />
+                    <input type="number" defaultValue={selectedService?.price} className="w-full bg-gray-100 border border-gray-200 rounded-xl p-4 text-gray-900 font-bold" />
                   </div>
                 </div>
-                <button onClick={() => setActiveModal(null)} className="w-full py-5 bg-secondary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] mt-8">{t.WorkerDashboard?.commitUpdates}</button>
+                <button onClick={() => setActiveModal(null)} className="w-full py-5 bg-secondary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-8">{t.WorkerDashboard?.commitUpdates}</button>
               </div>
             )}
 
@@ -408,10 +283,10 @@ export default function WorkerDashboard() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-black uppercase tracking-tighter italic">{t.WorkerDashboard?.appendNode}</h2>
                 <div className="space-y-4">
-                  <input type="text" placeholder={t.WorkerDashboard?.servicePlaceholder} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold" />
-                  <input type="number" placeholder={t.WorkerDashboard?.baseFee} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold" />
+                  <input type="text" placeholder={t.WorkerDashboard?.servicePlaceholder} className="w-full bg-gray-100 border border-gray-200 rounded-xl p-4 text-gray-900 font-bold" />
+                  <input type="number" placeholder={t.WorkerDashboard?.baseFee} className="w-full bg-gray-100 border border-gray-200 rounded-xl p-4 text-gray-900 font-bold" />
                 </div>
-                <button onClick={() => setActiveModal(null)} className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] mt-8">{t.WorkerDashboard?.initializeNode}</button>
+                <button onClick={() => setActiveModal(null)} className="w-full py-5 bg-primary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-8">{t.WorkerDashboard?.initializeNode}</button>
               </div>
             )}
 
@@ -425,7 +300,7 @@ export default function WorkerDashboard() {
                   <span className="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-black rounded-full uppercase tracking-widest">{selectedService?.status === 'Accepted' ? (t.Status?.accepted || 'Accepted') : (t.Status?.draft || 'Draft')}</span>
                 </div>
                 
-                <div className="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-4">
+                <div className="bg-black/40 p-6 rounded-2xl border border-gray-200 space-y-4">
                   <div className="flex justify-between text-xs">
                     <span className="text-slate-500 font-bold">{t.WorkerDashboard?.projectNode}</span>
                     <span className="font-black">{selectedService?.project}</span>
@@ -434,16 +309,16 @@ export default function WorkerDashboard() {
                     <span className="text-slate-500 font-bold">{t.WorkerDashboard?.baseValuation}</span>
                     <span className="font-black">${selectedService?.amount}.00</span>
                   </div>
-                  <div className="flex justify-between text-xs border-t border-white/5 pt-4">
+                  <div className="flex justify-between text-xs border-t border-gray-200 pt-4">
                     <span className="text-slate-500 font-bold">{t.WorkerDashboard?.escrowGuarantee}</span>
                     <span className="text-green-400 font-black">{t.WorkerDashboard?.verifiedByKalide}</span>
                   </div>
                 </div>
                 
                 <div className="flex gap-4">
-                  <button onClick={() => setActiveModal(null)} className="flex-1 py-4 glass text-[10px] font-black uppercase tracking-widest rounded-xl">{t.WorkerDashboard?.downloadPDF}</button>
+                  <button onClick={() => setActiveModal(null)} className="flex-1 py-4 bg-white shadow-sm border border-gray-100 text-[10px] font-black uppercase tracking-widest rounded-xl">{t.WorkerDashboard?.downloadPDF}</button>
                   {selectedService?.status === 'Draft' && (
-                    <button onClick={() => setActiveModal(null)} className="flex-1 py-4 bg-secondary text-white text-[10px] font-black uppercase tracking-widest rounded-xl">{t.WorkerDashboard?.transmitClient}</button>
+                    <button onClick={() => setActiveModal(null)} className="flex-1 py-4 bg-secondary text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl">{t.WorkerDashboard?.transmitClient}</button>
                   )}
                 </div>
               </div>

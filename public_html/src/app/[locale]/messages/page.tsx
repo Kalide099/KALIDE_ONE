@@ -42,6 +42,7 @@ export default function NeuralMessenger() {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [ws, setWs] = useState<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -49,16 +50,60 @@ export default function NeuralMessenger() {
   };
 
   useEffect(() => {
+    // Determine WebSocket protocol based on current protocol
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Hardcoding room 'general' for now
+    const roomName = 'general';
+    // Ensure we use the correct backend port (8000 for django runserver)
+    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+
+    socket.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const incomingMessage: Message = {
+        id: Date.now(),
+        senderId: 'NET-0x00',
+        senderName: data.user || 'Unknown',
+        sourceLang: language || 'en',
+        content: data.message,
+        translatedContent: {},
+        isMe: false, // will style appropriately if it's not our own broadcast
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages(prev => [...prev, incomingMessage]);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+
+    setWs(socket);
+
+    return () => {
+      socket.close();
+    };
+  }, [language]);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !ws) return;
+
+    // Send over WebSocket
+    ws.send(JSON.stringify({
+      message: newMessage
+    }));
 
     // Add Optimistic Message
     const tempMsg: Message = {
-      id: Date.now(),
+      id: Date.now() + 1,
       senderId: 'PRO-0x3C',
       senderName: 'You',
       sourceLang: language || 'en',
@@ -70,35 +115,17 @@ export default function NeuralMessenger() {
     
     setMessages(prev => [...prev, tempMsg]);
     setNewMessage('');
-    setIsTranslating(true);
-
-    // Simulate AI Translation Delay
-    setTimeout(() => {
-      setMessages(prev => prev.map(msg => {
-        if (msg.id === tempMsg.id) {
-          return {
-            ...msg,
-            translatedContent: {
-              fr: `[Traduction IA]: ${tempMsg.content}`,
-              en: `[AI Translated]: ${tempMsg.content}`
-            }
-          };
-        }
-        return msg;
-      }));
-      setIsTranslating(false);
-    }, 1200);
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0f172a] text-gray-900 flex flex-col">
       <div className="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10" />
 
       {/* Internal App Header */}
-      <header className="glass border-b border-white/5 h-20 shrink-0 relative z-10">
+      <header className="bg-white shadow-sm border border-gray-100 border-b border-gray-200 h-20 shrink-0 relative z-10">
         <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard/worker" className="text-secondary hover:text-white transition-colors">
+            <Link href="/dashboard/worker" className="text-secondary hover:text-gray-900 transition-colors">
               <span className="font-black text-xl">←</span>
             </Link>
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-secondary to-purple-500 p-[2px]">
@@ -108,15 +135,15 @@ export default function NeuralMessenger() {
               <h1 className="text-lg font-black tracking-tighter uppercase italic">{t.Messenger?.clientNode} [{language.toUpperCase()}]</h1>
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.Messenger?.translationActive}</span>
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t.Messenger?.translationActive}</span>
               </div>
             </div>
           </div>
           <div className="hidden sm:flex items-center space-x-4">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-white/10 rounded-full px-4 py-1">
-              {t.Messenger?.yourLang}: <span className="text-white">{language === 'en' ? t.Messenger?.english : t.Messenger?.french}</span>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-gray-200 rounded-full px-4 py-1">
+              {t.Messenger?.yourLang}: <span className="text-gray-900">{language === 'en' ? t.Messenger?.english : t.Messenger?.french}</span>
             </div>
-            <button className="text-secondary font-black bg-white/5 w-10 h-10 rounded-full hover:bg-secondary/20 transition-all">
+            <button className="text-secondary font-black bg-gray-100 w-10 h-10 rounded-full hover:bg-secondary/20 transition-all">
               ⋮
             </button>
           </div>
@@ -127,7 +154,7 @@ export default function NeuralMessenger() {
       <main className="flex-1 overflow-y-auto w-full max-w-6xl mx-auto p-4 md:p-6 pb-32 relative z-10">
         <div className="space-y-6">
           <div className="text-center my-8">
-            <span className="text-[10px] bg-white/5 border border-white/10 text-slate-500 px-4 py-2 rounded-full font-bold uppercase tracking-widest">
+            <span className="text-[10px] bg-gray-100 border border-gray-200 text-slate-500 px-4 py-2 rounded-full font-bold uppercase tracking-widest">
               {t.Messenger?.secureChannel}
             </span>
           </div>
@@ -151,8 +178,8 @@ export default function NeuralMessenger() {
                   {/* Message Bubble */}
                   <div className={`p-4 rounded-3xl ${
                     msg.isMe 
-                      ? 'bg-secondary text-white rounded-tr-sm shadow-xl shadow-secondary/10' 
-                      : 'glass border border-white/10 rounded-tl-sm'
+                      ? 'bg-secondary text-gray-900 rounded-tr-sm shadow-xl shadow-secondary/10' 
+                      : 'bg-white shadow-sm border border-gray-100 border border-gray-200 rounded-tl-sm'
                   }`}>
                     <p className="text-sm font-medium leading-relaxed">{displayContent}</p>
                   </div>
@@ -178,7 +205,7 @@ export default function NeuralMessenger() {
       </main>
 
       {/* Input Area */}
-      <footer className="glass border-t border-white/5 p-4 md:p-6 fixed bottom-0 w-full z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+      <footer className="bg-white shadow-sm border border-gray-100 border-t border-gray-200 p-4 md:p-6 fixed bottom-0 w-full z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
         <div className="max-w-6xl mx-auto relative">
           {isTranslating && (
              <div className="absolute -top-8 left-0 text-[10px] font-black uppercase tracking-widest text-secondary flex items-center space-x-2">
@@ -187,7 +214,7 @@ export default function NeuralMessenger() {
              </div>
           )}
           <form onSubmit={handleSend} className="relative flex items-center">
-            <button type="button" className="absolute left-4 text-slate-400 hover:text-white transition-colors">
+            <button type="button" className="absolute left-4 text-gray-500 hover:text-gray-900 transition-colors">
               📎
             </button>
             <input
@@ -195,12 +222,12 @@ export default function NeuralMessenger() {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder={t.Messenger?.placeholder}
-              className="w-full bg-black/40 border border-white/10 rounded-full py-4 pl-12 pr-32 text-sm text-white focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
+              className="w-full bg-black/40 border border-gray-200 rounded-full py-4 pl-12 pr-32 text-sm text-gray-900 focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
             />
             <button 
               type="submit"
               disabled={!newMessage.trim() || isTranslating}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary text-white rounded-full px-6 py-2 text-xs font-black uppercase tracking-widest hover:bg-secondary/80 focus:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary text-gray-900 rounded-full px-6 py-2 text-xs font-black uppercase tracking-widest hover:bg-secondary/80 focus:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t.Messenger?.send}
             </button>

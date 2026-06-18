@@ -8,9 +8,6 @@ export interface RegisterData {
   city: string;
   role: string;
   password: string;
-  expertiseAreas?: string[];
-  companyBase?: string;
-  companyCapabilities?: string[];
 }
 
 export interface LoginData {
@@ -47,138 +44,8 @@ export interface Project {
   deadline: string;
   client: number;
   professional?: number;
-  team_id?: number | null;
   insurance_active?: boolean;
   insurance_fee?: string;
-}
-
-export interface TeamMember {
-  id: number;
-  professional_id: number;
-  base_role: string;
-  permissions: string[];
-  skills: string[];
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    city?: string;
-    country?: string;
-  } | null;
-}
-
-export interface TeamRecord {
-  id: number;
-  name: string;
-  description: string;
-  category: {
-    id: number;
-    name: string;
-  } | null;
-  owner: {
-    id: number;
-    name: string;
-    email: string;
-  } | null;
-  members_count: number;
-  members: TeamMember[];
-}
-
-export interface CreateTeamPayload {
-  name: string;
-  description: string;
-  category_id?: number;
-}
-
-export interface InviteTeamMemberPayload {
-  email: string;
-  base_role: string;
-  permissions?: string[];
-  skills?: string[];
-}
-
-export interface UpdateTeamMemberPayload {
-  base_role?: string;
-  permissions?: string[];
-  skills?: string[];
-}
-
-export interface TeamProjectSkillTask {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  professional_id: number;
-  project_id: number;
-  required_skill?: string;
-  member: {
-    id: number;
-    name: string;
-    email: string;
-  } | null;
-}
-
-export interface MapTeamSkillPayload {
-  member_id: number;
-  required_skill: string;
-  task_title?: string;
-  task_description?: string;
-}
-
-export interface ClientPerformanceMetrics {
-  total_projects: number;
-  active_projects: number;
-  completed_projects: number;
-  spend_total: number;
-  committed_budget_total: number;
-  quality_rating_avg: number;
-  quality_reviews_count: number;
-  on_time_completion_rate: number;
-}
-
-export interface WorkerPerformanceMetrics {
-  total_projects: number;
-  active_projects: number;
-  completed_projects: number;
-  quotes_submitted: number;
-  quotes_accepted: number;
-  win_rate: number;
-  response_rate: number;
-  earnings_total: number;
-  repeat_clients: number;
-  average_rating: number;
-  reviews_count: number;
-}
-
-export interface AdminPerformanceMetrics {
-  total_users: number;
-  active_users: number;
-  total_projects: number;
-  active_projects: number;
-  completed_projects: number;
-  total_platform_volume: number;
-  total_escrow_volume: number;
-  total_quotes: number;
-  accepted_quotes: number;
-  global_win_rate: number;
-  average_marketplace_rating: number;
-}
-
-export interface PerformanceDashboard {
-  role: string;
-  client: ClientPerformanceMetrics;
-  worker: WorkerPerformanceMetrics;
-  admin: AdminPerformanceMetrics | null;
-}
-
-export interface ProjectMilestone {
-  id: number;
-  title: string;
-  description: string;
-  amount: string;
-  due_date: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'approved' | 'released';
-  project_id: number;
 }
 
 export interface Professional {
@@ -193,81 +60,6 @@ export interface Professional {
   bio: unknown;
 }
 
-export interface ProfessionalsFilter {
-  verified?: boolean;
-  skills?: string;
-  location?: string;
-  minRating?: number;
-}
-
-export interface AvailabilitySlot {
-  id: number;
-  date: string;
-  start_time: string;
-  end_time: string;
-  is_booked: boolean;
-  professional_id: number;
-}
-
-export interface CreateBookingData {
-  professional_id: number;
-  scheduled_date: string;
-  start_time: string;
-  end_time: string;
-  project_id?: number;
-  team_id?: number;
-}
-
-export interface CreateQuoteData {
-  total_amount: number;
-  terms: string;
-  project_id: number;
-  client_id: number;
-  valid_until?: string;
-  structured_proposal?: {
-    scope?: string;
-    timeline?: string;
-    milestones?: string[];
-  };
-}
-
-export interface DisputeSettlement {
-  confidence_score: number;
-  client_refund_percentage: number;
-  artisan_payout_percentage: number;
-  reasoning: string;
-  is_accepted_by_both: boolean;
-  generated_at: string;
-}
-
-export interface DisputeRecord {
-  id: number;
-  title: string;
-  description: string;
-  evidence: string;
-  status: string;
-  priority: string;
-  resolution: string | null;
-  resolution_notes: string;
-  resolved_at: string | null;
-  created_at: string;
-  updated_at: string;
-  project_id: number;
-  project_title: string;
-  initiator_id: number;
-  respondent_id: number;
-  ai_settlement: DisputeSettlement | null;
-}
-
-export interface CreateDisputeData {
-  project_id: number;
-  respondent_id: number;
-  title: string;
-  description: string;
-  evidence?: string;
-  priority?: 'low' | 'medium' | 'high';
-}
-
 class ApiService {
   private async request<T>(
     endpoint: string,
@@ -275,14 +67,10 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const token = localStorage.getItem('access_token');
-      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
       const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
         ...((options.headers as Record<string, string>) || {}),
       };
-
-      if (!isFormData && !headers['Content-Type']) {
-        headers['Content-Type'] = 'application/json';
-      }
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -321,26 +109,10 @@ class ApiService {
     }
   }
 
-  async register(userData: RegisterData, profilePhoto?: File | null): Promise<ApiResponse> {
-    const formData = new FormData();
-    formData.append('name', userData.name);
-    formData.append('email', userData.email);
-    formData.append('phone', userData.phone);
-    formData.append('country', userData.country);
-    formData.append('city', userData.city);
-    formData.append('role', userData.role);
-    formData.append('password', userData.password);
-    formData.append('expertiseAreas', JSON.stringify(userData.expertiseAreas || []));
-    formData.append('companyBase', userData.companyBase || '');
-    formData.append('companyCapabilities', JSON.stringify(userData.companyCapabilities || []));
-
-    if (profilePhoto) {
-      formData.append('profilePhoto', profilePhoto);
-    }
-
+  async register(userData: RegisterData): Promise<ApiResponse> {
     return this.request('/auth/register', {
       method: 'POST',
-      body: formData,
+      body: JSON.stringify(userData),
     });
   }
 
@@ -359,162 +131,45 @@ class ApiService {
     return this.request(`/projects/${id}/`);
   }
 
-  async getProfessionals(filters: ProfessionalsFilter = {}): Promise<ApiResponse<Professional[]>> {
+  async getProfessionals(): Promise<ApiResponse<Professional[]>> {
+    // Note: The backend view logic filters for is_verified=True
+    return this.request('/professionals');
+  }
+
+  async searchProfessionals(query: string, location: string, sortBy: string): Promise<ApiResponse<any>> {
     const params = new URLSearchParams();
-
-    if (typeof filters.verified === 'boolean') {
-      params.set('verified', String(filters.verified));
+    if (query) params.append('q', query);
+    if (location) params.append('location', location);
+    if (sortBy === 'price_asc') {
+      params.append('sort_by', 'price');
+      params.append('sort_order', 'asc');
+    } else if (sortBy === 'price_desc') {
+      params.append('sort_by', 'price');
+      params.append('sort_order', 'desc');
+    } else {
+      params.append('sort_by', 'rating');
+      params.append('sort_order', 'desc');
     }
-    if (filters.skills?.trim()) {
-      params.set('skills', filters.skills.trim());
-    }
-    if (filters.location?.trim()) {
-      params.set('location', filters.location.trim());
-    }
-    if (typeof filters.minRating === 'number' && filters.minRating > 0) {
-      params.set('minRating', String(filters.minRating));
-    }
-
-    const query = params.toString();
-    return this.request(`/professionals${query ? `?${query}` : ''}`);
+    return this.request(`/professionals/search/?${params.toString()}`);
   }
 
   async getProfessionalDetail(id: number): Promise<ApiResponse<Professional>> {
     return this.request(`/professionals/${id}/`);
   }
 
-  async releaseEscrow(id: number, milestoneId?: number): Promise<ApiResponse> {
+  async releaseEscrow(id: number): Promise<ApiResponse> {
     return this.request(`/projects/${id}/release-escrow`, {
       method: 'POST',
-      body: JSON.stringify(milestoneId ? { milestone_id: milestoneId } : {}),
     });
   }
 
-  async getProjectMilestones(projectId: number): Promise<ApiResponse<ProjectMilestone[]>> {
-    return this.request(`/projects/${projectId}/milestones`);
+  async getQuotes(): Promise<ApiResponse<any[]>> {
+    return this.request('/payments/quotes');
   }
 
-  async updateProjectMilestone(
-    projectId: number,
-    milestoneId: number,
-    status: ProjectMilestone['status']
-  ): Promise<ApiResponse<ProjectMilestone>> {
-    return this.request(`/projects/${projectId}/milestones/${milestoneId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status }),
-    });
-  }
-
-  async getAvailability(professionalId: number, date?: string, availableOnly = true): Promise<ApiResponse<AvailabilitySlot[]>> {
-    const params = new URLSearchParams();
-    params.set('professional_id', String(professionalId));
-    if (date) params.set('date', date);
-    params.set('availableOnly', String(availableOnly));
-
-    return this.request(`/bookings/availability?${params.toString()}`);
-  }
-
-  async createAvailability(date: string, start_time: string, end_time: string): Promise<ApiResponse<AvailabilitySlot>> {
-    return this.request('/bookings/availability', {
+  async fundQuote(id: number): Promise<ApiResponse> {
+    return this.request(`/payments/quotes/${id}/fund`, {
       method: 'POST',
-      body: JSON.stringify({ date, start_time, end_time }),
-    });
-  }
-
-  async createBooking(data: CreateBookingData): Promise<ApiResponse> {
-    return this.request('/bookings', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async createQuote(data: CreateQuoteData): Promise<ApiResponse> {
-    return this.request('/payments/quotes', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getPerformanceDashboard(): Promise<ApiResponse<PerformanceDashboard>> {
-    return this.request('/analytics/performance');
-  }
-
-  async getTeams(): Promise<ApiResponse<TeamRecord[]>> {
-    return this.request('/teams');
-  }
-
-  async createTeam(data: CreateTeamPayload): Promise<ApiResponse<TeamRecord>> {
-    return this.request('/teams', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getTeamMembers(teamId: number): Promise<ApiResponse<TeamMember[]>> {
-    return this.request(`/teams/${teamId}/members`);
-  }
-
-  async inviteTeamMember(teamId: number, data: InviteTeamMemberPayload): Promise<ApiResponse<TeamMember>> {
-    return this.request(`/teams/${teamId}/members`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateTeamMember(
-    teamId: number,
-    memberId: number,
-    data: UpdateTeamMemberPayload
-  ): Promise<ApiResponse<TeamMember>> {
-    return this.request(`/teams/${teamId}/members/${memberId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async removeTeamMember(teamId: number, memberId: number): Promise<ApiResponse> {
-    return this.request(`/teams/${teamId}/members/${memberId}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async getTeamProjectSkillMap(teamId: number, projectId: number): Promise<ApiResponse<TeamProjectSkillTask[]>> {
-    return this.request(`/teams/${teamId}/projects/${projectId}/skills-map`);
-  }
-
-  async mapMemberSkillToProject(
-    teamId: number,
-    projectId: number,
-    data: MapTeamSkillPayload
-  ): Promise<ApiResponse<TeamProjectSkillTask>> {
-    return this.request(`/teams/${teamId}/projects/${projectId}/skills-map`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getDisputes(): Promise<ApiResponse<DisputeRecord[]>> {
-    return this.request('/disputes');
-  }
-
-  async createDispute(data: CreateDisputeData): Promise<ApiResponse<DisputeRecord>> {
-    return this.request('/disputes', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async disputeAction(
-    disputeId: number,
-    payload: {
-      action: 'accept_ai_settlement' | 'escalate_to_admin' | 'resolve_manual';
-      note?: string;
-      resolution?: string;
-    }
-  ): Promise<ApiResponse<DisputeRecord>> {
-    return this.request(`/disputes/${disputeId}/action`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
     });
   }
 
@@ -529,12 +184,6 @@ class ApiService {
 
   async getAdminPayments(): Promise<ApiResponse<Record<string, unknown>[]>> {
     return this.request('/auth/admin/payments');
-  }
-
-  async approveUser(id: number): Promise<ApiResponse> {
-    return this.request(`/auth/admin/users/${id}/approve/`, {
-      method: 'POST',
-    });
   }
 
   async deleteUser(id: number): Promise<ApiResponse> {
@@ -562,27 +211,6 @@ class ApiService {
       body: JSON.stringify({ plan: tier }),
     });
   }
-
-  async submitApplication(documentType: string, photo: File): Promise<ApiResponse> {
-    const formData = new FormData();
-    formData.append('documentType', documentType);
-    formData.append('photo', photo);
-
-    return this.request('/auth/application', {
-      method: 'POST',
-      body: formData,
-    });
-  }
-
-  async uploadProfilePhoto(photo: File): Promise<ApiResponse> {
-    const formData = new FormData();
-    formData.append('photo', photo);
-
-    return this.request('/auth/profile-photo', {
-      method: 'POST',
-      body: formData,
-    });
-  }
   // =========================
 
   logout() {
@@ -604,6 +232,57 @@ class ApiService {
 
   isAuthenticated() {
     return !!this.getAccessToken();
+  }
+
+  async uploadAvatar(file: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    // We override default JSON headers for FormData
+    const token = this.getAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/avatar/`, {
+        method: 'PATCH',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
+      return { success: true, data };
+    } catch (e) {
+      return { success: false, message: 'Network error' };
+    }
+  }
+
+  async uploadPortfolio(professionalId: number, title: string, desc: string, file: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('title', JSON.stringify({ en: title }));
+    formData.append('description', JSON.stringify({ en: desc }));
+    formData.append('image_file', file);
+    
+    const token = this.getAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/professionals/${professionalId}/portfolio/`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
+      return { success: true, data };
+    } catch (e) {
+      return { success: false, message: 'Network error' };
+    }
   }
 }
 

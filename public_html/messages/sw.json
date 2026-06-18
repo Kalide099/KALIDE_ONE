@@ -1,0 +1,24 @@
+{
+  "Navigation": {
+    "services": "Huduma",
+    "bundles": "Vifurushi",
+    "login": "Ingia",
+    "join": "Jiunge",
+    "home": "Nyumbani"
+  },
+  "Hero": {
+    "badge": "Kitovu cha Akili za Lugha Mbili",
+    "titleHighlight": "KALIDE ONE",
+    "description": "Ajiri wataalamu walioidhinishwa kwa mradi wako unaofuata.",
+    "ctaHiring": "Anza Kuajiri"
+  },
+  "Status": {
+    "completed": "Imekamilika",
+    "in_progress": "Inaendelea",
+    "pending": "Inasubiri"
+  },
+  "WorkerDashboard": {
+    "title": "Dashibodi ya Fundi",
+    "subtitle": "Kusimamia kazi zako na mapato."
+  }
+}

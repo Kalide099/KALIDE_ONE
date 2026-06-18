@@ -15,7 +15,6 @@ export default function Login() {
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -38,23 +37,23 @@ export default function Login() {
         localStorage.setItem('refresh_token', response.data.refresh);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 
-        setSuccess(t.Auth?.actions?.success || 'Login successful. Taking you to your dashboard...');
+        setSuccess(t.Auth?.actions?.success || 'Authentication successful. Initializing session...');
 
-        const userRole = String(response.data.user.role || '').toLowerCase();
+        const userRole = response.data.user.role;
         setTimeout(() => {
           if (userRole === 'admin') {
             router.push('/dashboard/admin');
-          } else if (userRole === 'worker' || userRole === 'artisan' || userRole === 'team_leader') {
+          } else if (userRole === 'worker') {
             router.push('/dashboard/worker');
           } else {
             router.push('/dashboard/client');
           }
         }, 1500);
       } else {
-        setError(response.message || t.Auth?.actions?.error || 'We could not log you in. Please check your email and password.');
+        setError(response.message || t.Auth?.actions?.error || 'Verification failed. Please check your credentials.');
       }
     } catch (err) {
-      setError(t.Auth?.actions?.networkError || 'Unable to connect right now. Please try again in a moment.');
+      setError(t.Auth?.actions?.networkError || 'Network synchronization failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -67,13 +66,13 @@ export default function Login() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px]" />
       
       <div className="w-full max-w-xl relative">
-        <div className="glass p-12 md:p-20 rounded-[3rem] border-white/5 shadow-2xl">
+        <div className="bg-white shadow-sm border border-gray-100 p-12 md:p-20 rounded-[3rem] border-gray-200 shadow-2xl">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 glass rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
-              {t.Auth?.loginBadge || 'Welcome Back'}
+            <div className="inline-block px-4 py-1 bg-white shadow-sm border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-6">
+              {t.Auth?.loginBadge || 'Secure Access Node'}
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-white mb-2">{t.Auth?.loginTitle || 'Sign In'}</h1>
-            <p className="text-slate-500 font-medium">{t.Auth?.loginDesc || 'Access your account to manage bookings, jobs, and messages.'}</p>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-gray-900 mb-2">{t.Auth?.loginTitle || 'Protocol Access'}</h1>
+            <p className="text-slate-500 font-medium">{t.Auth?.loginDesc || 'Secure authentication for system-wide operations.'}</p>
           </div>
 
           {error && (
@@ -95,8 +94,8 @@ export default function Login() {
                   name="email"
                   type="email"
                   required
-                  className="w-full bg-white/5 border border-white/10 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-white font-medium placeholder:text-slate-600"
-                  placeholder={t.Auth?.fields?.email || 'Email address'}
+                  className="w-full bg-gray-100 border border-gray-200 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-gray-900 font-medium placeholder:text-slate-600"
+                  placeholder={t.Auth?.fields?.email || "Official Email Node"}
                   value={formData.email}
                   onChange={handleChange}
                 />
@@ -104,52 +103,36 @@ export default function Login() {
               <div className="group relative">
                 <input
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type="password"
                   required
-                  className="w-full bg-white/5 border border-white/10 px-8 py-5 pr-16 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-white font-medium placeholder:text-slate-600"
-                  placeholder={t.Auth?.fields?.password || 'Password'}
+                  className="w-full bg-gray-100 border border-gray-200 px-8 py-5 rounded-2xl outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-gray-900 font-medium placeholder:text-slate-600"
+                  placeholder={t.Auth?.fields?.password || "Access Key"}
                   value={formData.password}
                   onChange={handleChange}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xl"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? '🙈' : '👁️'}
-                </button>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50 active:scale-95"
+              className="w-full py-5 bg-primary text-gray-900 rounded-2xl font-black uppercase tracking-widest text-sm hover:translate-y-[-2px] hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50 active:scale-95"
             >
-              {isLoading ? (t.Auth?.actions?.loggingIn || 'Signing in...') : (t.Auth?.actions?.login || 'Sign In')}
+              {isLoading ? (t.Auth?.actions?.loggingIn || 'Verifying...') : (t.Auth?.actions?.login || 'Identify Access')}
             </button>
-
-            <p className="text-center text-xs text-slate-400 leading-relaxed">
-              By continuing, you agree to our{' '}
-              <Link href="/terms" className="text-primary hover:underline">Terms</Link>,{' '}
-              <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, and{' '}
-              <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link>.
-            </p>
 
             <div className="text-center pt-8">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                {t.Auth?.actions?.noAccount || 'Do not have an account yet?'} {' '}
-                <Link href="/register" className="text-primary hover:underline font-black">{t.Auth?.actions?.createNode || 'Create one'}</Link>
+                {t.Auth?.actions?.noAccount || 'No access node yet?'} {' '}
+                <Link href="/register" className="text-primary hover:underline font-black">{t.Auth?.actions?.createNode || 'Provision Account'}</Link>
               </span>
             </div>
           </form>
         </div>
 
         <div className="mt-8 text-center">
-          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-slate-400 transition-colors">
-            {t.Auth?.actions?.returnAccess || 'Back to Home'}
+          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 hover:text-gray-500 transition-colors">
+            {t.Auth?.actions?.returnAccess || 'Return to Command Center'}
           </Link>
         </div>
       </div>

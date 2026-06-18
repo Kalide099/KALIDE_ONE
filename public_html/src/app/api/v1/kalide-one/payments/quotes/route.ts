@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { PrismaClient } from '@/generated/prisma/client';
 import { verifyToken } from '@/lib/auth';
-import { serialize } from '@/lib/utils';
+import { serialize } from '@/lib/api-utils';
+
+const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('Authorization');
@@ -63,29 +65,12 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { total_amount, terms, project_id, client_id, valid_until, structured_proposal } = body;
-
-    if (!total_amount || !project_id || !client_id) {
-      return NextResponse.json({ message: 'total_amount, project_id and client_id are required' }, { status: 400 });
-    }
-
-    const normalizedProposal = {
-      scope: String(structured_proposal?.scope || ''),
-      timeline: String(structured_proposal?.timeline || ''),
-      milestones: Array.isArray(structured_proposal?.milestones)
-        ? structured_proposal.milestones.map((item: unknown) => String(item)).filter(Boolean)
-        : [],
-    };
-
-    const normalizedTerms = JSON.stringify({
-      plain_terms: terms || '',
-      structured_proposal: normalizedProposal,
-    });
+    const { total_amount, terms, project_id, client_id, valid_until } = body;
 
     const newQuote = await prisma.payments_quote.create({
       data: {
         total_amount: total_amount.toString(),
-        terms: normalizedTerms,
+        terms: terms || '',
         status: 'pending',
         created_at: new Date(),
         valid_until: valid_until ? new Date(valid_until) : undefined,
