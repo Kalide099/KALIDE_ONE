@@ -44,8 +44,83 @@ export interface Project {
   deadline: string;
   client: number;
   professional?: number;
+  team_id?: number;
   insurance_active?: boolean;
   insurance_fee?: string;
+}
+
+export interface TeamMember {
+  id: number;
+  professional_id: number;
+  base_role: string;
+  permissions: string[];
+  skills: string[];
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    city?: string;
+    country?: string;
+  } | null;
+}
+
+export interface TeamRecord {
+  id: number;
+  name: string;
+  description: string;
+  members_count?: number;
+  members: TeamMember[];
+}
+
+export interface TeamProjectSkillTask {
+  id: number;
+  title: string;
+  description?: string;
+  required_skill?: string;
+  assigned_to?: number | null;
+  member?: { id?: number; name?: string; email?: string } | null;
+  assigned_member?: TeamMember | null;
+  status?: string;
+}
+
+export interface ClientPerformanceMetrics {
+  total_projects: number;
+  active_projects: number;
+  completed_projects: number;
+  spend_total: number;
+  committed_budget_total: number;
+  quality_rating_avg: number;
+  quality_reviews_count: number;
+  on_time_completion_rate: number;
+}
+
+export interface WorkerPerformanceMetrics {
+  quotes_submitted: number;
+  quotes_accepted: number;
+  win_rate: number;
+  response_rate: number;
+  earnings_total: number;
+  repeat_clients: number;
+  average_rating: number;
+  reviews_count: number;
+}
+
+export interface AdminPerformanceMetrics {
+  total_users: number;
+  active_users: number;
+  total_projects: number;
+  active_projects: number;
+  completed_projects: number;
+  total_platform_volume: number;
+  total_escrow_volume: number;
+  average_marketplace_rating: number;
+  global_win_rate: number;
+}
+
+export interface PerformanceDashboard {
+  client: ClientPerformanceMetrics;
+  worker: WorkerPerformanceMetrics;
+  admin: AdminPerformanceMetrics;
 }
 
 export interface Professional {
@@ -173,6 +248,63 @@ class ApiService {
     });
   }
 
+  async getTeams(): Promise<ApiResponse<TeamRecord[]>> {
+    return this.request('/teams');
+  }
+
+  async createTeam(payload: { name: string; description: string; category?: string }): Promise<ApiResponse<TeamRecord>> {
+    return this.request('/teams', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async inviteTeamMember(
+    teamId: number,
+    payload: { email: string; base_role?: string; permissions?: string[]; skills?: string[] }
+  ): Promise<ApiResponse<TeamMember>> {
+    return this.request(`/teams/${teamId}/members`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateTeamMember(
+    teamId: number,
+    memberId: number,
+    payload: { base_role?: string; permissions?: string[]; skills?: string[] }
+  ): Promise<ApiResponse<TeamMember>> {
+    return this.request(`/teams/${teamId}/members/${memberId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async removeTeamMember(teamId: number, memberId: number): Promise<ApiResponse> {
+    return this.request(`/teams/${teamId}/members/${memberId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getTeamProjectSkillMap(teamId: number, projectId: number): Promise<ApiResponse<TeamProjectSkillTask[]>> {
+    return this.request(`/teams/${teamId}/projects/${projectId}/skills-map`);
+  }
+
+  async mapMemberSkillToProject(
+    teamId: number,
+    projectId: number,
+    payload: { member_id: number; required_skill: string; task_title?: string; task_description?: string }
+  ): Promise<ApiResponse<TeamProjectSkillTask>> {
+    return this.request(`/teams/${teamId}/projects/${projectId}/skills-map`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getPerformanceDashboard(): Promise<ApiResponse<PerformanceDashboard>> {
+    return this.request('/analytics/performance');
+  }
+
   // ==== ADMIN ENDPOINTS ====
   async getAdminUsers(): Promise<ApiResponse<Record<string, unknown>[]>> {
     return this.request('/auth/admin/users');
@@ -257,6 +389,10 @@ class ApiService {
     } catch (e) {
       return { success: false, message: 'Network error' };
     }
+  }
+
+  async uploadProfilePhoto(file: File): Promise<ApiResponse> {
+    return this.uploadAvatar(file);
   }
 
   async uploadPortfolio(professionalId: number, title: string, desc: string, file: File): Promise<ApiResponse> {
