@@ -67,10 +67,14 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const token = localStorage.getItem('access_token');
+      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         ...((options.headers as Record<string, string>) || {}),
       };
+
+      if (!isFormData && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+      }
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -109,10 +113,23 @@ class ApiService {
     }
   }
 
-  async register(userData: RegisterData): Promise<ApiResponse> {
+  async register(userData: RegisterData, profilePhoto?: File | null): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('name', userData.name);
+    formData.append('email', userData.email);
+    formData.append('phone', userData.phone);
+    formData.append('country', userData.country);
+    formData.append('city', userData.city);
+    formData.append('role', userData.role);
+    formData.append('password', userData.password);
+
+    if (profilePhoto) {
+      formData.append('profilePhoto', profilePhoto);
+    }
+
     return this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: formData,
     });
   }
 
@@ -159,6 +176,12 @@ class ApiService {
     return this.request('/auth/admin/payments');
   }
 
+  async approveUser(id: number): Promise<ApiResponse> {
+    return this.request(`/auth/admin/users/${id}/approve/`, {
+      method: 'POST',
+    });
+  }
+
   async deleteUser(id: number): Promise<ApiResponse> {
     return this.request(`/auth/admin/users/${id}/`, {
       method: 'DELETE',
@@ -182,6 +205,27 @@ class ApiService {
     return this.request(`/auth/admin/users/${id}/subscription/`, {
       method: 'POST',
       body: JSON.stringify({ plan: tier }),
+    });
+  }
+
+  async submitApplication(documentType: string, photo: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('documentType', documentType);
+    formData.append('photo', photo);
+
+    return this.request('/auth/application', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  async uploadProfilePhoto(photo: File): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append('photo', photo);
+
+    return this.request('/auth/profile-photo', {
+      method: 'POST',
+      body: formData,
     });
   }
   // =========================

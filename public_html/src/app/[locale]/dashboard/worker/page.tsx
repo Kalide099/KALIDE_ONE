@@ -50,6 +50,9 @@ export default function WorkerDashboard() {
             <span className="text-lg max-[360px]:text-sm font-black tracking-tighter uppercase italic">Kalide One</span>
           </div>
           <div className="flex items-center gap-2 max-[360px]:gap-1">
+            <Link href="/profile" className="px-3 sm:px-4 max-[360px]:px-2 py-2 max-[360px]:py-1.5 border border-white/20 bg-white/5 rounded-full text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-white/90">
+              Profile
+            </Link>
             <Link href="/upgrade" className="flex items-center space-x-2 px-3 sm:px-4 max-[360px]:px-2 py-2 max-[360px]:py-1.5 bg-gradient-to-r from-secondary to-purple-500 rounded-full hover:scale-105 transition-all shadow-lg shadow-secondary/20">
               <span className="text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-white max-w-20 max-[360px]:max-w-12 truncate">{t.WorkerDashboard?.upgradeNode}</span>
             </Link>

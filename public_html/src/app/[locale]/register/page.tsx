@@ -21,6 +21,7 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -37,15 +38,20 @@ export default function Register() {
       return;
     }
 
+    if (!profilePhoto) {
+      setError('Please upload a profile photo for admin review.');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setSuccess('');
 
     try {
-      const response = await apiService.register(formData);
+      const response = await apiService.register(formData, profilePhoto);
 
       if (response.success) {
-        setSuccess(t.Auth?.actions?.registerSuccess || 'Your account has been created successfully. Redirecting to sign in...');
+        setSuccess('Application submitted successfully. An admin will review your profile before login is enabled.');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -154,6 +160,17 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
             />
+
+            <label className="block">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Profile Photo (Required)</span>
+              <input
+                type="file"
+                accept="image/*"
+                required
+                onChange={(e) => setProfilePhoto(e.target.files?.[0] || null)}
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl outline-none focus:border-primary transition-all text-white font-medium file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-widest file:text-white"
+              />
+            </label>
 
             <label className="flex items-start gap-3 text-xs text-slate-300 leading-relaxed">
               <input

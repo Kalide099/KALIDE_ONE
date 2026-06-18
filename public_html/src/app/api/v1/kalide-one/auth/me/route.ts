@@ -20,6 +20,10 @@ export async function GET(request: Request) {
     const user = await prisma.users_user.findUnique({
       where: { id: BigInt(decoded.user_id) },
       include: {
+        trust_safety_professional_verifications: {
+          orderBy: { submitted_at: 'desc' },
+          take: 1,
+        },
         marketplace_professionals: true,
         payments_usersubscription: {
           include: {
@@ -34,9 +38,16 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
 
+    const latestApplication = user.trust_safety_professional_verifications?.[0];
+    const payload = {
+      ...user,
+      application_status: latestApplication?.verification_status || (user.is_active ? 'approved' : 'pending'),
+      profile_photo: latestApplication?.document_file || null,
+    };
+
     return NextResponse.json({
       success: true,
-      data: serialize(user)
+      data: serialize(payload)
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: 'Session expired or invalid' }, { status: 401 });

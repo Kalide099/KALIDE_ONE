@@ -33,9 +33,20 @@ export async function POST(request: Request) {
     }
 
     if (!user.is_active) {
+      const latestApplication = await prisma.trust_safety_professional_verifications.findFirst({
+        where: { professional_id: user.id },
+        orderBy: { submitted_at: 'desc' },
+        select: { verification_status: true },
+      });
+
+      const status = latestApplication?.verification_status || 'pending';
+      const message = status === 'rejected'
+        ? 'Your application was declined. Please update your profile and re-apply.'
+        : 'Your account is pending admin approval. Please wait for confirmation.';
+
       return NextResponse.json({
         success: false,
-        message: 'Account is disabled',
+        message,
       }, { status: 401 });
     }
 

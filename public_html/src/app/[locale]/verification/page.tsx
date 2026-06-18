@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Link } from '@/i18n/routing';
+import { apiService } from '@/services/api';
 
 export default function KYCVerification() {
   const { t } = useLanguage();
@@ -17,14 +18,22 @@ export default function KYCVerification() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!file) return;
+
     setIsSubmitting(true);
-    // Simulate API call to backend ProfessionalVerification view
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    const response = await apiService.submitApplication(documentType, file);
+
+    if (response.success) {
       setSuccess(true);
-    }, 2000);
+    } else {
+      alert(response.message || 'Failed to submit application. Please try again.');
+    }
+
+      setIsSubmitting(false);
   };
 
   if (success) {

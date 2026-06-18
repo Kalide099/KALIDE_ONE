@@ -46,6 +46,9 @@ export default function ClientDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden sm:block text-xs font-black uppercase tracking-widest text-slate-500">{t.ClientDashboard?.nodeID || 'Node ID'}: Client-0x7F</span>
+            <Link href="/profile" className="px-4 max-[360px]:px-3 py-2 max-[360px]:py-1.5 border border-white/20 bg-white/5 rounded-full text-xs max-[360px]:text-[9px] font-black uppercase tracking-widest transition-all">
+              Profile
+            </Link>
             <Link href="/" className="px-4 sm:px-6 max-[360px]:px-3 py-2 max-[360px]:py-1.5 glass hover:bg-white/5 rounded-full text-xs max-[360px]:text-[9px] font-black uppercase tracking-widest transition-all">
               {t.ClientDashboard?.disconnect}
             </Link>

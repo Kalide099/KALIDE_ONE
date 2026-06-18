@@ -11,6 +11,8 @@ export interface AdminUser {
   email: string;
   role: string;
   is_active: boolean;
+  application_status?: string;
+  profile_photo?: string | null;
   phone?: string;
   city?: string;
   country?: string;
@@ -114,6 +116,16 @@ export default function SupremeAdminDashboard() {
     const res = await apiService.toggleUserAccess(id);
     if (res.success) {
       fetchData(activeTab);
+    }
+  };
+
+  const handleApprove = async (id: number) => {
+    const res = await apiService.approveUser(id);
+    if (res.success) {
+      alert(res.message || 'User approved successfully.');
+      fetchData(activeTab);
+    } else {
+      alert('Approval failed: ' + res.message);
     }
   };
 
@@ -296,13 +308,22 @@ export default function SupremeAdminDashboard() {
                   <div className="space-y-2 mb-4">
                     <p className="text-sm max-[360px]:text-xs font-bold text-white break-words">{user.name}</p>
                     <p className="text-xs text-slate-400 break-all">{user.email}</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                      user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
-                      user.role === 'client' ? 'bg-blue-500/20 text-blue-400' :
-                      'bg-purple-500/20 text-purple-400'
-                    }`}>
-                      {user.role}
-                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                        user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
+                        user.role === 'client' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-purple-500/20 text-purple-400'
+                      }`}>
+                        {user.role}
+                      </span>
+                      <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                        user.application_status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                        user.application_status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                        'bg-amber-500/20 text-amber-300'
+                      }`}>
+                        {user.application_status || 'pending'}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 max-[360px]:grid-cols-1 gap-2">
@@ -311,6 +332,12 @@ export default function SupremeAdminDashboard() {
                       className="px-3 py-2 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
                     >
                       {t.Admin?.actions?.dossier}
+                    </button>
+                    <button
+                      onClick={() => handleApprove(user.id)}
+                      className="px-3 py-2 border border-green-500/30 text-green-400 hover:bg-green-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                    >
+                      Approve
                     </button>
                     <button
                       onClick={() => handleToggleAccess(user.id)}
@@ -343,6 +370,7 @@ export default function SupremeAdminDashboard() {
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.entity}</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.email}</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.status}</th>
+                    <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Application</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">{t.Admin?.table?.actions}</th>
                   </tr>
                 </thead>
@@ -368,12 +396,27 @@ export default function SupremeAdminDashboard() {
                           {user.is_active ? (t.Admin?.table?.active || 'Active') : (t.Admin?.table?.suspended || 'Suspended')}
                         </span>
                       </td>
+                      <td className="py-6">
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                          user.application_status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                          user.application_status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                          'bg-amber-500/20 text-amber-300'
+                        }`}>
+                          {user.application_status || 'pending'}
+                        </span>
+                      </td>
                       <td className="py-6 flex justify-end space-x-2">
                          <button 
                           onClick={() => setSelectedDossier(user)}
                           className="px-3 py-2 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
                         >
                           {t.Admin?.actions?.dossier}
+                        </button>
+                        <button
+                          onClick={() => handleApprove(user.id)}
+                          className="px-3 py-2 border border-green-500/30 text-green-400 hover:bg-green-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                        >
+                          Approve
                         </button>
                         <button 
                           onClick={() => handleToggleAccess(user.id)}
@@ -539,6 +582,18 @@ export default function SupremeAdminDashboard() {
               </button>
               <h2 className="text-3xl font-black uppercase tracking-widest mb-2 italic">{t.Admin?.dossier?.title}</h2>
               <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-8">Node #{selectedDossier.id} {t.Admin?.dossier?.classified}</p>
+
+              <div className="mb-8">
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">Profile Photo</p>
+                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-black/40 border border-white/10">
+                  {selectedDossier.profile_photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedDossier.profile_photo} alt="Applicant profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[10px] text-slate-500 font-black uppercase tracking-widest">No Photo</div>
+                  )}
+                </div>
+              </div>
               
               <div className="grid grid-cols-2 gap-6 mb-8 text-sm">
                 <div className="bg-black/40 p-4 rounded-xl border border-white/5">
@@ -560,6 +615,19 @@ export default function SupremeAdminDashboard() {
               </div>
 
               <div className="border-t border-white/5 pt-8">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Application Controls</h3>
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <button onClick={() => handleApprove(selectedDossier.id)} className="px-4 py-2 border border-green-500/30 text-green-400 hover:bg-green-500 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
+                    Approve Access
+                  </button>
+                  <button onClick={() => handleToggleAccess(selectedDossier.id)} className="px-4 py-2 border border-slate-500/30 text-slate-400 hover:bg-slate-500 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
+                    {selectedDossier.is_active ? 'Block User' : 'Unblock User'}
+                  </button>
+                  <button onClick={() => handleDelete(selectedDossier.id)} className="px-4 py-2 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
+                    Delete User
+                  </button>
+                </div>
+
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">{t.Admin?.dossier?.override}</h3>
                 <div className="flex space-x-4">
                   <button onClick={() => handleUpgrade(selectedDossier.id, 'free')} className="px-4 py-2 border border-slate-500/30 text-slate-400 hover:bg-slate-500 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
