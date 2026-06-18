@@ -174,7 +174,11 @@ export default function WorkerDetail() {
                   >
                     {t.WorkerProfile?.messageArtisan || 'Message Artisan'}
                   </Link>
-                  <button className="w-full py-5 bg-gray-50 shadow-sm border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all">
+                  <button
+                    type="button"
+                    onClick={() => setIsReviewModalOpen(true)}
+                    className="w-full py-5 bg-gray-50 shadow-sm border border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all"
+                  >
                     {t.WorkerProfile?.viewLedger || 'View Verified History'}
                   </button>
                 </div>

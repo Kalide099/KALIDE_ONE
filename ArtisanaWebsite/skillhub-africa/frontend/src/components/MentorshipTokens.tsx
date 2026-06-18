@@ -8,6 +8,7 @@ export default function MentorshipTokens() {
   const [tokens, setTokens] = useState(0);
   const [rewards, setRewards] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [exchangeStatus, setExchangeStatus] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,9 +64,23 @@ export default function MentorshipTokens() {
         ))}
       </div>
 
-      <button className="w-full py-4 bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white rounded-xl font-black uppercase tracking-widest text-[10px] mt-8 transition-all border border-purple-500/30">
+      <button
+        type="button"
+        onClick={() => {
+          if (tokens < 10) {
+            setExchangeStatus('Need at least 10 tokens to exchange.');
+            return;
+          }
+          setTokens(prev => prev - 10);
+          setExchangeStatus('10 tokens exchanged for fee credits.');
+        }}
+        className="w-full py-4 bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white rounded-xl font-black uppercase tracking-widest text-[10px] mt-8 transition-all border border-purple-500/30"
+      >
         Exchange for Platform Fee Credits
       </button>
+      {exchangeStatus && (
+        <p className="mt-3 text-center text-[10px] font-bold text-slate-500">{exchangeStatus}</p>
+      )}
     </div>
   );
 }

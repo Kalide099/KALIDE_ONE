@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { Link } from '@/i18n/routing';
 import { apiService } from '@/services/api';
 
 export interface AdminUser {
@@ -304,7 +305,7 @@ export default function SupremeAdminDashboard() {
                         </span>
                       </td>
                       <td className="py-6 text-right">
-                        <button className="px-3 py-2 border border-white/20 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">{t.Admin?.actions?.inspect}</button>
+                        <Link href={`/project/${project.id}`} className="inline-block px-3 py-2 border border-white/20 hover:bg-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all">{t.Admin?.actions?.inspect}</Link>
                       </td>
                     </tr>
                   ))}

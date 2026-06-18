@@ -43,9 +43,9 @@ export default function KalideSupply() {
             <div className="px-4 py-2 bg-orange-500/10 border border-orange-500/30 rounded-full text-xs font-bold text-orange-400">
                 {t.Supply?.escrowStatus}
             </div>
-            <button className="px-4 py-2 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-full text-xs font-black uppercase tracking-widest transition-all">
+            <Link href="/checkout" className="px-4 py-2 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-full text-xs font-black uppercase tracking-widest transition-all">
               {t.Supply?.cart} ({cartCount})
-            </button>
+            </Link>
           </div>
         </div>
       </header>

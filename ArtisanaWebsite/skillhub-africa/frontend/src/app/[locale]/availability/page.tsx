@@ -28,6 +28,19 @@ export default function AvailabilityManager() {
     }));
   };
 
+  const handleAddBlock = () => {
+    setSlots(prev => {
+      const nextId = prev.length > 0 ? Math.max(...prev.map(slot => slot.id)) + 1 : 1;
+      const lastEndTime = prev.length > 0 ? prev[prev.length - 1].endTime : '09:00';
+      const [hours, minutes] = lastEndTime.split(':').map(Number);
+      const endHours = (hours + 2) % 24;
+      const startTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+      const endTime = `${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+      return [...prev, { id: nextId, time: startTime, endTime, status: 'available' }];
+    });
+  };
+
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -136,7 +149,13 @@ export default function AvailabilityManager() {
                   {selectedDate?.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
-              <button className="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline">{t.Availability?.newBlock}</button>
+              <button
+                type="button"
+                onClick={handleAddBlock}
+                className="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline"
+              >
+                {t.Availability?.newBlock}
+              </button>
             </div>
 
             <div className="space-y-4">

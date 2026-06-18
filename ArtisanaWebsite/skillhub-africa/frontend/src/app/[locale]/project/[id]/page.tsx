@@ -150,9 +150,9 @@ export default function ProjectDetail() {
                     >
                        Field Check-In / Scan
                     </button>
-                    <button className="w-full py-4 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
+                      <Link href={`/messages?project=${project.id}`} className="block w-full py-4 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all text-center">
                        {t.ProjectDetail?.secureMessaging}
-                    </button>
+                      </Link>
                     {isClient && project.status !== 'completed' && (
                       <button 
                          onClick={handleReleaseEscrow}

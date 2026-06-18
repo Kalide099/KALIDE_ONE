@@ -42,8 +42,10 @@ export default function NeuralMessenger() {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -117,6 +119,25 @@ export default function NeuralMessenger() {
     setNewMessage('');
   };
 
+  const handleAttachmentPick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const attachmentMessage: Message = {
+      id: Date.now() + 2,
+      senderId: 'PRO-0x3C',
+      senderName: 'You',
+      sourceLang: language || 'en',
+      content: `Shared file: ${file.name}`,
+      translatedContent: {},
+      isMe: true,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, attachmentMessage]);
+    event.target.value = '';
+  };
+
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-900 flex flex-col">
       <div className="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-10" />
@@ -143,9 +164,27 @@ export default function NeuralMessenger() {
             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-gray-200 rounded-full px-4 py-1">
               {t.Messenger?.yourLang}: <span className="text-gray-900">{language === 'en' ? t.Messenger?.english : t.Messenger?.french}</span>
             </div>
-            <button className="text-secondary font-black bg-gray-100 w-10 h-10 rounded-full hover:bg-secondary/20 transition-all">
+            <button
+              type="button"
+              onClick={() => setShowMenu(prev => !prev)}
+              className="text-secondary font-black bg-gray-100 w-10 h-10 rounded-full hover:bg-secondary/20 transition-all"
+            >
               ⋮
             </button>
+            {showMenu && (
+              <div className="absolute top-16 right-6 bg-[#111827] border border-gray-200 rounded-xl p-2 shadow-2xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMessages([]);
+                    setShowMenu(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 text-xs font-bold text-gray-900 hover:bg-black rounded-lg"
+                >
+                  Clear chat
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -214,7 +253,17 @@ export default function NeuralMessenger() {
              </div>
           )}
           <form onSubmit={handleSend} className="relative flex items-center">
-            <button type="button" className="absolute left-4 text-gray-500 hover:text-gray-900 transition-colors">
+            <input
+              ref={attachmentInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleAttachmentPick}
+            />
+            <button
+              type="button"
+              onClick={() => attachmentInputRef.current?.click()}
+              className="absolute left-4 text-gray-500 hover:text-gray-900 transition-colors"
+            >
               📎
             </button>
             <input

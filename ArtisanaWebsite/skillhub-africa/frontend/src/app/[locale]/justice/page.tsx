@@ -7,6 +7,7 @@ import { useState } from 'react';
 export default function KalideJusticeNode() {
   const { t } = useLanguage();
   const [isAccepted, setIsAccepted] = useState(false);
+  const [isEscalated, setIsEscalated] = useState(false);
 
   const disputeData = {
     id: "DSP-8842-X",
@@ -141,7 +142,11 @@ export default function KalideJusticeNode() {
                   >
                     {t.Justice?.accept}
                   </button>
-                  <button className="flex-1 py-5 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-2xl font-black uppercase tracking-widest text-[10px] text-gray-500 hover:text-gray-900 transition-all">
+                  <button
+                    type="button"
+                    onClick={() => setIsEscalated(true)}
+                    className="flex-1 py-5 bg-white shadow-sm border border-gray-100 hover:bg-gray-100 rounded-2xl font-black uppercase tracking-widest text-[10px] text-gray-500 hover:text-gray-900 transition-all"
+                  >
                     {t.Justice?.escalate}
                   </button>
                 </>
@@ -149,6 +154,11 @@ export default function KalideJusticeNode() {
                 <div className="w-full bg-green-500/10 border border-green-500/30 p-6 rounded-2xl text-center">
                   <p className="text-green-400 font-black uppercase tracking-widest text-xs mb-2">{t.Justice?.protocolAccepted}</p>
                   <p className="text-[10px] text-gray-500 font-medium">{t.Justice?.redistributing}</p>
+                </div>
+              )}
+              {isEscalated && !isAccepted && (
+                <div className="w-full bg-orange-500/10 border border-orange-500/30 p-4 rounded-2xl text-center mt-4">
+                  <p className="text-orange-400 font-black uppercase tracking-widest text-xs">Escalation submitted</p>
                 </div>
               )}
             </div>

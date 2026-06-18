@@ -3,11 +3,14 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import MentorshipTokens from '@/components/MentorshipTokens';
 
 export default function KalideAcademy() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'mentors' | 'masterclasses' | 'forum'>('mentors');
+  const [visibleArchivedPosts, setVisibleArchivedPosts] = useState(0);
 
   const mentors = [
     { id: 1, name: 'Eng. Marcus T.', domain: 'Advanced Electrical Grids', rate: '$45/hr', rating: 4.9, country: 'DE', ar: true },
@@ -24,6 +27,14 @@ export default function KalideAcademy() {
     { id: 1, title: 'How to bypass standard load limits on D4 inverters?', author: 'AliK_99', upvotes: 245, replies: 12, category: 'Electrical' },
     { id: 2, title: 'Best waterproof sealant for tropical climates?', author: 'RoofCrafters', upvotes: 180, replies: 34, category: 'Construction' },
   ];
+
+  const archivedForumPosts = [
+    { id: 3, title: 'Which sensor pack is best for remote diagnostics?', author: 'NairobiOps', upvotes: 132, replies: 9, category: 'IoT' },
+    { id: 4, title: 'Reliable battery backup setup for workshop tools?', author: 'FixerLab', upvotes: 97, replies: 21, category: 'Power' },
+    { id: 5, title: 'Tips for clean conduit layout in tight ceilings?', author: 'BuildNode', upvotes: 88, replies: 11, category: 'Construction' },
+  ];
+
+  const allVisibleForumPosts = [...forumPosts, ...archivedForumPosts.slice(0, visibleArchivedPosts)];
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-900">
@@ -46,7 +57,11 @@ export default function KalideAcademy() {
               <span>{t.Academy?.reputation || 'Reputation'}:</span>
               <span className="text-purple-400">1,240 pts</span>
             </div>
-            <button className="px-4 py-2 border border-gray-200 rounded-full text-xs font-bold hover:bg-gray-100 transition-all">
+            <button
+              type="button"
+              onClick={() => setActiveTab('forum')}
+              className="px-4 py-2 border border-gray-200 rounded-full text-xs font-bold hover:bg-gray-100 transition-all"
+            >
               {t.Academy?.publish || '+ Publish'}
             </button>
           </div>
@@ -117,7 +132,11 @@ export default function KalideAcademy() {
                   </div>
 
                   <div className="space-y-3">
-                    <button className="w-full py-4 text-[10px] font-black uppercase tracking-widest bg-gray-100 hover:bg-white/10 rounded-xl transition-all">
+                    <button
+                      type="button"
+                      onClick={() => router.push('/availability')}
+                      className="w-full py-4 text-[10px] font-black uppercase tracking-widest bg-gray-100 hover:bg-white/10 rounded-xl transition-all"
+                    >
                       {t.Academy?.actions?.viewMatrix || 'View Availability Matrix'}
                     </button>
                     {mentor.ar && (
@@ -189,7 +208,7 @@ export default function KalideAcademy() {
               </div>
               
               <div className="space-y-4">
-                {forumPosts.map(post => (
+                {allVisibleForumPosts.map(post => (
                   <div key={post.id} className="flex items-center p-6 border border-gray-200 hover:border-gray-200 rounded-2xl bg-gray-100 hover:bg-black/40 transition-all cursor-pointer">
                     <div className="flex flex-col items-center mr-6 px-4">
                       <span className="text-purple-400 text-xl font-black">▲</span>
@@ -208,7 +227,12 @@ export default function KalideAcademy() {
                 ))}
               </div>
               <div className="mt-8 text-center">
-                <button className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setVisibleArchivedPosts((current) => Math.min(current + 1, archivedForumPosts.length))}
+                  disabled={visibleArchivedPosts >= archivedForumPosts.length}
+                  className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors disabled:opacity-50"
+                >
                   {t.Academy?.actions?.loadThreads || 'Load Older Threads ↓'}
                 </button>
               </div>
