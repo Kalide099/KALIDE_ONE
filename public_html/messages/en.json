@@ -181,6 +181,23 @@
       "projects": "Global Projects",
       "escrow": "Escrow Volume"
     },
+    "performance": {
+      "activeUsers": "Active Users",
+      "activeUsersSub": "active",
+      "activeProjects": "Active Projects",
+      "completedSub": "completed",
+      "platformVolume": "Platform Volume",
+      "invoiceTotal": "invoice total",
+      "escrowVolume": "Escrow Volume",
+      "remainingEscrow": "remaining in escrow",
+      "marketplaceRating": "Marketplace Rating",
+      "winRate": "Win rate",
+      "trend": {
+        "up": "Up",
+        "down": "Down",
+        "steady": "Steady"
+      }
+    },
     "tabs": {
       "users": "User Matrix Control",
       "projects": "Global Project Matrix",
@@ -574,7 +591,24 @@
     "verifiedByKalide": "Verified by Kalide",
     "downloadPDF": "Download PDF",
     "transmitClient": "Send to Client",
-    "origin": "Origin"
+    "origin": "Origin",
+    "performance": {
+      "winRate": "Win Rate",
+      "acceptedQuotes": "accepted",
+      "responseRate": "Response Rate",
+      "repliesProcessed": "quote replies processed",
+      "earnings": "Earnings",
+      "receivedPayouts": "received payouts",
+      "repeatClients": "Repeat Clients",
+      "withProjects": "with 2+ projects",
+      "rating": "Rating",
+      "reviews": "reviews",
+      "trend": {
+        "up": "Up",
+        "down": "Down",
+        "steady": "Steady"
+      }
+    }
   },
   "Quotes": {
     "generator": "Quote Builder",
@@ -645,6 +679,22 @@
       "active": "Active",
       "draft": "Draft",
       "accepted": "Accepted"
+    },
+    "performance": {
+      "activeProjects": "Active Projects",
+      "active": "Active",
+      "completed": "completed",
+      "totalSpend": "Total Spend",
+      "committedBudget": "Committed budget",
+      "qualityRating": "Quality Rating",
+      "reviews": "reviews",
+      "onTimeCompletion": "On-Time Completion",
+      "onTimeLabel": "on-time completion",
+      "trend": {
+        "up": "Up",
+        "down": "Down",
+        "steady": "Steady"
+      }
     }
   },
   "Status": {

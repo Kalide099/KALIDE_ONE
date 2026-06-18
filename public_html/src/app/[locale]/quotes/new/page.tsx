@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { Link } from '@/i18n/routing';
+import { apiService } from '@/services/api';
 
 interface LineItem {
   id: number;
@@ -12,10 +14,19 @@ interface LineItem {
 }
 
 export default function NewQuote() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [clientName, setClientName] = useState('');
   const [projectName, setProjectName] = useState('');
   const [terms, setTerms] = useState(t.Quotes?.defaultTerms || 'Standard payment terms: 50% upfront, 50% upon completion.');
+  const [clientId, setClientId] = useState('');
+  const [projectId, setProjectId] = useState('');
+  const [validUntil, setValidUntil] = useState('');
+  const [scope, setScope] = useState('');
+  const [timeline, setTimeline] = useState('');
+  const [milestonesText, setMilestonesText] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { id: 1, description: '', quantity: 1, unitPrice: 0 }
   ]);
@@ -42,14 +53,40 @@ export default function NewQuote() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!clientId || !projectId) {
+      setSubmitError('Client ID and Project ID are required to generate a formal proposal.');
+      return;
+    }
+
+    setSubmitError('');
     setIsSubmitting(true);
-    // Simulate API call to backend/payments/quotes/
-    setTimeout(() => {
-      setIsSubmitting(false);
-      // Let's assume redirect back to dashboard happens here via router
+
+    const response = await apiService.createQuote({
+      total_amount: total,
+      terms,
+      project_id: Number(projectId),
+      client_id: Number(clientId),
+      valid_until: validUntil || undefined,
+      structured_proposal: {
+        scope,
+        timeline,
+        milestones: milestonesText
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean),
+      },
+    });
+
+    setIsSubmitting(false);
+
+    if (response.success) {
       alert(t.Quotes?.success || "Quote successfully deployed to the Client's Escrow Node!");
-      window.location.href = `/${language}/dashboard/worker`;
-    }, 1500);
+      router.push('/dashboard/worker');
+      return;
+    }
+
+    setSubmitError(response.message || 'Could not deploy this proposal right now.');
   };
 
   return (
@@ -202,8 +239,73 @@ export default function NewQuote() {
                  
                  <div className="flex justify-between items-start mb-16 border-b pb-8">
                    <div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Client ID</label>
+                      <input 
+                        type="number" 
+                        required
+                        value={clientId}
+                        onChange={(e) => setClientId(e.target.value)}
+                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
+                        placeholder="e.g. 12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Project ID</label>
+                      <input 
+                        type="number" 
+                        required
+                        value={projectId}
+                        onChange={(e) => setProjectId(e.target.value)}
+                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
+                        placeholder={searchParams.get('project') || 'e.g. 34'}
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Valid Until</label>
+                      <input 
+                        type="date" 
+                        value={validUntil}
+                        onChange={(e) => setValidUntil(e.target.value)}
+                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
+                      />
+                    </div>
                      <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center font-black text-white text-2xl mb-4">K</div>
                      <h2 className="text-2xl font-black uppercase tracking-tighter">{t.Quotes?.officialQuote}</h2>
+
+                <div className="p-8 glass rounded-[2.5rem] border-white/5 space-y-6">
+                  <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 border-b border-white/5 pb-4">Structured Proposal</h2>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Scope of Work</label>
+                    <textarea
+                      rows={3}
+                      value={scope}
+                      onChange={(e) => setScope(e.target.value)}
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none resize-none"
+                      placeholder="Describe what is included in this proposal"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Timeline</label>
+                    <input
+                      type="text"
+                      value={timeline}
+                      onChange={(e) => setTimeline(e.target.value)}
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none"
+                      placeholder="e.g. 3 weeks from start date"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Milestones (one per line)</label>
+                    <textarea
+                      rows={4}
+                      value={milestonesText}
+                      onChange={(e) => setMilestonesText(e.target.value)}
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none resize-none"
+                      placeholder={"Kickoff and planning\nMaterials procurement\nExecution and QA\nFinal handover"}
+                    />
+                  </div>
+                </div>
                      <p className="text-sm text-slate-500 mt-1">{t.Quotes?.generatedBy}</p>
                    </div>
                    <div className="text-right">
@@ -294,6 +396,11 @@ export default function NewQuote() {
               </div>
 
               <div className="space-y-4">
+                {submitError && (
+                  <div className="w-full py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest">
+                    {submitError}
+                  </div>
+                )}
                 <button 
                   onClick={handleSubmit}
                   disabled={isSubmitting || lineItems.length === 0 || subtotal === 0}

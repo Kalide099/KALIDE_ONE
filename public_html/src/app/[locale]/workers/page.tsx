@@ -9,17 +9,27 @@ export default function Workers() {
   const { t } = useLanguage();
   const [workers, setWorkers] = useState<Professional[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [skillsFilter, setSkillsFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [minRating, setMinRating] = useState(0);
 
   useEffect(() => {
     const fetchWorkers = async () => {
-      const res = await apiService.getProfessionals();
+      setIsLoading(true);
+      const res = await apiService.getProfessionals({
+        skills: skillsFilter,
+        location: locationFilter,
+        verified: verifiedOnly,
+        minRating,
+      });
       if (res.success && res.data) {
         setWorkers(res.data);
       }
       setIsLoading(false);
     };
     fetchWorkers();
-  }, []);
+  }, [skillsFilter, locationFilter, verifiedOnly, minRating]);
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white">
@@ -35,6 +45,43 @@ export default function Workers() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
             {t.Workers?.titlePrefix} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">{t.Workers?.titleHighlight}</span>
           </h2>
+        </div>
+
+        <div className="glass rounded-3xl border-white/10 p-6 mb-10">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Find the right talent faster</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <input
+              value={skillsFilter}
+              onChange={(e) => setSkillsFilter(e.target.value)}
+              placeholder="Skill (e.g. Plumbing)"
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm outline-none focus:border-primary"
+            />
+            <input
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              placeholder="Location (city/country)"
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm outline-none focus:border-primary"
+            />
+            <select
+              value={minRating}
+              onChange={(e) => setMinRating(Number(e.target.value))}
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm outline-none focus:border-primary"
+            >
+              <option value={0}>Any rating</option>
+              <option value={3}>3+ stars</option>
+              <option value={4}>4+ stars</option>
+              <option value={5}>5 stars</option>
+            </select>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm">
+              <input
+                type="checkbox"
+                checked={verifiedOnly}
+                onChange={(e) => setVerifiedOnly(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+              />
+              Verified only
+            </label>
+          </div>
         </div>
 
         {isLoading ? (

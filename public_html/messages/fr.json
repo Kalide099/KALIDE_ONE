@@ -180,6 +180,23 @@
       "projects": "Projets Globaux",
       "escrow": "Volume Escrow"
     },
+    "performance": {
+      "activeUsers": "Utilisateurs Actifs",
+      "activeUsersSub": "actifs",
+      "activeProjects": "Projets Actifs",
+      "completedSub": "terminés",
+      "platformVolume": "Volume Plateforme",
+      "invoiceTotal": "total factures",
+      "escrowVolume": "Volume Escrow",
+      "remainingEscrow": "restant en escrow",
+      "marketplaceRating": "Note Marketplace",
+      "winRate": "Taux de gain",
+      "trend": {
+        "up": "En hausse",
+        "down": "En baisse",
+        "steady": "Stable"
+      }
+    },
     "tabs": {
       "users": "Contrôle de la Matrice Utilisateur",
       "projects": "Matrice de Projet Globale",
@@ -452,7 +469,24 @@
     "escrowGuarantee": "Garantie Escrow :",
     "verifiedByKalide": "Vérifié par Kalide",
     "downloadPDF": "Télécharger PDF",
-    "transmitClient": "Transmettre au Client"
+    "transmitClient": "Transmettre au Client",
+    "performance": {
+      "winRate": "Taux de gain",
+      "acceptedQuotes": "acceptés",
+      "responseRate": "Taux de réponse",
+      "repliesProcessed": "réponses traitées",
+      "earnings": "Revenus",
+      "receivedPayouts": "paiements reçus",
+      "repeatClients": "Clients récurrents",
+      "withProjects": "avec 2+ projets",
+      "rating": "Note",
+      "reviews": "avis",
+      "trend": {
+        "up": "En hausse",
+        "down": "En baisse",
+        "steady": "Stable"
+      }
+    }
   },
   "ProjectDetail": {
     "loading": "Initialisation du Module...",
@@ -571,6 +605,22 @@
       "active": "Actif",
       "draft": "Brouillon",
       "accepted": "Accepté"
+    },
+    "performance": {
+      "activeProjects": "Projets Actifs",
+      "active": "Actifs",
+      "completed": "terminés",
+      "totalSpend": "Dépenses Totales",
+      "committedBudget": "Budget engagé",
+      "qualityRating": "Note Qualité",
+      "reviews": "avis",
+      "onTimeCompletion": "Livraison à temps",
+      "onTimeLabel": "complétion à temps",
+      "trend": {
+        "up": "En hausse",
+        "down": "En baisse",
+        "steady": "Stable"
+      }
     }
   },
   "Status": {

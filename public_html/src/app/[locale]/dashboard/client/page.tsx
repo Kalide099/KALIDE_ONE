@@ -3,20 +3,53 @@
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import { useState, useEffect } from 'react';
-import { apiService, Project } from '@/services/api';
+import { apiService, PerformanceDashboard, Project } from '@/services/api';
 import ProfessionalMatch from '@/components/ProfessionalMatch';
+import { DEFAULT_TREND_THRESHOLDS, getRatioPercent, getTrendByThreshold, getTrendThresholds, TREND_BADGE_CLASSES } from '@/lib/performance-trends';
 
 export default function ClientDashboard() {
   const { t, language } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
+  const [performance, setPerformance] = useState<PerformanceDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [trendThresholds, setTrendThresholdsState] = useState(DEFAULT_TREND_THRESHOLDS);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const formatPercent = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const trendLabels = t.ClientDashboard?.performance?.trend || {
+    up: 'Up',
+    down: 'Down',
+    steady: 'Steady',
+  };
+
+  useEffect(() => {
+    const syncThresholds = () => setTrendThresholdsState(getTrendThresholds());
+    syncThresholds();
+
+    window.addEventListener('storage', syncThresholds);
+    return () => {
+      window.removeEventListener('storage', syncThresholds);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiService.getProjects();
-      if (response.success && response.data) {
-        setProjects(response.data);
+      const [projectsResponse, performanceResponse] = await Promise.all([
+        apiService.getProjects(),
+        apiService.getPerformanceDashboard(),
+      ]);
+
+      if (projectsResponse.success && projectsResponse.data) {
+        setProjects(projectsResponse.data);
+      }
+
+      if (performanceResponse.success && performanceResponse.data) {
+        setPerformance(performanceResponse.data);
       }
       
       // Fetch Quotes Mock for now
@@ -31,6 +64,31 @@ export default function ClientDashboard() {
   }, []);
 
   const getTitle = (p: Project) => p.title[language] || p.title['en'] || t.ClientDashboard?.untitled || 'Untitled Project';
+
+  const clientMetrics = performance?.client;
+  const completionRatio = getRatioPercent(clientMetrics?.completed_projects ?? 0, clientMetrics?.total_projects ?? 0);
+  const spendRatio = getRatioPercent(clientMetrics?.spend_total ?? 0, clientMetrics?.committed_budget_total ?? 0);
+
+  const activeProjectsTrend = getTrendByThreshold(
+    completionRatio,
+    trendThresholds.client.completion.up,
+    trendThresholds.client.completion.down
+  );
+  const spendTrend = getTrendByThreshold(
+    spendRatio,
+    trendThresholds.client.spend.up,
+    trendThresholds.client.spend.down
+  );
+  const qualityTrend = getTrendByThreshold(
+    clientMetrics?.quality_rating_avg ?? 0,
+    trendThresholds.client.quality.up,
+    trendThresholds.client.quality.down
+  );
+  const onTimeTrend = getTrendByThreshold(
+    clientMetrics?.on_time_completion_rate ?? 0,
+    trendThresholds.client.onTime.up,
+    trendThresholds.client.onTime.down
+  );
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white">
@@ -63,6 +121,49 @@ export default function ClientDashboard() {
           </div>
           <h1 className="text-4xl max-[360px]:text-2xl md:text-6xl font-black tracking-tighter uppercase italic mb-2">{t.ClientDashboard?.title}</h1>
           <p className="text-slate-500 font-medium max-[360px]:text-xs">{t.ClientDashboard?.subtitle}</p>
+        </div>
+
+        <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.ClientDashboard?.performance?.activeProjects || 'Active Projects'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[activeProjectsTrend]}`}>
+                {trendLabels[activeProjectsTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{clientMetrics?.active_projects ?? 0} {t.ClientDashboard?.performance?.active || 'Active'}</p>
+            <p className="text-xs text-slate-400">{clientMetrics?.completed_projects ?? 0} {t.ClientDashboard?.performance?.completed || 'completed'}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.ClientDashboard?.performance?.totalSpend || 'Total Spend'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[spendTrend]}`}>
+                {trendLabels[spendTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">${formatCurrency(clientMetrics?.spend_total ?? 0)}</p>
+            <p className="text-xs text-slate-400">{t.ClientDashboard?.performance?.committedBudget || 'Committed budget'}: ${formatCurrency(clientMetrics?.committed_budget_total ?? 0)}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.ClientDashboard?.performance?.qualityRating || 'Quality Rating'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[qualityTrend]}`}>
+                {trendLabels[qualityTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{(clientMetrics?.quality_rating_avg ?? 0).toFixed(2)} / 5</p>
+            <p className="text-xs text-slate-400">{clientMetrics?.quality_reviews_count ?? 0} {t.ClientDashboard?.performance?.reviews || 'reviews'}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.ClientDashboard?.performance?.onTimeCompletion || 'On-Time Completion'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[onTimeTrend]}`}>
+                {trendLabels[onTimeTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{formatPercent(clientMetrics?.on_time_completion_rate ?? 0)}%</p>
+            <p className="text-xs text-slate-400">{t.ClientDashboard?.performance?.onTimeLabel || 'on-time completion'}</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 max-[360px]:gap-2 mb-10 max-[360px]:mb-6 lg:hidden">

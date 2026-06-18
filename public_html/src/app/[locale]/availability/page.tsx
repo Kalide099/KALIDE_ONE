@@ -1,8 +1,24 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Link } from '@/i18n/routing';
+import { apiService, AvailabilitySlot } from '@/services/api';
+
+function toLocalDateInputValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toTimeLabel(value: string) {
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return value;
+  const hh = `${dt.getHours()}`.padStart(2, '0');
+  const mm = `${dt.getMinutes()}`.padStart(2, '0');
+  return `${hh}:${mm}`;
+}
 
 export default function AvailabilityManager() {
   const { t, language } = useLanguage();
@@ -10,23 +26,48 @@ export default function AvailabilityManager() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  
-  // Mock data for availability
-  const [slots, setSlots] = useState([
-    { id: 1, time: '09:00', endTime: '11:00', status: 'booked', client: 'John Doe' },
-    { id: 2, time: '11:30', endTime: '13:30', status: 'available' },
-    { id: 3, time: '14:00', endTime: '16:00', status: 'available' },
-    { id: 4, time: '16:30', endTime: '18:30', status: 'booked', client: 'Alice Smith' },
-  ]);
+  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [professionalId, setProfessionalId] = useState<number | null>(null);
+  const [newStartTime, setNewStartTime] = useState('09:00');
+  const [newEndTime, setNewEndTime] = useState('11:00');
+  const [feedback, setFeedback] = useState('');
 
-  const toggleSlot = (id: number) => {
-    setSlots(slots.map(slot => {
-      if (slot.id === id && slot.status !== 'booked') {
-        return { ...slot, status: slot.status === 'available' ? 'unavailable' : 'available' };
+  useEffect(() => {
+    const loadMe = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      try {
+        const res = await fetch('/api/v1/kalide-one/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const payload = await res.json();
+        if (res.ok && payload?.success) {
+          setProfessionalId(Number(payload.data?.id));
+        }
+      } catch {
+        // ignore
       }
-      return slot;
-    }));
-  };
+    };
+
+    loadMe();
+  }, []);
+
+  useEffect(() => {
+    const loadAvailability = async () => {
+      if (!professionalId || !selectedDate) return;
+
+      const dateKey = toLocalDateInputValue(selectedDate);
+      const response = await apiService.getAvailability(professionalId, dateKey, false);
+      if (response.success && Array.isArray(response.data)) {
+        setSlots(response.data);
+      } else {
+        setSlots([]);
+      }
+    };
+
+    loadAvailability();
+  }, [professionalId, selectedDate]);
 
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -40,6 +81,7 @@ export default function AvailabilityManager() {
   const firstDay = getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth());
   const monthNames = t.Availability?.months || ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const weekdaysShort = t.Availability?.weekdaysShort || ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  const selectedDateKey = selectedDate ? toLocalDateInputValue(selectedDate) : toLocalDateInputValue();
 
   const renderCalendar = () => {
     let days = [];
@@ -48,7 +90,8 @@ export default function AvailabilityManager() {
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const isSelected = selectedDate?.getDate() === i && selectedDate?.getMonth() === currentDate.getMonth();
-      const hasBooking = i % 4 === 0; // Mock logic for visual dots
+      const dayKey = toLocalDateInputValue(new Date(currentDate.getFullYear(), currentDate.getMonth(), i));
+      const hasBooking = slots.some((slot) => toLocalDateInputValue(new Date(slot.date)) === dayKey);
       days.push(
         <div 
           key={i} 
@@ -136,69 +179,101 @@ export default function AvailabilityManager() {
                   {selectedDate?.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
-              <button className="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline">{t.Availability?.newBlock}</button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!selectedDateKey) return;
+                  if (newStartTime >= newEndTime) {
+                    setFeedback('End time must be after start time.');
+                    return;
+                  }
+
+                  setIsSaving(true);
+                  setFeedback('');
+
+                  const response = await apiService.createAvailability(selectedDateKey, newStartTime, newEndTime);
+                  setIsSaving(false);
+
+                  if (response.success && response.data) {
+                    setSaveSuccess(true);
+                    setFeedback('Time block saved successfully.');
+                    setSlots((prev) => [...prev, response.data as AvailabilitySlot].sort((a, b) =>
+                      new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+                    ));
+                    setTimeout(() => setSaveSuccess(false), 2500);
+                  } else {
+                    setFeedback(response.message || 'Could not save this time block.');
+                  }
+                }}
+                className="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline"
+              >
+                {isSaving ? 'Saving...' : t.Availability?.newBlock}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              <input
+                type="time"
+                value={newStartTime}
+                onChange={(e) => setNewStartTime(e.target.value)}
+                className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-sm"
+              />
+              <input
+                type="time"
+                value={newEndTime}
+                onChange={(e) => setNewEndTime(e.target.value)}
+                className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-sm"
+              />
             </div>
 
             <div className="space-y-4">
-              {slots.map(slot => (
+              {slots.map(slot => {
+                const status = slot.is_booked ? 'booked' : 'available';
+                return (
                 <div 
                   key={slot.id} 
                   className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-2xl border transition-all ${
-                    slot.status === 'booked' 
+                    status === 'booked' 
                       ? 'border-secondary/20 bg-secondary/5' 
-                      : slot.status === 'available'
+                      : status === 'available'
                         ? 'border-white/10 bg-black/20 hover:border-white/20 hover:bg-black/40 cursor-pointer'
                         : 'border-red-500/10 bg-red-500/5 opacity-50 cursor-pointer'
                   }`}
-                  onClick={() => toggleSlot(slot.id)}
                 >
                   <div className="flex items-center space-x-6 mb-4 sm:mb-0">
                     <div className={`w-3 h-3 rounded-full ${
-                      slot.status === 'booked' ? 'bg-secondary shadow-[0_0_10px_rgba(var(--secondary),0.5)]' 
-                      : slot.status === 'available' ? 'bg-green-500' 
+                      status === 'booked' ? 'bg-secondary shadow-[0_0_10px_rgba(var(--secondary),0.5)]' 
+                      : status === 'available' ? 'bg-green-500' 
                       : 'bg-red-500'
                     }`} />
                     <div>
-                      <span className="font-black text-lg tracking-tight">{slot.time} - {slot.endTime}</span>
+                      <span className="font-black text-lg tracking-tight">{toTimeLabel(slot.start_time)} - {toTimeLabel(slot.end_time)}</span>
                       <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">
-                        {slot.status === 'booked' ? t.Availability?.status?.reserved : slot.status === 'available' ? t.Availability?.status?.open : t.Availability?.status?.offline}
+                        {status === 'booked' ? t.Availability?.status?.reserved : status === 'available' ? t.Availability?.status?.open : t.Availability?.status?.offline}
                       </p>
                     </div>
                   </div>
                   
-                  {slot.status === 'booked' && (
+                  {status === 'booked' && (
                     <div className="flex items-center space-x-3 bg-black/30 px-4 py-2 rounded-xl">
-                      <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center font-black text-secondary text-xs">
-                        {slot.client?.[0]}
-                      </div>
-                      <span className="text-xs font-black uppercase tracking-widest">{slot.client}</span>
+                      <span className="text-xs font-black uppercase tracking-widest text-secondary">Reserved</span>
                     </div>
                   )}
                 </div>
-              ))}
+              );
+              })}
+
+              {!slots.length && (
+                <div className="p-6 rounded-2xl border border-white/10 bg-black/20 text-xs font-black uppercase tracking-widest text-slate-400">
+                  No slots yet for this date. Add your first time block.
+                </div>
+              )}
             </div>
 
-            {slots.filter(s => s.status !== 'booked').length > 0 && (
-              <button 
-                onClick={async () => {
-                  setIsSaving(true);
-                  // Mock API delay
-                  await new Promise(r => setTimeout(r, 1500));
-                  setIsSaving(false);
-                  setSaveSuccess(true);
-                  setTimeout(() => setSaveSuccess(false), 3000);
-                }}
-                disabled={isSaving}
-                className="w-full mt-8 py-5 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:border-primary/50 transition-all rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/5 flex items-center justify-center space-x-2"
-              >
-                {isSaving ? (
-                  <span className="animate-spin text-xl">◌</span>
-                ) : saveSuccess ? (
-                  <span className="text-green-400 italic">{t.Availability?.syncSuccess}</span>
-                ) : (
-                  <span>{t.Availability?.commit}</span>
-                )}
-              </button>
+            {(feedback || saveSuccess) && (
+              <div className="w-full mt-8 py-4 px-5 bg-primary/10 text-primary border border-primary/20 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                {saveSuccess ? t.Availability?.syncSuccess : feedback}
+              </div>
             )}
           </div>
         </div>

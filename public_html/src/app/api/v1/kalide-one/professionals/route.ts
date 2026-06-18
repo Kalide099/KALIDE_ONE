@@ -6,8 +6,26 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const verifiedOnly = searchParams.get('verified') === 'true';
+    const skills = (searchParams.get('skills') || '').trim();
+    const location = (searchParams.get('location') || '').trim();
+    const minRatingParam = Number(searchParams.get('minRating') || '0');
+    const minRating = Number.isNaN(minRatingParam) ? 0 : Math.max(0, minRatingParam);
 
-    const where = verifiedOnly ? { is_verified: true } : {};
+    const where: Record<string, unknown> = {
+      ...(verifiedOnly ? { is_verified: true } : {}),
+      ...(minRating > 0 ? { rating: { gte: minRating } } : {}),
+      ...(skills ? { skills: { contains: skills } } : {}),
+      ...(location
+        ? {
+            users_user: {
+              OR: [
+                { city: { contains: location } },
+                { country: { contains: location } },
+              ],
+            },
+          }
+        : {}),
+    };
 
     const professionals = await prisma.marketplace_professionals.findMany({
       where,

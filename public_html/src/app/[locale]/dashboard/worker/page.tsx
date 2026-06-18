@@ -3,21 +3,54 @@
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import { useState, useEffect } from 'react';
-import { apiService, Project } from '@/services/api';
+import { apiService, PerformanceDashboard, Project } from '@/services/api';
+import { DEFAULT_TREND_THRESHOLDS, getPresenceTrend, getTrendByThreshold, getTrendThresholds, TREND_BADGE_CLASSES } from '@/lib/performance-trends';
 
 export default function WorkerDashboard() {
   const { t, language } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
+  const [performance, setPerformance] = useState<PerformanceDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [trendThresholds, setTrendThresholdsState] = useState(DEFAULT_TREND_THRESHOLDS);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const formatPercent = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const trendLabels = t.WorkerDashboard?.performance?.trend || {
+    up: 'Up',
+    down: 'Down',
+    steady: 'Steady',
+  };
+
+  useEffect(() => {
+    const syncThresholds = () => setTrendThresholdsState(getTrendThresholds());
+    syncThresholds();
+
+    window.addEventListener('storage', syncThresholds);
+    return () => {
+      window.removeEventListener('storage', syncThresholds);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiService.getProjects();
-      if (response.success && response.data) {
-        setProjects(response.data);
+      const [projectsResponse, performanceResponse] = await Promise.all([
+        apiService.getProjects(),
+        apiService.getPerformanceDashboard(),
+      ]);
+
+      if (projectsResponse.success && projectsResponse.data) {
+        setProjects(projectsResponse.data);
+      }
+
+      if (performanceResponse.success && performanceResponse.data) {
+        setPerformance(performanceResponse.data);
       }
       
       // Fetch Quotes Mock for now until API is updated
@@ -32,6 +65,29 @@ export default function WorkerDashboard() {
   }, []);
 
   const getTitle = (p: Project) => p.title[language] || p.title['en'] || 'Untitled Project';
+
+  const workerMetrics = performance?.worker;
+  const winRateTrend = getTrendByThreshold(
+    workerMetrics?.win_rate ?? 0,
+    trendThresholds.worker.winRate.up,
+    trendThresholds.worker.winRate.down
+  );
+  const responseRateTrend = getTrendByThreshold(
+    workerMetrics?.response_rate ?? 0,
+    trendThresholds.worker.responseRate.up,
+    trendThresholds.worker.responseRate.down
+  );
+  const earningsTrend = getPresenceTrend(workerMetrics?.earnings_total ?? 0);
+  const repeatClientsTrend = getTrendByThreshold(
+    workerMetrics?.repeat_clients ?? 0,
+    trendThresholds.worker.repeatClients.up,
+    trendThresholds.worker.repeatClients.down
+  );
+  const ratingTrend = getTrendByThreshold(
+    workerMetrics?.average_rating ?? 0,
+    trendThresholds.worker.rating.up,
+    trendThresholds.worker.rating.down
+  );
 
   const services = [
     { id: 1, title: 'Plumbing Service', price: 50, bookings: 5 },
@@ -77,7 +133,65 @@ export default function WorkerDashboard() {
           <p className="text-slate-500 font-medium max-[360px]:text-xs">{t.WorkerDashboard?.subtitle}</p>
         </div>
 
+        <div className="mb-10 grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.winRate || 'Win Rate'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[winRateTrend]}`}>
+                {trendLabels[winRateTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{formatPercent(workerMetrics?.win_rate ?? 0)}%</p>
+            <p className="text-xs text-slate-400">
+              {workerMetrics?.quotes_accepted ?? 0}/{workerMetrics?.quotes_submitted ?? 0} {t.WorkerDashboard?.performance?.acceptedQuotes || 'accepted'}
+            </p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.responseRate || 'Response Rate'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[responseRateTrend]}`}>
+                {trendLabels[responseRateTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{formatPercent(workerMetrics?.response_rate ?? 0)}%</p>
+            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.repliesProcessed || 'quote replies processed'}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.earnings || 'Earnings'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[earningsTrend]}`}>
+                {trendLabels[earningsTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">${formatCurrency(workerMetrics?.earnings_total ?? 0)}</p>
+            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.receivedPayouts || 'received payouts'}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.repeatClients || 'Repeat Clients'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[repeatClientsTrend]}`}>
+                {trendLabels[repeatClientsTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{workerMetrics?.repeat_clients ?? 0}</p>
+            <p className="text-xs text-slate-400">{t.WorkerDashboard?.performance?.withProjects || 'with 2+ projects'}</p>
+          </div>
+          <div className="glass rounded-2xl p-4 border border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] uppercase tracking-widest font-black text-slate-500">{t.WorkerDashboard?.performance?.rating || 'Rating'}</p>
+              <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[ratingTrend]}`}>
+                {trendLabels[ratingTrend]}
+              </span>
+            </div>
+            <p className="text-xl font-black mt-2">{(workerMetrics?.average_rating ?? 0).toFixed(2)} / 5</p>
+            <p className="text-xs text-slate-400">{workerMetrics?.reviews_count ?? 0} {t.WorkerDashboard?.performance?.reviews || 'reviews'}</p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 max-[360px]:gap-2 mb-10 max-[360px]:mb-6 lg:hidden">
+          <Link href="/dashboard/worker/teams" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-cyan-300 break-words">
+            Team Hub
+          </Link>
           <Link href="/messages" className="p-4 max-[360px]:p-3 glass rounded-2xl border border-white/10 text-center text-[10px] max-[360px]:text-[8px] font-black uppercase tracking-widest text-blue-300 break-words">
             {t.WorkerDashboard?.messenger || 'Messages'}
           </Link>
@@ -136,6 +250,13 @@ export default function WorkerDashboard() {
           <div className="space-y-8">
             <h2 className="text-xl font-black uppercase tracking-widest text-slate-400 mb-8 border-b border-white/5 pb-4">{t.WorkerDashboard?.serviceModules}</h2>
             <div className="space-y-4">
+              <Link href="/dashboard/worker/teams" className="flex items-center justify-between p-6 max-[360px]:p-4 glass rounded-2xl border-cyan-500/20 border hover:border-cyan-500/50 group transition-all">
+                <div>
+                  <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] text-cyan-300 group-hover:text-white transition-colors break-words">Team Management</h3>
+                  <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest mt-1">Invite, assign roles, set permissions</p>
+                </div>
+                <span className="text-cyan-300 group-hover:translate-x-2 transition-transform">→</span>
+              </Link>
               <Link href="/availability" className="flex items-center justify-between p-6 max-[360px]:p-4 glass rounded-2xl border-white/5 border hover:border-secondary/50 group transition-all">
                 <div>
                   <h3 className="font-black uppercase tracking-tight text-sm max-[360px]:text-[11px] text-secondary group-hover:text-white transition-colors break-words">{t.Availability?.headerTitle}</h3>

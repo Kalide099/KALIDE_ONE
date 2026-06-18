@@ -5,6 +5,21 @@ import { useRouter } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { apiService } from '@/services/api';
 
+interface ProfilePayload {
+  name?: string;
+  email?: string;
+  role?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  has_password?: boolean;
+  application_status?: string;
+  profile_photo?: string | null;
+  expertise_areas?: string[];
+  company_base?: string;
+  company_capabilities?: string[];
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -14,6 +29,7 @@ export default function ProfilePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [profileData, setProfileData] = useState<ProfilePayload>({});
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -38,6 +54,7 @@ export default function ProfilePage() {
         setEmail(payload.data?.email || '');
         setRole(payload.data?.role || '');
         setPhotoUrl(payload.data?.profile_photo || null);
+        setProfileData(payload.data || {});
       } catch {
         router.push('/login');
       } finally {
@@ -69,6 +86,38 @@ export default function ProfilePage() {
   if (isLoading) {
     return <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center">Loading profile...</div>;
   }
+
+  const checklist = [
+    { label: 'Full name', done: Boolean(profileData.name?.trim()) },
+    { label: 'Email address', done: Boolean(profileData.email?.trim()) },
+    { label: 'Phone number', done: Boolean(profileData.phone?.trim()) },
+    { label: 'Country', done: Boolean(profileData.country?.trim()) },
+    { label: 'City', done: Boolean(profileData.city?.trim()) },
+    { label: 'Profile photo', done: Boolean(photoUrl) },
+    { label: 'Password set', done: Boolean(profileData.has_password) },
+    { label: 'Application submitted', done: Boolean(profileData.application_status) },
+    {
+      label: 'Expertise areas',
+      done: role !== 'artisan' || (Array.isArray(profileData.expertise_areas) && profileData.expertise_areas.length > 0),
+    },
+    {
+      label: 'Company base',
+      done: role !== 'team_leader' || Boolean(profileData.company_base?.trim()),
+    },
+    {
+      label: 'Company capabilities',
+      done: role !== 'team_leader' || (Array.isArray(profileData.company_capabilities) && profileData.company_capabilities.length > 0),
+    },
+  ];
+
+  const filteredChecklist = checklist.filter((item) => item.label !== 'Expertise areas' || role === 'artisan')
+    .filter((item) => item.label !== 'Company base' || role === 'team_leader')
+    .filter((item) => item.label !== 'Company capabilities' || role === 'team_leader');
+
+  const completedCount = filteredChecklist.filter((item) => item.done).length;
+  const completionScore = filteredChecklist.length > 0
+    ? Math.round((completedCount / filteredChecklist.length) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white p-6">
@@ -103,6 +152,24 @@ export default function ProfilePage() {
               <p className="text-[10px] uppercase tracking-widest text-slate-500 font-black">Role</p>
               <p className="font-medium text-slate-300 uppercase">{role}</p>
             </div>
+          </div>
+        </div>
+
+        <div className="mb-8 p-5 rounded-2xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-black">Profile Completion</p>
+            <p className="text-sm font-black text-primary">{completionScore}%</p>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-4">
+            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${completionScore}%` }} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {filteredChecklist.map((item) => (
+              <div key={item.label} className="text-xs flex items-center gap-2">
+                <span>{item.done ? '✅' : '⬜'}</span>
+                <span className={item.done ? 'text-green-400' : 'text-slate-400'}>{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import { Link } from '../../../../i18n/routing';
 import { useLanguage } from '../../../../context/LanguageContext';
 
 import { useState, useEffect } from 'react';
-import { apiService, Project } from '../../../../services/api';
+import { apiService, Project, ProjectMilestone } from '../../../../services/api';
 import VoiceUpdate from '@/components/VoiceUpdate';
 import QRCheckIn from '@/components/QRCheckIn';
 import ProjectInsurance from '@/components/ProjectInsurance';
@@ -15,15 +15,25 @@ export default function ProjectDetail() {
   const { t, language } = useLanguage();
   const id = params?.id as string;
   const [project, setProject] = useState<Project | null>(null);
+  const [milestones, setMilestones] = useState<ProjectMilestone[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [activeAction, setActiveAction] = useState<'voice' | 'qr' | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
       if (id) {
-        const response = await apiService.getProjectDetail(parseInt(id));
-        if (response.success && response.data) {
-          setProject(response.data);
+        const [projectResponse, milestoneResponse] = await Promise.all([
+          apiService.getProjectDetail(parseInt(id)),
+          apiService.getProjectMilestones(parseInt(id)),
+        ]);
+
+        if (projectResponse.success && projectResponse.data) {
+          setProject(projectResponse.data);
+        }
+
+        if (milestoneResponse.success && milestoneResponse.data) {
+          setMilestones(milestoneResponse.data);
         }
       }
       setIsLoading(false);
@@ -39,19 +49,58 @@ export default function ProjectDetail() {
 
   const handleReleaseEscrow = async () => {
     if (!project) return;
-    setIsLoading(true);
+    setIsActionLoading(true);
     const response = await apiService.releaseEscrow(project.id);
     if (response.success) {
        setProject({ ...project, status: 'completed' });
        alert(t.ProjectDetail?.releaseSuccess || 'Escrow released successfully');
+       const milestoneRefresh = await apiService.getProjectMilestones(project.id);
+       if (milestoneRefresh.success && milestoneRefresh.data) {
+         setMilestones(milestoneRefresh.data);
+       }
     } else {
        alert(t.ProjectDetail?.releaseFail || 'Failed to release escrow');
     }
-    setIsLoading(false);
+    setIsActionLoading(false);
+  };
+
+  const handleMilestoneStatus = async (milestoneId: number, status: ProjectMilestone['status']) => {
+    if (!project) return;
+
+    setIsActionLoading(true);
+    const response = await apiService.updateProjectMilestone(project.id, milestoneId, status);
+    if (response.success) {
+      setMilestones((prev) => prev.map((item) => (item.id === milestoneId ? { ...item, status } : item)));
+    } else {
+      alert(response.message || 'Milestone update failed');
+    }
+    setIsActionLoading(false);
+  };
+
+  const handleReleaseMilestone = async (milestoneId: number) => {
+    if (!project) return;
+
+    setIsActionLoading(true);
+    const response = await apiService.releaseEscrow(project.id, milestoneId);
+    if (response.success) {
+      const refreshed = await apiService.getProjectMilestones(project.id);
+      if (refreshed.success && refreshed.data) {
+        setMilestones(refreshed.data);
+      }
+
+      const detailRefresh = await apiService.getProjectDetail(project.id);
+      if (detailRefresh.success && detailRefresh.data) {
+        setProject(detailRefresh.data);
+      }
+    } else {
+      alert(response.message || 'Escrow release failed');
+    }
+    setIsActionLoading(false);
   };
 
   const currentUser = apiService.getCurrentUser();
   const isClient = currentUser?.role === 'client';
+  const isProfessional = currentUser?.role === 'professional';
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white">
@@ -113,6 +162,72 @@ export default function ProjectDetail() {
                    </div>
                 </div>
              </div>
+
+             <div className="space-y-6">
+               <div className="flex items-center justify-between">
+                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Milestone Contract</h3>
+                 <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{milestones.length} items</span>
+               </div>
+
+               <div className="space-y-4">
+                 {milestones.length === 0 ? (
+                   <div className="p-6 glass rounded-2xl border-white/5 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                     No milestones added yet.
+                   </div>
+                 ) : (
+                   milestones.map((milestone) => (
+                     <div key={milestone.id} className="p-6 glass rounded-2xl border-white/5 space-y-4">
+                       <div className="flex items-start justify-between gap-4">
+                         <div>
+                           <p className="font-black uppercase tracking-tight text-sm">{milestone.title}</p>
+                           <p className="text-xs text-slate-400 mt-1">{milestone.description}</p>
+                         </div>
+                         <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-secondary/10 text-secondary">
+                           {milestone.status}
+                         </span>
+                       </div>
+
+                       <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold">
+                         <span className="text-slate-400">Amount: ${Number(milestone.amount).toLocaleString()}</span>
+                         <span className="text-slate-500">Due: {new Date(milestone.due_date).toLocaleDateString()}</span>
+                       </div>
+
+                       <div className="flex flex-wrap gap-3">
+                         {isProfessional && ['pending', 'in_progress'].includes(milestone.status) && (
+                           <button
+                             disabled={isActionLoading}
+                             onClick={() => handleMilestoneStatus(milestone.id, 'completed')}
+                             className="px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                           >
+                             Mark Complete
+                           </button>
+                         )}
+
+                         {isClient && milestone.status === 'completed' && (
+                           <button
+                             disabled={isActionLoading}
+                             onClick={() => handleMilestoneStatus(milestone.id, 'approved')}
+                             className="px-4 py-2 rounded-xl border border-secondary/30 text-secondary text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                           >
+                             Approve
+                           </button>
+                         )}
+
+                         {isClient && ['approved', 'completed'].includes(milestone.status) && milestone.status !== 'released' && (
+                           <button
+                             disabled={isActionLoading}
+                             onClick={() => handleReleaseMilestone(milestone.id)}
+                             className="px-4 py-2 rounded-xl border border-green-400/30 text-green-400 text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                           >
+                             Release Escrow
+                           </button>
+                         )}
+                       </div>
+                     </div>
+                   ))
+                 )}
+               </div>
+             </div>
           </div>
 
           {/* Sidebar Actions */}
@@ -153,12 +268,13 @@ export default function ProjectDetail() {
                     <button className="w-full py-4 glass hover:bg-white/5 text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all">
                        {t.ProjectDetail?.secureMessaging}
                     </button>
-                    {isClient && project.status !== 'completed' && (
+                      {isClient && project.status !== 'completed' && (
                       <button 
                          onClick={handleReleaseEscrow}
+                         disabled={isActionLoading}
                          className="w-full py-4 border border-secondary/30 text-secondary hover:bg-secondary/5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
                       >
-                         {t.ProjectDetail?.releaseEscrow}
+                         {isActionLoading ? 'Processing...' : t.ProjectDetail?.releaseEscrow}
                       </button>
                     )}
                  </div>

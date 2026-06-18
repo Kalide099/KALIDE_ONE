@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { apiService } from '@/services/api';
+import { apiService, PerformanceDashboard } from '@/services/api';
+import {
+  DEFAULT_TREND_THRESHOLDS,
+  getPresenceTrend,
+  getRatioPercent,
+  getTrendByThreshold,
+  getTrendThresholds,
+  setTrendThresholds,
+  TREND_BADGE_CLASSES,
+  TrendThresholdConfig,
+} from '@/lib/performance-trends';
 
 export interface AdminUser {
   id: number;
@@ -13,6 +23,19 @@ export interface AdminUser {
   is_active: boolean;
   application_status?: string;
   profile_photo?: string | null;
+  expertise_areas?: string[];
+  company_base?: string;
+  company_capabilities?: string[];
+  verification_tier?: {
+    tier: number;
+    label: string;
+  };
+  badges?: string[];
+  badge_level?: string;
+  fraud_risk_score?: number;
+  fraud_risk_level?: 'low' | 'medium' | 'high' | string;
+  active_alerts?: number;
+  high_severity_alerts?: number;
   phone?: string;
   city?: string;
   country?: string;
@@ -25,7 +48,9 @@ export default function SupremeAdminDashboard() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [performance, setPerformance] = useState<PerformanceDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [trendThresholds, setTrendThresholdsState] = useState<TrendThresholdConfig>(DEFAULT_TREND_THRESHOLDS);
 
   // Stats Counters
   const [stats, setStats] = useState({
@@ -38,11 +63,47 @@ export default function SupremeAdminDashboard() {
   const [activeTab, setActiveTab] = useState('Users');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const formatCurrency = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const formatPercent = (value: number) =>
+    value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const trendLabels = t.Admin?.performance?.trend || {
+    up: 'Up',
+    down: 'Down',
+    steady: 'Steady',
+  };
+
+  const adminMetrics = performance?.admin;
+  const activeUsersTrend = getTrendByThreshold(
+    getRatioPercent(adminMetrics?.active_users ?? 0, adminMetrics?.total_users ?? 0),
+    trendThresholds.admin.activeUsers.up,
+    trendThresholds.admin.activeUsers.down
+  );
+  const activeProjectsTrend = getTrendByThreshold(
+    getRatioPercent(adminMetrics?.completed_projects ?? 0, adminMetrics?.total_projects ?? 0),
+    trendThresholds.admin.activeProjects.up,
+    trendThresholds.admin.activeProjects.down
+  );
+  const platformVolumeTrend = getPresenceTrend(adminMetrics?.total_platform_volume ?? 0);
+  const escrowVolumeTrend = getPresenceTrend(adminMetrics?.total_escrow_volume ?? 0);
+  const marketplaceRatingTrend = getTrendByThreshold(
+    adminMetrics?.average_marketplace_rating ?? 0,
+    trendThresholds.admin.marketplaceRating.up,
+    trendThresholds.admin.marketplaceRating.down
+  );
+
   const features = ['Users', 'Projects', 'Services', 'Academy', 'Justice', 'Workers', 'Quotes', 'Supply', 'Verification'];
 
   const fetchData = async (tab: string) => {
     setIsLoading(true);
     try {
+      const performanceRes = await apiService.getPerformanceDashboard();
+      if (performanceRes.success && performanceRes.data) {
+        setPerformance(performanceRes.data);
+      }
+
       if (tab === 'Users') {
         const res = await apiService.getAdminUsers();
         if (res.success && res.data) {
@@ -83,6 +144,45 @@ export default function SupremeAdminDashboard() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [activeTab]);
+
+  useEffect(() => {
+    const syncThresholds = () => setTrendThresholdsState(getTrendThresholds());
+    syncThresholds();
+
+    window.addEventListener('storage', syncThresholds);
+    return () => {
+      window.removeEventListener('storage', syncThresholds);
+    };
+  }, []);
+
+  const updateRange = (
+    section: keyof TrendThresholdConfig,
+    metric: string,
+    field: 'up' | 'down',
+    value: number
+  ) => {
+    setTrendThresholdsState((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [metric]: {
+          ...(prev[section] as Record<string, { up: number; down: number }>)[metric],
+          [field]: value,
+        },
+      },
+    }));
+  };
+
+  const handleSaveThresholds = () => {
+    setTrendThresholds(trendThresholds);
+    alert('Trend thresholds saved. Client and worker dashboards will use these values on refresh.');
+  };
+
+  const handleResetThresholds = () => {
+    setTrendThresholdsState(DEFAULT_TREND_THRESHOLDS);
+    setTrendThresholds(DEFAULT_TREND_THRESHOLDS);
+    alert('Trend thresholds reset to defaults.');
+  };
 
   const handleLogout = () => {
     apiService.logout();
@@ -277,6 +377,105 @@ export default function SupremeAdminDashboard() {
           ))}
         </div>
 
+        {adminMetrics && (
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-16">
+            <div className="glass p-4 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.performance?.activeUsers || 'Active Users'}</p>
+                <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[activeUsersTrend]}`}>
+                  {trendLabels[activeUsersTrend]}
+                </span>
+              </div>
+              <p className="text-xl font-black mt-2">{adminMetrics.active_users}</p>
+              <p className="text-xs text-slate-400">of {adminMetrics.total_users} {t.Admin?.performance?.activeUsersSub || 'active'}</p>
+            </div>
+            <div className="glass p-4 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.performance?.activeProjects || 'Active Projects'}</p>
+                <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[activeProjectsTrend]}`}>
+                  {trendLabels[activeProjectsTrend]}
+                </span>
+              </div>
+              <p className="text-xl font-black mt-2">{adminMetrics.active_projects}</p>
+              <p className="text-xs text-slate-400">{adminMetrics.completed_projects} {t.Admin?.performance?.completedSub || 'completed'}</p>
+            </div>
+            <div className="glass p-4 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.performance?.platformVolume || 'Platform Volume'}</p>
+                <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[platformVolumeTrend]}`}>
+                  {trendLabels[platformVolumeTrend]}
+                </span>
+              </div>
+              <p className="text-xl font-black mt-2">${formatCurrency(adminMetrics.total_platform_volume)}</p>
+              <p className="text-xs text-slate-400">{t.Admin?.performance?.invoiceTotal || 'invoice total'}</p>
+            </div>
+            <div className="glass p-4 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.performance?.escrowVolume || 'Escrow Volume'}</p>
+                <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[escrowVolumeTrend]}`}>
+                  {trendLabels[escrowVolumeTrend]}
+                </span>
+              </div>
+              <p className="text-xl font-black mt-2">${formatCurrency(adminMetrics.total_escrow_volume)}</p>
+              <p className="text-xs text-slate-400">{t.Admin?.performance?.remainingEscrow || 'remaining in escrow'}</p>
+            </div>
+            <div className="glass p-4 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.performance?.marketplaceRating || 'Marketplace Rating'}</p>
+                <span className={`px-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${TREND_BADGE_CLASSES[marketplaceRatingTrend]}`}>
+                  {trendLabels[marketplaceRatingTrend]}
+                </span>
+              </div>
+              <p className="text-xl font-black mt-2">{adminMetrics.average_marketplace_rating.toFixed(2)} / 5</p>
+              <p className="text-xs text-slate-400">{t.Admin?.performance?.winRate || 'Win rate'} {formatPercent(adminMetrics.global_win_rate)}%</p>
+            </div>
+          </div>
+        )}
+
+        <div className="glass p-6 rounded-2xl border border-white/10 mb-12">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-sm font-black uppercase tracking-widest text-slate-300">Trend Controls</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleResetThresholds}
+                className="px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg border border-slate-400/30 text-slate-300 hover:bg-white/5"
+              >
+                Reset Defaults
+              </button>
+              <button
+                onClick={handleSaveThresholds}
+                className="px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg border border-red-400/40 text-red-300 hover:bg-red-500/10"
+              >
+                Save Thresholds
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-slate-400 mb-4">Set up/down values used to show trend badges across client, worker, and admin KPI cards.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label className="glass rounded-xl p-3 border border-white/10">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Client Completion</p>
+              <div className="grid grid-cols-2 gap-2">
+                <input type="number" value={trendThresholds.client.completion.up} onChange={(e) => updateRange('client', 'completion', 'up', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+                <input type="number" value={trendThresholds.client.completion.down} onChange={(e) => updateRange('client', 'completion', 'down', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+              </div>
+            </label>
+            <label className="glass rounded-xl p-3 border border-white/10">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Worker Win Rate</p>
+              <div className="grid grid-cols-2 gap-2">
+                <input type="number" value={trendThresholds.worker.winRate.up} onChange={(e) => updateRange('worker', 'winRate', 'up', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+                <input type="number" value={trendThresholds.worker.winRate.down} onChange={(e) => updateRange('worker', 'winRate', 'down', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+              </div>
+            </label>
+            <label className="glass rounded-xl p-3 border border-white/10">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Admin Active Users</p>
+              <div className="grid grid-cols-2 gap-2">
+                <input type="number" value={trendThresholds.admin.activeUsers.up} onChange={(e) => updateRange('admin', 'activeUsers', 'up', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+                <input type="number" value={trendThresholds.admin.activeUsers.down} onChange={(e) => updateRange('admin', 'activeUsers', 'down', Number(e.target.value))} className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs" />
+              </div>
+            </label>
+          </div>
+        </div>
+
         {/* Tab Content */}
         {activeTab === 'Users' && (
           <div className="glass rounded-[3rem] p-8 md:p-12 border-red-500/20 shadow-[0_0_30px_rgba(220,38,38,0.05)] animate-in fade-in zoom-in duration-500">
@@ -308,6 +507,23 @@ export default function SupremeAdminDashboard() {
                   <div className="space-y-2 mb-4">
                     <p className="text-sm max-[360px]:text-xs font-bold text-white break-words">{user.name}</p>
                     <p className="text-xs text-slate-400 break-all">{user.email}</p>
+                    {Array.isArray(user.expertise_areas) && user.expertise_areas.length > 0 && (
+                      <p className="text-[10px] text-slate-400 break-words">Expertise: {user.expertise_areas.join(', ')}</p>
+                    )}
+                    {user.company_base && (
+                      <p className="text-[10px] text-slate-400 break-words">Company Base: {user.company_base}</p>
+                    )}
+                    {user.verification_tier && (
+                      <p className="text-[10px] text-cyan-300 break-words">Verification: {user.verification_tier.label}</p>
+                    )}
+                    <p className="text-[10px] text-amber-300 break-words">Badge Level: {user.badge_level || 'None'}</p>
+                    <p className={`text-[10px] break-words ${
+                      user.fraud_risk_level === 'high' ? 'text-red-400' :
+                      user.fraud_risk_level === 'medium' ? 'text-orange-400' :
+                      'text-green-400'
+                    }`}>
+                      Fraud Risk: {user.fraud_risk_score ?? 0}% ({user.fraud_risk_level || 'low'})
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
                         user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
@@ -371,6 +587,7 @@ export default function SupremeAdminDashboard() {
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.email}</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">{t.Admin?.table?.status}</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Application</th>
+                    <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Trust Layer</th>
                     <th className="pb-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">{t.Admin?.table?.actions}</th>
                   </tr>
                 </thead>
@@ -404,6 +621,23 @@ export default function SupremeAdminDashboard() {
                         }`}>
                           {user.application_status || 'pending'}
                         </span>
+                      </td>
+                      <td className="py-6">
+                        <div className="space-y-2">
+                          <p className="text-[9px] uppercase tracking-widest font-black text-cyan-300">
+                            {user.verification_tier?.label || 'Tier 0 - Unverified'}
+                          </p>
+                          <p className="text-[9px] uppercase tracking-widest font-black text-amber-300">
+                            {user.badge_level || 'None'} Badge
+                          </p>
+                          <p className={`text-[9px] uppercase tracking-widest font-black ${
+                            user.fraud_risk_level === 'high' ? 'text-red-400' :
+                            user.fraud_risk_level === 'medium' ? 'text-orange-400' :
+                            'text-green-400'
+                          }`}>
+                            Risk {user.fraud_risk_score ?? 0}%
+                          </p>
+                        </div>
                       </td>
                       <td className="py-6 flex justify-end space-x-2">
                          <button 
@@ -611,6 +845,49 @@ export default function SupremeAdminDashboard() {
                 <div className="bg-black/40 p-4 rounded-xl border border-white/5">
                   <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{t.Admin?.table?.date}</p>
                   <p className="font-bold">{new Date(selectedDossier.created_at).toLocaleDateString()}</p>
+                </div>
+                <div className="bg-black/40 p-4 rounded-xl border border-white/5 col-span-2">
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Role-specific Details</p>
+                  <p className="font-bold break-words">
+                    {Array.isArray(selectedDossier.expertise_areas) && selectedDossier.expertise_areas.length > 0
+                      ? `Expertise: ${selectedDossier.expertise_areas.join(', ')}`
+                      : 'Expertise: Not provided'}
+                  </p>
+                  <p className="font-bold break-words mt-2">
+                    {selectedDossier.company_base
+                      ? `Company Base: ${selectedDossier.company_base}`
+                      : 'Company Base: Not provided'}
+                  </p>
+                  <p className="font-bold break-words mt-2">
+                    {Array.isArray(selectedDossier.company_capabilities) && selectedDossier.company_capabilities.length > 0
+                      ? `Company Capabilities: ${selectedDossier.company_capabilities.join(', ')}`
+                      : 'Company Capabilities: Not provided'}
+                  </p>
+                </div>
+
+                <div className="bg-black/40 p-4 rounded-xl border border-white/5 col-span-2">
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Trust Layer</p>
+                  <p className="font-bold break-words">
+                    Verification Tier: {selectedDossier.verification_tier?.label || 'Tier 0 - Unverified'}
+                  </p>
+                  <p className="font-bold break-words mt-2">
+                    Badge Level: {selectedDossier.badge_level || 'None'}
+                  </p>
+                  <p className="font-bold break-words mt-2">
+                    Badges: {Array.isArray(selectedDossier.badges) && selectedDossier.badges.length > 0
+                      ? selectedDossier.badges.join(', ')
+                      : 'No badges yet'}
+                  </p>
+                  <p className={`font-bold break-words mt-2 ${
+                    selectedDossier.fraud_risk_level === 'high' ? 'text-red-400' :
+                    selectedDossier.fraud_risk_level === 'medium' ? 'text-orange-400' :
+                    'text-green-400'
+                  }`}>
+                    Fraud Risk: {selectedDossier.fraud_risk_score ?? 0}% ({selectedDossier.fraud_risk_level || 'low'})
+                  </p>
+                  <p className="font-bold break-words mt-2">
+                    Active Alerts: {selectedDossier.active_alerts ?? 0} | High Severity: {selectedDossier.high_severity_alerts ?? 0}
+                  </p>
                 </div>
               </div>
 

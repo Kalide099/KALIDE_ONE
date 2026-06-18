@@ -2,9 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { apiService, Professional } from '@/services/api';
+import { apiService, AvailabilitySlot, Professional } from '@/services/api';
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
+
+function toLocalDateInputValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toTimeLabel(value: string) {
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return value;
+  const hh = `${dt.getHours()}`.padStart(2, '0');
+  const mm = `${dt.getMinutes()}`.padStart(2, '0');
+  return `${hh}:${mm}`;
+}
 
 export default function WorkerDetail() {
   const params = useParams();
@@ -12,6 +27,11 @@ export default function WorkerDetail() {
   const id = params?.id as string;
   const [worker, setWorker] = useState<Professional | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(toLocalDateInputValue());
+  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState('');
 
   useEffect(() => {
     const fetchWorker = async () => {
@@ -25,6 +45,56 @@ export default function WorkerDetail() {
     };
     fetchWorker();
   }, [id]);
+
+  useEffect(() => {
+    const fetchSlots = async () => {
+      if (!worker) return;
+      setIsLoadingSlots(true);
+      setBookingMessage('');
+
+      const professionalUserId = Number((worker as any)?.users_user?.id || worker.id);
+      const res = await apiService.getAvailability(professionalUserId, selectedDate, true);
+
+      if (res.success && Array.isArray(res.data)) {
+        setSlots(res.data);
+      } else {
+        setSlots([]);
+      }
+      setIsLoadingSlots(false);
+    };
+
+    fetchSlots();
+  }, [worker, selectedDate]);
+
+  const handleBookSlot = async (slot: AvailabilitySlot) => {
+    if (!worker) return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setBookingMessage('Please login first to book a slot.');
+      return;
+    }
+
+    setIsBooking(true);
+    setBookingMessage('');
+
+    const professionalUserId = Number((worker as any)?.users_user?.id || worker.id);
+    const response = await apiService.createBooking({
+      professional_id: professionalUserId,
+      scheduled_date: selectedDate,
+      start_time: toTimeLabel(slot.start_time),
+      end_time: toTimeLabel(slot.end_time),
+    });
+
+    if (response.success) {
+      setBookingMessage('Slot booked successfully. Your booking request is now pending confirmation.');
+      setSlots((prev) => prev.filter((s) => s.id !== slot.id));
+    } else {
+      setBookingMessage(response.message || 'Could not complete booking for this slot.');
+    }
+
+    setIsBooking(false);
+  };
 
   if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-primary animate-pulse italic">{t.WorkerProfile?.synchronizing || 'Synchronizing Node Data...'}</div>;
   if (!worker) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-red-500">{t.WorkerProfile?.notIdentified || 'Node Not Identified'}</div>;
@@ -106,6 +176,43 @@ export default function WorkerDetail() {
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t.WorkerProfile?.escrowProtected || 'Escrow Protected'}</span>
                       <span className="font-bold text-green-400">{t.WorkerProfile?.locked || 'Locked'}</span>
                    </div>
+                </div>
+
+                <div className="mb-8 p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Availability Calendar</p>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-sm text-white outline-none focus:border-primary"
+                  />
+
+                  <div className="mt-4 space-y-2 max-h-44 overflow-auto">
+                    {isLoadingSlots ? (
+                      <p className="text-xs text-slate-400 uppercase tracking-widest font-black">Loading slots...</p>
+                    ) : slots.length === 0 ? (
+                      <p className="text-xs text-slate-400 uppercase tracking-widest font-black">No open slots for this date</p>
+                    ) : (
+                      slots.map((slot) => (
+                        <button
+                          key={slot.id}
+                          type="button"
+                          onClick={() => handleBookSlot(slot)}
+                          disabled={isBooking}
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-white/10 bg-black/30 hover:border-primary/50 hover:bg-primary/10 transition-all disabled:opacity-60"
+                        >
+                          <span className="text-xs font-black uppercase tracking-widest text-slate-300">
+                            {toTimeLabel(slot.start_time)} - {toTimeLabel(slot.end_time)}
+                          </span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-primary">Book</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+
+                  {bookingMessage && (
+                    <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-secondary break-words">{bookingMessage}</p>
+                  )}
                 </div>
 
                 <div className="space-y-4">
