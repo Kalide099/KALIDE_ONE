@@ -179,6 +179,7 @@
     "rating": "Votre évaluation",
     "comment": "Votre expérience",
     "placeholder": "Parlez-nous de la qualité du travail, du professionnalisme et de l'expérience globale...",
+    "cancel": "Annuler",
     "submit": "Publier l'avis"
   },
   "Admin": {

@@ -181,6 +181,7 @@
     "rating": "Your Rating",
     "comment": "Your Experience",
     "placeholder": "Tell us about the quality of work, professionalism, and overall experience...",
+    "cancel": "Cancel",
     "submit": "Publish Review"
   },
   "Admin": {

@@ -82,7 +82,7 @@ export default function ReviewFormModal({ isOpen, onClose, workerId, workerName 
               onClick={onClose}
               className="px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors"
             >
-              {t.Common?.cancel || 'Cancel'}
+              {t.ReviewModal?.cancel || 'Cancel'}
             </button>
             <button
               type="submit"
