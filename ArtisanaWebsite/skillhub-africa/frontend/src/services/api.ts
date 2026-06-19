@@ -1,4 +1,26 @@
-const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api/v1/kalide-one' : (process.env.NEXT_PUBLIC_API_URL || '/api/v1/kalide-one');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  || (process.env.NODE_ENV === 'production'
+    ? 'https://api.kalideone.com/api/v1/kalide-one'
+    : 'http://127.0.0.1:8000/api/v1/kalide-one');
+
+function normalizeEndpoint(endpoint: string): string {
+  if (!endpoint) return '/';
+  const [path, query] = endpoint.split('?');
+  const normalizedPath = path.endsWith('/') ? path : `${path}/`;
+  return query ? `${normalizedPath}?${query}` : normalizedPath;
+}
+
+async function parseJsonSafe(response: Response): Promise<any> {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return null;
+  }
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
 
 export interface RegisterData {
   name: string;
@@ -141,7 +163,7 @@ class ApiService {
       const refresh = localStorage.getItem('refresh_token');
       if (!refresh) return false;
 
-      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,6 +188,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
+      const normalizedEndpoint = normalizeEndpoint(endpoint);
       const token = localStorage.getItem('access_token');
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -176,7 +199,7 @@ class ApiService {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const url = `${API_BASE_URL}${endpoint}`;
+      const url = `${API_BASE_URL}${normalizedEndpoint}`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -189,9 +212,9 @@ class ApiService {
 
       if (
         response.status === 401 &&
-        endpoint !== '/auth/login' &&
-        endpoint !== '/auth/register' &&
-        endpoint !== '/auth/refresh'
+        normalizedEndpoint !== '/auth/login/' &&
+        normalizedEndpoint !== '/auth/register/' &&
+        normalizedEndpoint !== '/auth/refresh/'
       ) {
         const refreshed = await this.refreshAccessToken();
         if (refreshed) {
@@ -209,35 +232,35 @@ class ApiService {
             headers: retryHeaders,
           });
 
-          const retryData = await retryResponse.json();
+          const retryData = await parseJsonSafe(retryResponse);
           if (!retryResponse.ok) {
             return {
               success: false,
-              message: retryData.message || 'An error occurred',
-              errors: retryData.errors,
+              message: retryData?.message || 'An error occurred',
+              errors: retryData?.errors,
             };
           }
 
           return {
             success: true,
-            data: retryData,
+            data: (retryData || ({} as T)),
           };
         }
       }
 
-      const data = await response.json();
+      const data = await parseJsonSafe(response);
 
       if (!response.ok) {
         return {
           success: false,
-          message: data.message || 'An error occurred',
-          errors: data.errors,
+          message: data?.message || 'An error occurred',
+          errors: data?.errors,
         };
       }
 
       return {
         success: true,
-        data,
+        data: (data || ({} as T)),
       };
     } catch (error) {
       return {

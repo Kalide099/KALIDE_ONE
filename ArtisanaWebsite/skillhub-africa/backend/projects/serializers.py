@@ -31,6 +31,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     client = serializers.StringRelatedField()
     team = serializers.StringRelatedField()
     professional = serializers.StringRelatedField()
+    client_id = serializers.IntegerField(source='client.id', read_only=True)
+    team_id = serializers.IntegerField(source='team.id', read_only=True)
+    professional_id = serializers.IntegerField(source='professional.id', read_only=True)
 
     class Meta:
         model = Project
