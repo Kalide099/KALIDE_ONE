@@ -71,4 +71,4 @@ class ProjectUpdateListCreateView(generics.ListCreateAPIView):
         return ProjectUpdate.objects.filter(project_id=project_id)
 
     def perform_create(self, serializer):
-        serializer.save(project_id=self.kwargs['project_id'])
+        serializer.save(project_id=self.kwargs['project_id'], professional=self.request.user)
