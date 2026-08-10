@@ -157,7 +157,7 @@ export default function Landing() {
                 <p className="font-bold uppercase tracking-widest text-gray-400 text-xs mb-3">{t.Footer?.contact?.title || 'Headquarters Address'}</p>
                 <p>{t.Footer?.contact?.address || '1674, Benin'}</p>
                 <p>Tel: {t.Footer?.contact?.phone || '+229 01 66 98 33 83'}</p>
-                <p>Email: {t.Footer?.contact?.email || 'kalideglobal@gmail.com'}</p>
+                <p>Email: {t.Footer?.contact?.email || 'info@kalidesarl.com'}</p>
               </div>
             </div>
             <div>
