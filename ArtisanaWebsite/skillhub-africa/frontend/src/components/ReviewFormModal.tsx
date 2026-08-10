@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { apiService } from '@/services/api';
 
 interface ReviewFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   workerId: string;
   workerName: string;
+  onSuccess?: () => void;
 }
 
-export default function ReviewFormModal({ isOpen, onClose, workerId, workerName }: ReviewFormModalProps) {
+export default function ReviewFormModal({ isOpen, onClose, workerId, workerName, onSuccess }: ReviewFormModalProps) {
   const { t } = useLanguage();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -22,12 +24,26 @@ export default function ReviewFormModal({ isOpen, onClose, workerId, workerName 
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call to POST /api/reviews/
-    setTimeout(() => {
+    try {
+      const res = await apiService.submitReview({
+        reviewee: workerId,
+        rating,
+        comment,
+      });
+
+      if (res.success) {
+        setComment('');
+        setRating(5);
+        if (onSuccess) onSuccess();
+        onClose();
+      } else {
+        alert(res.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      alert('An error occurred');
+    } finally {
       setIsSubmitting(false);
-      onClose();
-      // In a real app, we would refresh the reviews list here
-    }, 1000);
+    }
   };
 
   return (

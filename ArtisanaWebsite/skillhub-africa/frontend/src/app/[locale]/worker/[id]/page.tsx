@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { apiService, Professional } from '@/services/api';
+import { apiService, Professional, Review } from '@/services/api';
 import { Link } from '@/i18n/routing';
 import { useLanguage } from '@/context/LanguageContext';
 import ReviewFormModal from '@/components/ReviewFormModal';
@@ -12,20 +12,26 @@ export default function WorkerDetail() {
   const { t } = useLanguage();
   const id = params?.id as string;
   const [worker, setWorker] = useState<Professional | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchWorker = async () => {
-      if (id) {
-        const res = await apiService.getProfessionalDetail(parseInt(id));
-        if (res.success && res.data) {
-          setWorker(res.data);
-        }
+  const fetchWorkerAndReviews = async () => {
+    if (id) {
+      const res = await apiService.getProfessionalDetail(parseInt(id));
+      if (res.success && res.data) {
+        setWorker(res.data);
       }
-      setIsLoading(false);
-    };
-    fetchWorker();
+      const revRes = await apiService.getReviews(id);
+      if (revRes.success && revRes.data) {
+        setReviews(revRes.data);
+      }
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchWorkerAndReviews();
   }, [id]);
 
   if (isLoading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center font-black uppercase tracking-widest text-primary animate-pulse italic">{t.WorkerProfile?.synchronizing || 'Loading profile data...'}</div>;
@@ -124,23 +130,26 @@ export default function WorkerDetail() {
                </div>
                
                <div className="space-y-4">
-                  {[
-                    { name: 'Sarah M.', date: 'Oct 2026', rating: 5, text: 'Absolutely phenomenal work. Arrived on time, was extremely professional, and the quality of the finish exceeded my expectations.' },
-                    { name: 'David K.', date: 'Sep 2026', rating: 5, text: 'Very fast and efficient. Escrow payment made the whole process stress-free. Highly recommended for any complex projects.' }
-                  ].map((review, idx) => (
-                    <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <p className="font-bold text-gray-900">{review.name}</p>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{review.date}</p>
+                  {reviews.length === 0 ? (
+                    <p className="text-gray-500 text-sm font-medium">{t.WorkerProfile?.noReviews || 'No reviews yet.'}</p>
+                  ) : (
+                    reviews.map((review, idx) => (
+                      <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <p className="font-bold text-gray-900">{review.reviewer?.name || 'Anonymous Client'}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                              {review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Recent'}
+                            </p>
+                          </div>
+                          <div className="flex text-orange-400 text-sm">
+                            {'★'.repeat(review.rating)}
+                          </div>
                         </div>
-                        <div className="flex text-orange-400 text-sm">
-                          {'★'.repeat(review.rating)}
-                        </div>
+                        <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
                       </div>
-                      <p className="text-gray-600 text-sm leading-relaxed">{review.text}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
                </div>
             </div>
           </div>
@@ -196,6 +205,7 @@ export default function WorkerDetail() {
         onClose={() => setIsReviewModalOpen(false)} 
         workerId={id} 
         workerName={worker.user_name} 
+        onSuccess={fetchWorkerAndReviews}
       />
     </div>
   );

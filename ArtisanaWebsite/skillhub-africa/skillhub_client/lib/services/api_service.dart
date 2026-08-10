@@ -5,7 +5,10 @@ import '../models/user.dart';
 import '../models/project.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://api.skillhub-africa.com/api';
+  static const String baseUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: 'https://api.kalideone.com/api/v1/kalide-one',
+  );
   static const String authTokenKey = 'auth_token';
 
   final http.Client _client;

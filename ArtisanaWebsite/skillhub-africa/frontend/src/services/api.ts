@@ -157,6 +157,16 @@ export interface Professional {
   bio: unknown;
 }
 
+export interface Review {
+  id?: number;
+  rating: number;
+  comment: string;
+  reviewer?: { name?: string };
+  reviewee?: number;
+  created_at?: string;
+  [key: string]: any;
+}
+
 class ApiService {
   private async refreshAccessToken(): Promise<boolean> {
     try {
@@ -430,6 +440,17 @@ class ApiService {
     });
   }
   // =========================
+
+  async getReviews(workerId: string): Promise<ApiResponse<Review[]>> {
+    return this.request(`/reviews/?worker_id=${workerId}`);
+  }
+
+  async submitReview(payload: { reviewee: string; rating: number; comment: string; project_id?: string }): Promise<ApiResponse<Review>> {
+    return this.request('/reviews/create/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
 
   logout() {
     localStorage.removeItem('access_token');
