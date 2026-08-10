@@ -55,7 +55,7 @@ export default function AvailabilityManager() {
   const weekdaysShort = t.Availability?.weekdaysShort || ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const renderCalendar = () => {
-    let days = [];
+    const days = [];
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="h-12 w-full"></div>);
     }

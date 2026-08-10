@@ -131,7 +131,7 @@ export default function WorkerDetail() {
                
                <div className="space-y-4">
                   {reviews.length === 0 ? (
-                    <p className="text-gray-500 text-sm font-medium">{t.WorkerProfile?.noReviews || 'No reviews yet.'}</p>
+                    <p className="text-gray-500 text-sm font-medium">{'No reviews yet.'}</p>
                   ) : (
                     reviews.map((review, idx) => (
                       <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
