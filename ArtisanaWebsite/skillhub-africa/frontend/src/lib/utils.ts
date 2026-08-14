@@ -1,7 +1,7 @@
 /**
  * Recursively converts BigInt values to Numbers or Strings to allow JSON serialization.
  */
-export function serialize(data: any): any {
+export function serialize(data: unknown): unknown {
   if (data === null || data === undefined) return data;
   
   if (typeof data === 'bigint') {
@@ -13,9 +13,9 @@ export function serialize(data: any): any {
   }
   
   if (typeof data === 'object') {
-    const serialized: any = {};
+    const serialized: Record<string, unknown> = {};
     for (const key in data) {
-      serialized[key] = serialize(data[key]);
+      serialized[key] = serialize((data as Record<string, unknown>)[key]);
     }
     return serialized;
   }

@@ -1,12 +1,24 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+
 import { Link } from '@/i18n/routing';
 
 export default function ProfessionalMatch() {
-  const { t, language } = useLanguage();
-  const [artisans, setArtisans] = useState<any[]>([]);
+interface ArtisanMatch {
+  id: number;
+  matchScore: number;
+  user_id: number;
+  rating: number;
+  bio: string;
+  users_user: {
+    name: string;
+    city: string;
+    country: string;
+  };
+}
+
+  const [artisans, setArtisans] = useState<ArtisanMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -33,6 +33,7 @@ export default function Workers() {
 
   useEffect(() => {
     if (isUserAuthenticated()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setJoinHref(getAuthenticatedRouteFallback());
     }
   }, []);

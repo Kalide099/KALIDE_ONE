@@ -17,14 +17,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     const savedLang = localStorage.getItem("app_language") as Language;
     if (savedLang && (savedLang === "en" || savedLang === "fr")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLanguage(savedLang);
     }
-    setMounted(true);
   }, []);
 
   const handleSetLanguage = (lang: Language) => {

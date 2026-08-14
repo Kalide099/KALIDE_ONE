@@ -10,7 +10,7 @@ function normalizeEndpoint(endpoint: string): string {
   return query ? `${normalizedPath}?${query}` : normalizedPath;
 }
 
-async function parseJsonSafe(response: Response): Promise<any> {
+async function parseJsonSafe(response: Response): Promise<unknown> {
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('application/json')) {
     return null;
@@ -164,7 +164,7 @@ export interface Review {
   reviewer?: { name?: string };
   reviewee?: number;
   created_at?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class ApiService {
@@ -307,7 +307,7 @@ class ApiService {
     return this.request('/professionals');
   }
 
-  async searchProfessionals(query: string, location: string, sortBy: string): Promise<ApiResponse<any>> {
+  async searchProfessionals(query: string, location: string, sortBy: string): Promise<ApiResponse<Professional[]>> {
     const params = new URLSearchParams();
     if (query) params.append('q', query);
     if (location) params.append('location', location);
@@ -334,7 +334,7 @@ class ApiService {
     });
   }
 
-  async getQuotes(): Promise<ApiResponse<any[]>> {
+  async getQuotes(): Promise<ApiResponse<unknown[]>> {
     return this.request('/payments/quotes');
   }
 
@@ -473,7 +473,7 @@ class ApiService {
     return !!this.getAccessToken();
   }
 
-  async getProjectUpdates(projectId: number): Promise<ApiResponse<any[]>> {
+  async getProjectUpdates(projectId: number): Promise<ApiResponse<unknown[]>> {
     return this.request(`/projects/${projectId}/updates/`);
   }
 
@@ -499,7 +499,7 @@ class ApiService {
       const data = await response.json();
       if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
       return { success: true, data };
-    } catch (e) {
+    } catch {
       return { success: false, message: 'Network error' };
     }
   }
@@ -524,7 +524,7 @@ class ApiService {
       const data = await response.json();
       if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
       return { success: true, data };
-    } catch (e) {
+    } catch {
       return { success: false, message: 'Network error' };
     }
   }
@@ -554,7 +554,7 @@ class ApiService {
       const data = await response.json();
       if (!response.ok) return { success: false, message: data.message || 'Upload failed' };
       return { success: true, data };
-    } catch (e) {
+    } catch {
       return { success: false, message: 'Network error' };
     }
   }

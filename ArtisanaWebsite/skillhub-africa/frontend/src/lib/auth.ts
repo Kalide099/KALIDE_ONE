@@ -27,7 +27,7 @@ export async function verifyDjangoPassword(password: string, encoded: string): P
     const derivedKeyBase64 = derivedKey.toString('base64');
 
     return derivedKeyBase64 === hash;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -64,7 +64,7 @@ export function generateAccessToken(payload: { user_id: number; email: string; r
 export function verifyToken(token: string) {
   try {
     return jwt.verify(token, JWT_SECRET) as { user_id: number; email: string; role: string };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

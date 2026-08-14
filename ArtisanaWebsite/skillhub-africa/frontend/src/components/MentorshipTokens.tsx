@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+
 
 export default function MentorshipTokens() {
-  const { t } = useLanguage();
   const [tokens, setTokens] = useState(0);
-  const [rewards, setRewards] = useState<any[]>([]);
+interface Reward {
+  id: number;
+  amount: number;
+  type: string;
+  reason: string;
+  created_at: string;
+}
+
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [exchangeStatus, setExchangeStatus] = useState('');
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+
 
 interface VoiceUpdateProps {
   projectId: number;
@@ -9,17 +9,19 @@ interface VoiceUpdateProps {
 }
 
 export default function VoiceUpdate({ projectId, onUpdateComplete }: VoiceUpdateProps) {
-  const { t } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     // Check for speech recognition support
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsSupported(false);
       return;
     }
@@ -29,6 +31,7 @@ export default function VoiceUpdate({ projectId, onUpdateComplete }: VoiceUpdate
     recognitionRef.current.interimResults = true;
     recognitionRef.current.lang = 'en-US'; // Default, can be dynamic based on language
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognitionRef.current.onresult = (event: any) => {
       let currentTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -37,6 +40,7 @@ export default function VoiceUpdate({ projectId, onUpdateComplete }: VoiceUpdate
       setTranscript(currentTranscript);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognitionRef.current.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsRecording(false);

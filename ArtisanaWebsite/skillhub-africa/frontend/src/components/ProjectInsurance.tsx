@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+
 
 interface ProjectInsuranceProps {
   projectId: number;
@@ -10,7 +10,6 @@ interface ProjectInsuranceProps {
 }
 
 export default function ProjectInsurance({ projectId, isInsuranceActive, insuranceFee }: ProjectInsuranceProps) {
-  const { t } = useLanguage();
   const [isActive, setIsActive] = useState(isInsuranceActive);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [claimForm, setClaimForm] = useState({

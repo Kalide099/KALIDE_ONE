@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import { useLanguage } from '@/context/LanguageContext';
+
 import { apiService } from '@/services/api';
 
 interface QRCheckInProps {
@@ -13,7 +13,6 @@ interface QRCheckInProps {
 }
 
 export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps) {
-  const { t } = useLanguage();
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const user = apiService.getCurrentUser();
@@ -43,7 +42,7 @@ export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps
         handleLogAttendance(decodedText);
       }
 
-      function onScanError(err: any) {
+      function onScanError() {
         // console.warn(err);
       }
 
@@ -51,6 +50,7 @@ export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps
         scanner.clear();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleLogAttendance = async (data: string) => {
@@ -79,7 +79,7 @@ export default function QRCheckIn({ projectId, mode, onSuccess }: QRCheckInProps
       } else {
         alert("Failed to log attendance.");
       }
-    } catch (e) {
+    } catch {
       alert("Error parsing QR data.");
     } finally {
       setIsLoading(false);

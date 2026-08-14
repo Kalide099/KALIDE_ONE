@@ -39,7 +39,7 @@ export default function ReviewFormModal({ isOpen, onClose, workerId, workerName,
       } else {
         alert(res.message || 'Failed to submit review');
       }
-    } catch (error) {
+    } catch {
       alert('An error occurred');
     } finally {
       setIsSubmitting(false);
